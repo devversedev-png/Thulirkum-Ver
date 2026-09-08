@@ -1,0 +1,21 @@
+import { Link } from 'react-router-dom'
+import { useStore } from '../context/StoreContext'
+import BookCard from '../components/BookCard'
+
+export default function WishlistPage() {
+  const { books, account } = useStore()
+  const list = books.filter(book => account?.wishlist?.includes(book.id))
+
+  return (
+    <section className="page-width section min-page">
+      <div className="page-title-row">
+        <div><span className="eyebrow">Saved for later</span><h1>My Wishlist</h1><p>{list.length} saved books</p></div>
+      </div>
+      {list.length ? (
+        <div className="book-grid">{list.map(book => <BookCard key={book.id} book={book} />)}</div>
+      ) : (
+        <div className="empty-state"><h3>Your wishlist is empty</h3><p>Save books you want to come back to.</p><Link className="primary-btn inline-btn" to="/shop">Browse Books</Link></div>
+      )}
+    </section>
+  )
+}
