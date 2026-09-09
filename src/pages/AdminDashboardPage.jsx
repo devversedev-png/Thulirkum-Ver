@@ -211,19 +211,48 @@ export default function AdminDashboardPage() {
 
   async function executeOrderAction(action) {
     if (!selectedOrder || orderActionBusy) return
+
+    const previousOrder = selectedOrder
+    const optimisticStatus = action.status || selectedOrder.status
+    const optimisticOrder = { ...selectedOrder, status: optimisticStatus }
+
+    // Update the UI immediately so status changes feel instant, even if the API is waking up.
+    setOrderActionBusy(true)
+    setSelectedOrder(optimisticOrder)
+    setOrders(current => current.map(item => item.id === optimisticOrder.id ? { ...item, status: optimisticStatus } : item))
+    setOrderActions([])
+
     try {
-      setOrderActionBusy(true)
       const updated = await api(`/admin/orders/${selectedOrder.id}/status`, {
         method: 'PUT', body: JSON.stringify({ status: action.status, note: '' })
       })
+
       setOrders(current => current.map(item => item.id === updated.id ? updated : item))
       setStatusOptions(current => current.includes(updated.status) ? current : [...current, updated.status])
       setSelectedOrder(updated)
-      setOrderActions(await api(`/admin/orders/${updated.id}/actions`))
-      setBooks(await api('/admin/books'))
-      setCustomers(await api('/admin/customers'))
       setMessage(`Order #${updated.orderNumber} updated to ${statusLabel(updated.status)}`)
+
+      // Only the next available workflow actions are needed before the modal is usable again.
+      try {
+        setOrderActions(await api(`/admin/orders/${updated.id}/actions`))
+      } catch {
+        setOrderActions([])
+      }
+
+      // Inventory/customer totals refresh in the background instead of blocking the status interaction.
+      Promise.allSettled([api('/admin/books'), api('/admin/customers')]).then(([bookResult, customerResult]) => {
+        if (bookResult.status === 'fulfilled') setBooks(bookResult.value)
+        if (customerResult.status === 'fulfilled') setCustomers(customerResult.value)
+      })
     } catch (err) {
+      // Roll back the optimistic UI if the backend rejects the transition.
+      setSelectedOrder(previousOrder)
+      setOrders(current => current.map(item => item.id === previousOrder.id ? previousOrder : item))
+      try {
+        setOrderActions(await api(`/admin/orders/${previousOrder.id}/actions`))
+      } catch {
+        setOrderActions([])
+      }
       setMessage(err.message)
     } finally {
       setOrderActionBusy(false)
@@ -345,7 +374,7 @@ export default function AdminDashboardPage() {
             <p>Live data from your catalogue, customers and orders.</p>
           </div>
           <div className="admin-top-actions-v6">
-            <a href="/home" target="_blank" rel="noreferrer" className="admin-view-store-btn">View website ↗</a>
+            <button type="button" className="admin-view-store-btn" onClick={() => window.open(`${window.location.origin}/home`, '_blank', 'noopener,noreferrer')}>View website</button>
             <button className={refreshing ? 'is-refreshing' : ''} onClick={refreshEverything} disabled={refreshing}>
               <span className="refresh-icon-v73">↻</span>{refreshing ? 'Refreshing...' : 'Refresh'}
             </button>
@@ -547,7 +576,7 @@ export default function AdminDashboardPage() {
               <h3>Available actions</h3>
               {orderActions.length ? orderActions.map(action => (
                 <button key={`${action.action}-${action.status}`} className={`order-action-v6 ${action.tone || ''}`} onClick={() => performOrderAction(action)} disabled={orderActionBusy}>
-                  <span><strong>{action.label}</strong><small>{action.description}</small></span><b>→</b>
+                  <span><strong>{action.label}</strong><small>{action.description}</small></span>
                 </button>
               )) : <div className="admin-empty-v6">No further workflow actions are available for this order.</div>}
             </div>
@@ -575,7 +604,7 @@ function KpiCard({ label, value, detail, icon }) {
 }
 
 function StatusCard({ label, value, onClick }) {
-  return <button className="admin-status-card-v6 glass-card" onClick={onClick}><span>{label}</span><strong>{value}</strong><b>→</b></button>
+  return <button className="admin-status-card-v6 glass-card" onClick={onClick}><span>{label}</span><strong>{value}</strong></button>
 }
 
 function PanelTitle({ eyebrow, title, copy, action }) {
