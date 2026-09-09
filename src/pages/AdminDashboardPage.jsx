@@ -62,10 +62,16 @@ export default function AdminDashboardPage() {
   const stats = useMemo(() => ({
     books: books.length,
     lowStock: books.filter(book => book.stock <= 5 || book.available === false).length,
+    outOfStock: books.filter(book => book.stock === 0 || book.available === false).length,
     orders: orders.length,
+    pending: orders.filter(order => ['BOOKING_CONFIRMED', 'CONFIRMED', 'PACKED'].includes(order.status)).length,
+    shipped: orders.filter(order => ['SHIPPED', 'OUT_FOR_DELIVERY'].includes(order.status)).length,
+    delivered: orders.filter(order => order.status === 'DELIVERED').length,
+    cancelled: orders.filter(order => order.status === 'CANCELLED').length,
     revenue: orders.filter(order => order.status !== 'CANCELLED').reduce((sum, order) => sum + Number(order.total || 0), 0),
-    customers: customers.length
-  }), [books, orders, customers])
+    customers: customers.length,
+    activeOffers: offers.filter(offer => offer.active).length
+  }), [books, orders, customers, offers])
 
   const filteredBooks = useMemo(() => {
     const q = inventorySearch.toLowerCase().trim()
@@ -183,7 +189,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="admin-shell-v4">
       <aside className="admin-sidebar-v4">
-        <div className="admin-logo-v4"><img src="/logo.png" alt="" /><div><strong>Thulirkum Ver</strong><span>Admin Console</span></div></div>
+        <div className="admin-logo-v4"><img src="/logo.png" alt="" /><div><strong>Thulirkum Ver</strong><span>Seller & Admin Center</span></div></div>
         <nav>
           {[
             ['overview', '▦', 'Overview'], ['orders', '▣', 'Orders'], ['inventory', '▤', 'Inventory'],
@@ -195,30 +201,54 @@ export default function AdminDashboardPage() {
 
       <main className="admin-content-v4">
         <header className="admin-page-header-v4">
-          <div><span className="eyebrow">Store control centre</span><h1>{tab[0].toUpperCase() + tab.slice(1)}</h1></div>
+          <div><span className="eyebrow">Commerce administration</span><h1>{tab[0].toUpperCase() + tab.slice(1)}</h1><p className="admin-page-subtitle">Manage the bookstore from one workspace.</p></div>
           <div className="admin-header-actions"><button className="outline-btn" onClick={loadEverything}>Refresh Data</button><span className="admin-live-dot">● Live</span></div>
         </header>
         {message && <div className="admin-toast-v4" onClick={() => setMessage('')}>{message}<span>×</span></div>}
 
         {tab === 'overview' && (
           <>
-            <section className="admin-stat-grid-v4">
-              <StatCard label="Total Books" value={stats.books} detail={`${stats.lowStock} need attention`} />
-              <StatCard label="Orders" value={stats.orders} detail="Current filtered view" />
-              <StatCard label="Customers" value={stats.customers} detail="Registered customers" />
-              <StatCard label="Order Value" value={`₹${Math.round(stats.revenue).toLocaleString()}`} detail="Excluding cancelled orders" />
-            </section>
-            <section className="admin-panel-v4">
-              <div className="admin-panel-title"><div><h2>Recent Orders</h2><p>Confirm and move orders through fulfilment.</p></div><button className="text-btn" onClick={() => setTab('orders')}>View all →</button></div>
-              <OrderTable orders={orders.slice(0, 6)} onStatus={updateOrderStatus} />
-            </section>
-            <section className="admin-panel-v4">
-              <div className="admin-panel-title"><div><h2>Inventory Attention</h2><p>Low stock and out-of-stock books.</p></div><button className="text-btn" onClick={() => setTab('inventory')}>Manage stock →</button></div>
-              <div className="inventory-attention-grid">
-                {books.filter(book => book.stock <= 5 || book.available === false).slice(0, 6).map(book => <InventoryMini key={book.id} book={book} />)}
-                {!books.some(book => book.stock <= 5 || book.available === false) && <p className="muted">Inventory looks healthy.</p>}
+            <section className="admin-command-banner">
+              <div>
+                <span>STORE SUMMARY</span>
+                <h2>Good morning, {user?.name?.split(' ')[0] || 'Admin'}.</h2>
+                <p>Track sales, fulfil orders, manage stock and keep the storefront ready for customers.</p>
+              </div>
+              <div className="admin-command-actions">
+                <button className="admin-command-primary" onClick={() => setTab('orders')}>Process Orders</button>
+                <button className="admin-command-secondary" onClick={() => setTab('inventory')}>Update Inventory</button>
               </div>
             </section>
+
+            <section className="admin-stat-grid-v4 marketplace-admin-stats">
+              <StatCard icon="₹" label="Order Value" value={`₹${Math.round(stats.revenue).toLocaleString()}`} detail="Excluding cancelled orders" tone="green" />
+              <StatCard icon="▣" label="Total Orders" value={stats.orders} detail={`${stats.pending} waiting for fulfilment`} tone="blue" />
+              <StatCard icon="◎" label="Customers" value={stats.customers} detail="Registered customer accounts" tone="violet" />
+              <StatCard icon="▤" label="Catalogue" value={stats.books} detail={`${stats.lowStock} stock alerts`} tone="amber" />
+            </section>
+
+            <section className="admin-fulfilment-strip">
+              <button onClick={() => setTab('orders')}><span>To Process</span><strong>{stats.pending}</strong><small>Confirmed / packed</small></button>
+              <button onClick={() => setTab('orders')}><span>In Transit</span><strong>{stats.shipped}</strong><small>Shipped / out for delivery</small></button>
+              <button onClick={() => setTab('orders')}><span>Delivered</span><strong>{stats.delivered}</strong><small>Completed orders</small></button>
+              <button onClick={() => setTab('inventory')}><span>Out of Stock</span><strong>{stats.outOfStock}</strong><small>Needs inventory action</small></button>
+              <button onClick={() => setTab('offers')}><span>Live Offers</span><strong>{stats.activeOffers}</strong><small>Published promotions</small></button>
+            </section>
+
+            <div className="admin-overview-grid">
+              <section className="admin-panel-v4 admin-orders-panel">
+                <div className="admin-panel-title"><div><span className="admin-panel-kicker">FULFILMENT</span><h2>Recent Orders</h2><p>Confirm and move orders through the delivery workflow.</p></div><button className="text-btn" onClick={() => setTab('orders')}>View all →</button></div>
+                <OrderTable orders={orders.slice(0, 6)} onStatus={updateOrderStatus} />
+              </section>
+
+              <section className="admin-panel-v4 admin-inventory-panel">
+                <div className="admin-panel-title"><div><span className="admin-panel-kicker">STOCK HEALTH</span><h2>Inventory Attention</h2><p>Low-stock and unavailable titles.</p></div><button className="text-btn" onClick={() => setTab('inventory')}>Manage →</button></div>
+                <div className="inventory-attention-grid admin-attention-list">
+                  {books.filter(book => book.stock <= 5 || book.available === false).slice(0, 6).map(book => <InventoryMini key={book.id} book={book} />)}
+                  {!books.some(book => book.stock <= 5 || book.available === false) && <p className="muted">Inventory looks healthy.</p>}
+                </div>
+              </section>
+            </div>
           </>
         )}
 
@@ -314,8 +344,8 @@ export default function AdminDashboardPage() {
   )
 }
 
-function StatCard({ label, value, detail }) {
-  return <article className="admin-stat-card-v4"><span>{label}</span><strong>{value}</strong><small>{detail}</small></article>
+function StatCard({ icon = '•', label, value, detail, tone = 'green' }) {
+  return <article className={`admin-stat-card-v4 admin-stat-${tone}`}><div className="admin-stat-icon">{icon}</div><div><span>{label}</span><strong>{value}</strong><small>{detail}</small></div></article>
 }
 
 function InventoryMini({ book }) {

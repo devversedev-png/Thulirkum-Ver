@@ -3,6 +3,10 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
 
+const quickCategories = [
+  'Tamil Literature', 'Fiction', 'Children Books', 'Educational', 'Spiritual', 'Biography', 'Competitive Exams', 'Self Help'
+]
+
 export default function Header() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -13,6 +17,7 @@ export default function Header() {
   const [open, setOpen] = useState(false)
 
   const cartCount = account?.cart?.reduce((sum, item) => sum + item.quantity, 0) || 0
+  const wishlistCount = account?.wishlist?.length || 0
 
   const suggestions = useMemo(() => {
     const text = term.trim().toLowerCase()
@@ -29,12 +34,12 @@ export default function Header() {
       })
       .filter(item => item.match)
       .sort((a, b) => a.score - b.score || a.book.title.localeCompare(b.book.title))
-      .slice(0, 6)
+      .slice(0, 7)
       .map(item => item.book)
   }, [books, term])
 
   function submit(event) {
-    event.preventDefault()
+    event?.preventDefault?.()
     const value = term.trim()
     setOpen(false)
     navigate(value ? `/shop?q=${encodeURIComponent(value)}` : '/shop')
@@ -56,6 +61,12 @@ export default function Header() {
     }
   }
 
+  function clearSearch() {
+    setTerm('')
+    setOpen(false)
+    if (location.pathname === '/shop') navigate('/shop', { replace: true })
+  }
+
   function choose(book) {
     setTerm(book.title)
     setOpen(false)
@@ -64,48 +75,47 @@ export default function Header() {
 
   return (
     <>
-      <div className="top-strip">
-        <span>Dharmapuri, Tamil Nadu</span>
-        <span>Free shipping on orders above ₹499 · Genuine books · Safe delivery</span>
-        <span>Support: thulirkumver@gmail.com</span>
+      <div className="market-topbar">
+        <div className="market-topbar-inner">
+          <span>📍 Deliver to Dharmapuri 636705</span>
+          <span className="market-trust">100% Genuine Books &nbsp;·&nbsp; Secure Checkout &nbsp;·&nbsp; Easy Order Tracking</span>
+          <span>Need help? thulirkumver@gmail.com</span>
+        </div>
       </div>
 
-      <header className="main-header">
-        <Link className="brand" to="/home">
+      <header className="market-header">
+        <Link className="market-brand" to="/home" aria-label="Thulirkum Ver home">
           <img src="/logo.png" alt="Thulirkum Ver Book Store" />
         </Link>
 
-        <div className="smart-search-wrap">
-          <form className="header-search" onSubmit={submit}>
+        <div className="smart-search-wrap market-search-wrap">
+          <form className="market-search" onSubmit={submit}>
+            <span className="market-search-icon">⌕</span>
             <input
               value={term}
               onChange={change}
               onFocus={() => term.trim() && setOpen(true)}
               onBlur={() => setTimeout(() => setOpen(false), 160)}
-              placeholder="Search books by title, author or category..."
+              placeholder="Search by title, author, ISBN or category"
               autoComplete="off"
             />
             {term && (
               <button
                 type="button"
-                className="search-clear-btn"
+                className="market-search-clear"
                 aria-label="Clear search"
                 onMouseDown={event => event.preventDefault()}
-                onClick={() => {
-                  setTerm('')
-                  setOpen(false)
-                  if (location.pathname === '/shop') navigate('/shop')
-                }}
+                onClick={clearSearch}
               >×</button>
             )}
-            <button type="submit" className="search-submit-btn">Search</button>
+            <button type="submit" className="market-search-button">Search</button>
           </form>
 
           {open && (
-            <div className="search-suggestions">
+            <div className="search-suggestions market-search-suggestions">
               <div className="search-suggestion-head">
-                <span>Quick suggestions</span>
-                <small>{suggestions.length ? `${suggestions.length} matches` : 'No exact matches'}</small>
+                <span>Search suggestions</span>
+                <small>{suggestions.length ? `${suggestions.length} results` : 'No exact matches'}</small>
               </div>
               {suggestions.length ? suggestions.map(book => (
                 <button key={book.id} className="search-suggestion-row" type="button" onMouseDown={() => choose(book)}>
@@ -117,7 +127,7 @@ export default function Header() {
                   <span className="search-suggestion-meta">
                     <b>₹{book.price}</b>
                     <small className={book.available !== false && book.stock > 0 ? 'available' : 'unavailable'}>
-                      {book.available !== false && book.stock > 0 ? `${book.stock} left` : 'Out of stock'}
+                      {book.available !== false && book.stock > 0 ? 'In stock' : 'Out of stock'}
                     </small>
                   </span>
                 </button>
@@ -131,22 +141,32 @@ export default function Header() {
           )}
         </div>
 
-        <nav className="header-actions">
-          <NavLink to="/shop">Categories</NavLink>
-          <NavLink to="/wishlist">♡ Wishlist</NavLink>
-          <NavLink to="/account">♙ {user?.name?.split(' ')[0] || 'Account'}</NavLink>
-          <NavLink className="cart-link" to="/cart">🛒 Cart <b>{cartCount}</b></NavLink>
-          <NavLink to="/shop#filters">☷ Filters</NavLink>
+        <nav className="market-header-actions">
+          <NavLink to="/account" className="market-action-link">
+            <span className="market-action-icon">♙</span>
+            <span><small>Hello, {user?.name?.split(' ')[0] || 'Reader'}</small><strong>Account</strong></span>
+          </NavLink>
+          <NavLink to="/wishlist" className="market-action-link market-action-simple">
+            <span className="market-action-icon">♡</span>
+            <span><small>Saved</small><strong>Wishlist</strong></span>
+            {wishlistCount > 0 && <b className="market-count-badge">{wishlistCount}</b>}
+          </NavLink>
+          <NavLink to="/cart" className="market-action-link market-cart-action">
+            <span className="market-action-icon">🛒</span>
+            <span><small>Your</small><strong>Cart</strong></span>
+            <b className="market-count-badge">{cartCount}</b>
+          </NavLink>
         </nav>
       </header>
 
-      <div className="sub-nav">
-        <NavLink to="/home">Home</NavLink>
-        <NavLink to="/shop">All Books</NavLink>
-        <NavLink to="/shop?sort=new">New Arrivals</NavLink>
-        <NavLink to="/shop?sort=rating">Best Sellers</NavLink>
-        <NavLink to="/offers">Offers</NavLink>
-        <span className="sub-nav-message">Books grow better humans 🌿</span>
+      <div className="market-category-nav">
+        <div className="market-category-inner">
+          <NavLink className="market-all-link" to="/shop">☰ All Books</NavLink>
+          {quickCategories.map(category => (
+            <NavLink key={category} to={`/shop?category=${encodeURIComponent(category)}`}>{category}</NavLink>
+          ))}
+          <NavLink className="market-offer-link" to="/offers">⚡ Today's Offers</NavLink>
+        </div>
       </div>
     </>
   )

@@ -18,20 +18,20 @@ export default function ShopPage() {
   const languages = [...new Set(books.map(book => book.language).filter(Boolean))]
 
   const sortOptions = [
-    { value: '', label: 'Featured' },
-    { value: 'rating', label: 'Best Rated' },
-    { value: 'new', label: 'New Arrivals' },
+    { value: '', label: 'Recommended' },
+    { value: 'rating', label: 'Customer Rating' },
+    { value: 'new', label: 'Newest First' },
     { value: 'price-low', label: 'Price: Low to High' },
     { value: 'price-high', label: 'Price: High to Low' }
   ]
 
   const categoryOptions = [
-    { value: '', label: 'Category' },
+    { value: '', label: 'All Categories' },
     ...categories.map(item => ({ value: item, label: item }))
   ]
 
   const languageOptions = [
-    { value: '', label: 'Language' },
+    { value: '', label: 'All Languages' },
     ...languages.map(item => ({ value: item, label: item }))
   ]
 
@@ -55,7 +55,6 @@ export default function ShopPage() {
   function update(key, value) {
     const next = new URLSearchParams(params)
     value ? next.set(key, value) : next.delete(key)
-    next.delete('filters')
     setParams(next)
   }
 
@@ -68,19 +67,19 @@ export default function ShopPage() {
   const hasFilters = Boolean(category || language || sort || offerOnly)
 
   return (
-    <section className="shop-page page-width premium-shop-page">
-      <div className="shop-hero-row">
-        <div className="shop-title-block">
-          <span className="eyebrow">Browse our shelf</span>
-          <h1>{category || 'All Books'}</h1>
-          <div className="shop-result-line">
-            <span>{filtered.length} books found</span>
-            {q && <span className="search-result-chip">Search: “{q}”</span>}
-            {offerOnly && <span className="search-result-chip">Offers only</span>}
-          </div>
+    <section className="shop-page page-width market-shop-page">
+      <div className="market-shop-heading">
+        <div>
+          <div className="market-breadcrumb">Home / Books {category ? `/ ${category}` : ''}</div>
+          <h1>{q ? `Search results for “${q}”` : category || 'All Books'}</h1>
+          <p>{filtered.length} {filtered.length === 1 ? 'book' : 'books'} available</p>
         </div>
+        {q && <span className="market-search-summary">Showing matches for <strong>{q}</strong></span>}
+      </div>
 
-        <div className="shop-filter-bar" id="filters">
+      <div className="market-shop-toolbar" id="filters">
+        <div className="market-filter-group">
+          <span className="market-filter-label">Filter by</span>
           <PremiumSelect
             value={category}
             options={categoryOptions}
@@ -95,6 +94,16 @@ export default function ShopPage() {
             className="shop-filter-select language-filter-select"
             icon="◎"
           />
+          <button
+            type="button"
+            className={`market-offer-filter ${offerOnly ? 'active' : ''}`}
+            onClick={() => update('offer', offerOnly ? '' : '1')}
+          >⚡ Offers</button>
+          {hasFilters && <button type="button" className="clear-filter-chip" onClick={clearFilters}>Clear all</button>}
+        </div>
+
+        <div className="market-sort-group">
+          <span>Sort by</span>
           <PremiumSelect
             value={sort}
             options={sortOptions}
@@ -102,22 +111,19 @@ export default function ShopPage() {
             className="shop-filter-select sort-premium-select"
             icon="☷"
           />
-          {hasFilters && (
-            <button type="button" className="clear-filter-chip" onClick={clearFilters}>Clear</button>
-          )}
         </div>
       </div>
 
       {filtered.length ? (
-        <div className="book-grid shop-grid premium-shop-grid">
+        <div className="book-grid shop-grid premium-shop-grid market-shop-grid">
           {filtered.map(book => <BookCard key={book.id} book={book} variant="shop" />)}
         </div>
       ) : (
-        <div className="empty-state premium-empty-state">
-          <span className="empty-book-icon">▤</span>
-          <h3>No books found</h3>
-          <p>Try another category, language or search term.</p>
-          <button type="button" className="primary-btn" onClick={() => setParams({})}>View all books</button>
+        <div className="empty-state premium-empty-state market-empty-state">
+          <span className="empty-book-icon">📚</span>
+          <h3>No matching books</h3>
+          <p>Try a different title, author, category or language.</p>
+          <button type="button" className="market-cart-button" onClick={() => setParams({})}>View all books</button>
         </div>
       )}
     </section>

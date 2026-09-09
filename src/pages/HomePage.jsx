@@ -3,14 +3,14 @@ import { useStore } from '../context/StoreContext'
 import BookCard from '../components/BookCard'
 
 const categories = [
-  { name: 'Tamil Literature', small: 'தமிழ்', icon: '▤' },
-  { name: 'Fiction', small: 'Stories', icon: '▥' },
-  { name: 'Children Books', small: 'Kids', icon: '◉' },
-  { name: 'Educational', small: 'Learn', icon: '◆' },
-  { name: 'Spiritual', small: 'Peace', icon: '✦' },
-  { name: 'Biography', small: 'Lives', icon: '●' },
-  { name: 'Competitive Exams', small: 'Prepare', icon: '▰' },
-  { name: 'Self Help', small: 'Grow', icon: '◒' }
+  { name: 'Tamil Literature', small: 'தமிழ் நூல்கள்', icon: '📚' },
+  { name: 'Fiction', small: 'Stories & novels', icon: '📖' },
+  { name: 'Children Books', small: 'Young readers', icon: '🧒' },
+  { name: 'Educational', small: 'Learn better', icon: '🎓' },
+  { name: 'Spiritual', small: 'Mind & peace', icon: '🪷' },
+  { name: 'Biography', small: 'Life stories', icon: '👤' },
+  { name: 'Competitive Exams', small: 'Exam prep', icon: '🏆' },
+  { name: 'Self Help', small: 'Grow daily', icon: '🌱' }
 ]
 
 export default function HomePage() {
@@ -20,7 +20,9 @@ export default function HomePage() {
   const newBooks = books.filter(book => book.newArrival)
   const featured = (featuredBooks.length ? featuredBooks : books).slice(0, 6)
   const arrivals = (newBooks.length ? newBooks : books).slice(0, 6)
+  const valueBooks = [...books].sort((a, b) => a.price - b.price).slice(0, 6)
   const topOffer = offers[0]
+  const heroBooks = featured.slice(0, 3)
 
   return (
     <>
@@ -28,102 +30,116 @@ export default function HomePage() {
         <div className="demo-note">Preview mode is active. Connect Spring Boot + MongoDB Atlas to enable account actions.</div>
       )}
 
-      <section className="hero-section page-width premium-home-hero">
-        <div className="hero-copy">
-          <span className="eyebrow">Good books · brighter lives</span>
-          <h1>Books for a<br /><em>Brighter Tomorrow</em></h1>
-          <p>
-            Discover stories, ideas and wisdom in Tamil and beyond. Books selected to inspire,
-            educate and grow with every kind of reader.
-          </p>
-          <Link className="primary-btn big inline-btn" to="/shop">Start Exploring →</Link>
+      <section className="market-home page-width">
+        <div className="market-hero">
+          <div className="market-hero-copy">
+            <span className="market-kicker">THULIRKUM VER BOOK STORE</span>
+            <h1>Find the right book.<br /><span>Grow the right idea.</span></h1>
+            <p>Shop Tamil literature, fiction, self-help, children's books, education and more — all in one simple bookstore.</p>
+            <div className="market-hero-actions">
+              <Link className="market-primary-cta" to="/shop">Shop all books</Link>
+              <Link className="market-secondary-cta" to="/offers">View offers</Link>
+            </div>
+            <div className="market-hero-promises">
+              <span>✓ Genuine books</span>
+              <span>✓ Safe payments</span>
+              <span>✓ Easy tracking</span>
+            </div>
+          </div>
 
-          <div className="hero-benefits">
-            <div><b>↝</b><span><strong>Free shipping</strong><small>above ₹499</small></span></div>
-            <div><b>✓</b><span><strong>Genuine books</strong><small>trusted collection</small></span></div>
-            <div><b>◒</b><span><strong>A better you</strong><small>with every book</small></span></div>
+          <div className="market-hero-products">
+            <div className="market-hero-badge">Reader favourites</div>
+            <div className="market-hero-book-row">
+              {heroBooks.map((book, index) => (
+                <Link key={book.id} to={`/book/${book.id}`} className={`market-hero-book hero-book-${index + 1}`}>
+                  <img src={book.image} alt={book.title} />
+                  <span>{book.title}</span>
+                </Link>
+              ))}
+            </div>
+            <div className="market-hero-deal">
+              <strong>{topOffer?.title || 'Special savings on selected books'}</strong>
+              <span>{topOffer?.code ? `Use ${topOffer.code}` : 'Limited-time offers available'}</span>
+            </div>
           </div>
         </div>
 
-        <div className="hero-visual premium-book-scene">
-          <div className="hero-leaf hero-leaf-one">⌁</div>
-          <div className="hero-leaf hero-leaf-two">⌁</div>
-          <div className="scene-plant">
-            <span className="plant-stem" />
-            <span className="plant-leaf leaf-a" />
-            <span className="plant-leaf leaf-b" />
-            <span className="plant-leaf leaf-c" />
-            <span className="plant-leaf leaf-d" />
-          </div>
-          <div className="premium-stack">
-            <div className="scene-book brown-book">TAMIL LITERATURE</div>
-            <div className="scene-book green-book">SPIRITUALITY</div>
-            <div className="scene-book cream-book">SELF HELP</div>
-            <div className="scene-book gold-book">CHILDREN BOOKS</div>
-            <div className="scene-book dark-book">BIOGRAPHY</div>
-          </div>
-          <div className="scene-mug">A Good Book<br /><small>A Kinder You</small></div>
-          <div className="scene-note">Small<br />Books<br /><strong>Big Changes</strong></div>
+        <div className="market-service-row">
+          <div><b>🚚</b><span><strong>Free Delivery</strong><small>On orders above ₹499</small></span></div>
+          <div><b>✓</b><span><strong>Genuine Collection</strong><small>Carefully selected titles</small></span></div>
+          <div><b>🔒</b><span><strong>Secure Checkout</strong><small>Simple & protected ordering</small></span></div>
+          <div><b>📦</b><span><strong>Track Orders</strong><small>From confirmed to delivered</small></span></div>
         </div>
       </section>
 
-      <section className="section page-width home-category-section">
-        <div className="section-heading">
-          <div><h2>Browse by Category</h2><p>Explore books that match what you love.</p></div>
-          <Link to="/shop">View all categories →</Link>
+      <section className="market-category-section page-width">
+        <div className="market-section-title">
+          <div><span>SHOP BY INTEREST</span><h2>Popular Categories</h2></div>
+          <Link to="/shop">See all →</Link>
         </div>
-        <div className="category-row">
+        <div className="market-category-grid">
           {categories.map(item => (
-            <Link key={item.name} className="category-pill" to={`/shop?category=${encodeURIComponent(item.name)}`}>
-              <div className={`category-icon category-icon-${item.name.toLowerCase().replaceAll(' ', '-')}`}>{item.icon}</div>
+            <Link key={item.name} className="market-category-card" to={`/shop?category=${encodeURIComponent(item.name)}`}>
+              <div className="market-category-icon">{item.icon}</div>
               <strong>{item.name}</strong>
-              <span>{item.small}</span>
+              <small>{item.small}</small>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="section page-width">
-        <div className="section-heading">
-          <div><h2>Bestsellers</h2><p>Reader favourites, loved by many.</p></div>
-          <Link to="/shop?sort=rating">View all books →</Link>
+      <section className="market-shelf page-width">
+        <div className="market-section-title">
+          <div><span>TOP PICKS</span><h2>Bestsellers & Reader Favourites</h2></div>
+          <Link to="/shop?sort=rating">View all →</Link>
         </div>
-        <div className="book-grid home-book-grid">
+        <div className="market-product-grid">
           {loading ? <p>Loading books...</p> : featured.map(book => <BookCard key={book.id} book={book} />)}
         </div>
       </section>
 
-      <section className="offer-strip page-width premium-offer-strip">
-        <div>
-          <span>{topOffer?.code ? `Use code ${topOffer.code}` : 'Special Offer'}</span>
-          <h2>{topOffer?.title || 'Up to 30% Off on Selected Books'}</h2>
-          <p>{topOffer?.description || 'Good books should always be within reach.'}</p>
+      <section className="market-deal-banner page-width">
+        <div className="market-deal-copy">
+          <span>LIMITED TIME DEAL</span>
+          <h2>{topOffer?.title || 'Books worth reading. Prices worth smiling about.'}</h2>
+          <p>{topOffer?.description || 'Explore selected titles with special prices and seasonal offers.'}</p>
         </div>
-        <Link className="outline-btn" to="/offers">Explore Offers →</Link>
+        <div className="market-deal-code">
+          <small>{topOffer?.code ? 'COUPON CODE' : 'BOOKSTORE OFFER'}</small>
+          <strong>{topOffer?.code || 'SAVE MORE'}</strong>
+          <Link to="/offers">Explore deals →</Link>
+        </div>
       </section>
 
       {arrivals.length > 0 && (
-        <section className="section page-width">
-          <div className="section-heading">
-            <div><h2>New Arrivals</h2><p>Fresh titles added to the shelf.</p></div>
-            <Link to="/shop?sort=new">See new arrivals →</Link>
+        <section className="market-shelf page-width">
+          <div className="market-section-title">
+            <div><span>JUST ADDED</span><h2>New Arrivals</h2></div>
+            <Link to="/shop?sort=new">See all new books →</Link>
           </div>
-          <div className="book-grid home-book-grid">
+          <div className="market-product-grid">
             {arrivals.map(book => <BookCard key={book.id} book={book} />)}
           </div>
         </section>
       )}
 
-      <section className="flow-section page-width premium-flow-section">
-        <div className="flow-heading">
-          <span className="eyebrow">Simple from start to finish</span>
-          <h2>A Better Way to Buy Your Books</h2>
-        </div>
-        <div className="flow-grid">
-          {['Login', 'Home', 'Search / Browse', 'Book Details', 'Add to Cart', 'Checkout', 'Order Confirmation'].map((item, index) => (
-            <div key={item} className="flow-step"><b>{index + 1}</b><span>{item}</span></div>
-          ))}
-        </div>
+      {valueBooks.length > 0 && (
+        <section className="market-shelf page-width market-value-shelf">
+          <div className="market-section-title">
+            <div><span>VALUE PICKS</span><h2>Books at Friendly Prices</h2></div>
+            <Link to="/shop?sort=price-low">Shop by low price →</Link>
+          </div>
+          <div className="market-product-grid">
+            {valueBooks.map(book => <BookCard key={book.id} book={book} />)}
+          </div>
+        </section>
+      )}
+
+      <section className="market-confidence page-width">
+        <div><b>01</b><span><strong>Search easily</strong><small>Title, author, category or ISBN</small></span></div>
+        <div><b>02</b><span><strong>Choose confidently</strong><small>Stock, rating and price shown clearly</small></span></div>
+        <div><b>03</b><span><strong>Order simply</strong><small>Cart, checkout and confirmation in a few steps</small></span></div>
+        <div><b>04</b><span><strong>Track everything</strong><small>Confirmed, shipped, delivered or cancelled</small></span></div>
       </section>
     </>
   )
