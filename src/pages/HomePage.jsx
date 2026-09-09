@@ -11,7 +11,7 @@ function languageKey(value = '') {
 }
 
 export default function HomePage() {
-  const { books, offers, loading, backendReady } = useStore()
+  const { books, offers, authors, loading, backendReady } = useStore()
 
   const categoryRows = useMemo(() => {
     const groups = new Map()
@@ -46,42 +46,49 @@ export default function HomePage() {
       groups.get(author).push(book)
     })
 
-    const authors = [...groups.entries()].map(([name, authorBooks]) => {
-      const languageCounts = authorBooks.reduce((result, book) => {
-        const key = languageKey(book.language)
-        result[key] = (result[key] || 0) + 1
-        return result
-      }, {})
-
-      const language = Object.entries(languageCounts)
-        .sort((a, b) => b[1] - a[1])[0]?.[0] || 'Other'
-
+    const catalogueAuthor = name => {
+      const authorBooks = groups.get(name) || []
       const sortedBooks = [...authorBooks].sort((a, b) =>
         Number(b.featured || false) - Number(a.featured || false)
         || Number(b.rating || 0) - Number(a.rating || 0)
         || String(a.title || '').localeCompare(String(b.title || ''))
       )
-
       return {
         name,
-        language,
         count: authorBooks.length,
-        rating: authorBooks.reduce((sum, book) => sum + Number(book.rating || 0), 0) / Math.max(authorBooks.length, 1),
-        books: sortedBooks.slice(0, 3)
+        books: sortedBooks.slice(0, 3),
+        rating: authorBooks.reduce((sum, book) => sum + Number(book.rating || 0), 0) / Math.max(authorBooks.length, 1)
       }
+    }
+
+    const managedFeatured = (authors || []).filter(author => author.active !== false && author.featured === true)
+    if (managedFeatured.length) {
+      return [...managedFeatured]
+        .sort((a, b) => Number(a.displayOrder || 0) - Number(b.displayOrder || 0) || String(a.name || '').localeCompare(String(b.name || '')))
+        .slice(0, 5)
+        .map(author => ({
+          ...catalogueAuthor(author.name),
+          ...author,
+          language: author.language || languageKey((groups.get(author.name) || [])[0]?.language)
+        }))
+    }
+
+    const fallback = [...groups.entries()].map(([name, authorBooks]) => {
+      const languageCounts = authorBooks.reduce((result, book) => {
+        const key = languageKey(book.language)
+        result[key] = (result[key] || 0) + 1
+        return result
+      }, {})
+      const language = Object.entries(languageCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Other'
+      return { ...catalogueAuthor(name), language }
     })
 
-    const sortAuthors = list => [...list].sort((a, b) =>
-      b.count - a.count || b.rating - a.rating || a.name.localeCompare(b.name)
-    )
-
-    const english = sortAuthors(authors.filter(author => author.language === 'English')).slice(0, 3)
-    const tamil = sortAuthors(authors.filter(author => author.language === 'Tamil')).slice(0, 2)
+    const sortAuthors = list => [...list].sort((a, b) => b.count - a.count || b.rating - a.rating || a.name.localeCompare(b.name))
+    const english = sortAuthors(fallback.filter(author => author.language === 'English')).slice(0, 3)
+    const tamil = sortAuthors(fallback.filter(author => author.language === 'Tamil')).slice(0, 2)
     const selectedNames = new Set([...english, ...tamil].map(author => author.name))
-    const remaining = sortAuthors(authors.filter(author => !selectedNames.has(author.name)))
-
-    return [...english, ...tamil, ...remaining].slice(0, 5)
-  }, [books])
+    return [...english, ...tamil, ...sortAuthors(fallback.filter(author => !selectedNames.has(author.name)))].slice(0, 5)
+  }, [books, authors])
 
   const featuredBooks = books.filter(book => book.featured && book.available !== false && book.stock > 0)
   const newBooks = books.filter(book => book.newArrival && book.available !== false && book.stock > 0)
@@ -229,7 +236,7 @@ export default function HomePage() {
             <div>
               <span>AUTHOR SPOTLIGHT</span>
               <h2>Browse by author</h2>
-              <p>Three English and two Tamil author shelves are selected automatically from your live catalogue whenever those languages are available.</p>
+              <p>Featured authors selected in the admin panel, with their books linked from the live catalogue.</p>
             </div>
             <Link to="/shop">Explore the full catalogue →</Link>
           </div>
@@ -237,8 +244,10 @@ export default function HomePage() {
           <div className="author-grid-v7">
             {authorRows.map(author => (
               <Link key={author.name} to={`/shop?q=${encodeURIComponent(author.name)}`} className="author-card-v7 glass-card">
-                <div className="author-book-stack-v7" aria-hidden="true">
-                  {author.books.map((book, index) => (
+                <div className={`author-book-stack-v7 ${author.image ? 'has-author-photo' : ''}`} aria-hidden="true">
+                  {author.image ? (
+                    <img className="author-profile-photo-v75" src={author.image} alt="" />
+                  ) : author.books.map((book, index) => (
                     <img
                       key={`${book.id}-${index}`}
                       className={`author-cover-v7 author-cover-${index + 1}`}
@@ -246,12 +255,12 @@ export default function HomePage() {
                       alt=""
                     />
                   ))}
-                  {!author.books.length && <span>{author.name.charAt(0).toUpperCase()}</span>}
+                  {!author.image && !author.books.length && <span>{author.name.charAt(0).toUpperCase()}</span>}
                 </div>
                 <div className="author-copy-v7">
                   <span>{author.language}</span>
                   <strong>{author.name}</strong>
-                  <small>{author.count} {author.count === 1 ? 'title' : 'titles'} available</small>
+                  <small>{author.bio || `${author.count} ${author.count === 1 ? 'title' : 'titles'} available`}</small>
                 </div>
                 <b>View books →</b>
               </Link>

@@ -8,6 +8,10 @@ const emptyBook = {
   price: 0, originalPrice: 0, rating: 0, reviewCount: 0, stock: 0, featured: false, newArrival: false, available: true
 }
 
+const emptyAuthor = {
+  name: '', language: '', bio: '', image: '', featured: true, active: true, displayOrder: 0
+}
+
 const emptyOffer = {
   title: '', code: '', description: '', discountType: 'PERCENT', discountValue: 0, minOrderAmount: 0,
   startDate: '', endDate: '', active: true
@@ -25,14 +29,18 @@ export default function AdminDashboardPage() {
   const [orders, setOrders] = useState([])
   const [customers, setCustomers] = useState([])
   const [offers, setOffers] = useState([])
+  const [authors, setAuthors] = useState([])
   const [statusOptions, setStatusOptions] = useState([])
   const [bookForm, setBookForm] = useState(emptyBook)
   const [offerForm, setOfferForm] = useState(emptyOffer)
+  const [authorForm, setAuthorForm] = useState(emptyAuthor)
   const [editingBook, setEditingBook] = useState(null)
   const [editingOffer, setEditingOffer] = useState(null)
+  const [editingAuthor, setEditingAuthor] = useState(null)
   const [message, setMessage] = useState('')
   const [inventorySearch, setInventorySearch] = useState('')
   const [customerSearch, setCustomerSearch] = useState('')
+  const [authorSearch, setAuthorSearch] = useState('')
   const [orderedOnly, setOrderedOnly] = useState(false)
   const [orderFilters, setOrderFilters] = useState({ q: '', status: '', from: '', to: '', month: '' })
   const [selectedOrder, setSelectedOrder] = useState(null)
@@ -50,13 +58,14 @@ export default function AdminDashboardPage() {
 
   async function loadEverything() {
     try {
-      const [bookData, orderData, customerData, offerData] = await Promise.all([
-        api('/admin/books'), api('/admin/orders'), api('/admin/customers'), api('/admin/offers')
+      const [bookData, orderData, customerData, offerData, authorData] = await Promise.all([
+        api('/admin/books'), api('/admin/orders'), api('/admin/customers'), api('/admin/offers'), api('/admin/authors')
       ])
       setBooks(bookData)
       setOrders(orderData)
       setCustomers(customerData)
       setOffers(offerData)
+      setAuthors(authorData)
       setStatusOptions([...new Set(orderData.map(order => order.status).filter(Boolean))])
     } catch (err) {
       setMessage(err.message)
@@ -94,9 +103,10 @@ export default function AdminDashboardPage() {
       cancelled: count('CANCELLED'),
       revenue: activeRevenue,
       customers: customers.length,
-      activeOffers: offers.filter(offer => offer.active).length
+      activeOffers: offers.filter(offer => offer.active).length,
+      featuredAuthors: authors.filter(author => author.active !== false && author.featured !== false).length
     }
-  }, [books, orders, customers, offers])
+  }, [books, orders, customers, offers, authors])
 
   const filteredBooks = useMemo(() => {
     const q = inventorySearch.toLowerCase().trim()
@@ -109,6 +119,14 @@ export default function AdminDashboardPage() {
       && (!q || `${customer.name} ${customer.email} ${customer.mobile || ''}`.toLowerCase().includes(q)))
   }, [customers, customerSearch, orderedOnly])
 
+
+  const filteredAuthors = useMemo(() => {
+    const q = authorSearch.toLowerCase().trim()
+    return [...authors]
+      .filter(author => !q || `${author.name} ${author.language || ''} ${author.bio || ''}`.toLowerCase().includes(q))
+      .sort((a, b) => Number(a.displayOrder || 0) - Number(b.displayOrder || 0) || String(a.name || '').localeCompare(String(b.name || '')))
+  }, [authors, authorSearch])
+
   function bookChange(event) {
     const { name, value, type, checked } = event.target
     setBookForm(current => ({ ...current, [name]: type === 'checkbox' ? checked : value }))
@@ -117,6 +135,11 @@ export default function AdminDashboardPage() {
   function offerChange(event) {
     const { name, value, type, checked } = event.target
     setOfferForm(current => ({ ...current, [name]: type === 'checkbox' ? checked : value }))
+  }
+
+  function authorChange(event) {
+    const { name, value, type, checked } = event.target
+    setAuthorForm(current => ({ ...current, [name]: type === 'checkbox' ? checked : value }))
   }
 
   async function saveBook(event) {
@@ -292,6 +315,42 @@ export default function AdminDashboardPage() {
     await loadOrders(blank)
   }
 
+
+  async function saveAuthor(event) {
+    event.preventDefault()
+    const payload = { ...authorForm, displayOrder: Number(authorForm.displayOrder || 0) }
+    if (editingAuthor) await api(`/admin/authors/${editingAuthor}`, { method: 'PUT', body: JSON.stringify(payload) })
+    else await api('/admin/authors', { method: 'POST', body: JSON.stringify(payload) })
+    setEditingAuthor(null)
+    setAuthorForm(emptyAuthor)
+    const [authorData, bookData] = await Promise.all([api('/admin/authors'), api('/admin/books')])
+    setAuthors(authorData)
+    setBooks(bookData)
+    setMessage(editingAuthor ? 'Author updated successfully' : 'Author added successfully')
+  }
+
+  function editAuthor(author) {
+    setEditingAuthor(author.id)
+    setAuthorForm({ ...emptyAuthor, ...author, active: author.active !== false, featured: author.featured !== false })
+    setTab('authors')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function deleteAuthor(author) {
+    setConfirmDialog({
+      eyebrow: 'AUTHORS',
+      title: 'Remove this author profile?',
+      message: `${author.name} will be removed from the featured author manager. Existing books will keep their author name.`,
+      confirmLabel: 'Remove author',
+      tone: 'danger',
+      onConfirm: async () => {
+        await api(`/admin/authors/${author.id}`, { method: 'DELETE' })
+        setAuthors(current => current.filter(item => item.id !== author.id))
+        setMessage(`${author.name} removed from author manager`)
+      }
+    })
+  }
+
   async function saveOffer(event) {
     event.preventDefault()
     const payload = {
@@ -329,7 +388,7 @@ export default function AdminDashboardPage() {
 
   const navItems = [
     ['overview', '▦', 'Dashboard'], ['orders', '▣', 'Orders'], ['inventory', '▤', 'Catalogue'],
-    ['customers', '◎', 'Customers'], ['offers', '✦', 'Promotions']
+    ['customers', '◎', 'Customers'], ['authors', '✎', 'Authors'], ['offers', '✦', 'Promotions']
   ]
 
   return (
@@ -512,6 +571,66 @@ export default function AdminDashboardPage() {
             </div>
             <div className="admin-table-wrap-v6"><table className="admin-table-v6"><thead><tr><th>Customer</th><th>Mobile</th><th>Registered</th><th>Last login</th><th>Orders</th><th>Total spent</th><th>Last order</th></tr></thead><tbody>{filteredCustomers.map(customer => <tr key={customer.id}><td><strong>{customer.name}</strong><span>{customer.email}</span></td><td>{customer.mobile || '—'}</td><td>{formatDate(customer.createdAt)}</td><td>{formatDateTime(customer.lastLoginAt)}</td><td><b>{customer.orderCount}</b></td><td>₹{Math.round(customer.totalSpent || 0).toLocaleString()}</td><td>{formatDateTime(customer.lastOrderAt)}</td></tr>)}</tbody></table></div>
           </section>
+        )}
+
+        {tab === 'authors' && (
+          <>
+            <section className="admin-panel-v6 glass-panel">
+              <PanelTitle
+                eyebrow="AUTHOR MANAGER"
+                title={editingAuthor ? 'Edit author' : 'Add author'}
+                copy="Control the author profiles shown in the Home page author section without changing code."
+                action={editingAuthor ? <button onClick={() => { setEditingAuthor(null); setAuthorForm(emptyAuthor) }}>Cancel edit</button> : null}
+              />
+              <form className="admin-form-grid-v6 author-form-v75" onSubmit={saveAuthor}>
+                <label>Author name<input name="name" value={authorForm.name} onChange={authorChange} required /></label>
+                <label>Language<input name="language" value={authorForm.language} onChange={authorChange} placeholder="English / Tamil" /></label>
+                <label className="wide">Portrait image URL<input name="image" value={authorForm.image} onChange={authorChange} placeholder="https://..." /></label>
+                <label>Display order<input type="number" min="0" name="displayOrder" value={authorForm.displayOrder} onChange={authorChange} /></label>
+                <label className="wide">Short bio<textarea name="bio" value={authorForm.bio} onChange={authorChange} rows="3" placeholder="Short line shown under the author name" /></label>
+                <div className="admin-toggle-row-v6 wide">
+                  <label className="premium-check-v73"><input name="featured" type="checkbox" checked={authorForm.featured !== false} onChange={authorChange} /> Show on Home page</label>
+                  <label className="premium-check-v73"><input name="active" type="checkbox" checked={authorForm.active !== false} onChange={authorChange} /> Active author</label>
+                </div>
+                <button className="admin-primary-v6" type="submit">{editingAuthor ? 'Update author' : 'Add author'}</button>
+              </form>
+            </section>
+
+            <section className="admin-panel-v6 glass-panel">
+              <PanelTitle
+                eyebrow="FEATURED AUTHORS"
+                title={`Authors (${filteredAuthors.length})`}
+                copy="The first five active featured authors by display order are shown on the Home page."
+                action={<input className="admin-search-v6" value={authorSearch} onChange={e => setAuthorSearch(e.target.value)} placeholder="Search authors..." />}
+              />
+              <div className="admin-author-grid-v75">
+                {filteredAuthors.map(author => {
+                  const titleCount = books.filter(book => String(book.author || '').toLowerCase() === String(author.name || '').toLowerCase()).length
+                  return (
+                    <article className={`admin-author-card-v75 glass-card ${author.active === false ? 'inactive' : ''}`} key={author.id}>
+                      <div className="admin-author-avatar-v75">
+                        {author.image ? <img src={author.image} alt={author.name} /> : <span>{author.name?.charAt(0)?.toUpperCase()}</span>}
+                      </div>
+                      <div className="admin-author-info-v75">
+                        <div><strong>{author.name}</strong><span>{author.language || 'Language not set'}</span></div>
+                        <p>{author.bio || 'No author bio added yet.'}</p>
+                        <small>{titleCount} {titleCount === 1 ? 'book' : 'books'} linked · Order {author.displayOrder || 0}</small>
+                        <div className="admin-author-badges-v75">
+                          <span className={author.active === false ? 'off' : ''}>{author.active === false ? 'Inactive' : 'Active'}</span>
+                          <span className={author.featured === false ? 'off' : ''}>{author.featured === false ? 'Hidden from Home' : 'Home featured'}</span>
+                        </div>
+                      </div>
+                      <div className="admin-author-actions-v75">
+                        <button onClick={() => editAuthor(author)}>Edit</button>
+                        <button className="danger" onClick={() => deleteAuthor(author)}>Remove</button>
+                      </div>
+                    </article>
+                  )
+                })}
+                {!filteredAuthors.length && <div className="admin-empty-v6">No author profiles found. Add the first author above.</div>}
+              </div>
+            </section>
+          </>
         )}
 
         {tab === 'offers' && (

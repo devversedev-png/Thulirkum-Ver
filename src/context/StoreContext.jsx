@@ -8,6 +8,7 @@ export function StoreProvider({ children }) {
   const { user } = useAuth()
   const [books, setBooks] = useState([])
   const [offers, setOffers] = useState([])
+  const [authors, setAuthors] = useState([])
   const [account, setAccount] = useState(null)
   const [loading, setLoading] = useState(true)
   const [backendReady, setBackendReady] = useState(true)
@@ -15,6 +16,7 @@ export function StoreProvider({ children }) {
   useEffect(() => {
     loadBooks()
     loadOffers()
+    loadAuthors()
   }, [])
 
   useEffect(() => {
@@ -41,6 +43,15 @@ export function StoreProvider({ children }) {
       setOffers(await api('/offers/active'))
     } catch {
       setOffers([])
+    }
+  }
+
+
+  async function loadAuthors() {
+    try {
+      setAuthors(await api('/authors'))
+    } catch {
+      setAuthors([])
     }
   }
 
@@ -122,12 +133,12 @@ export function StoreProvider({ children }) {
   }
 
   const value = useMemo(() => ({
-    books, offers, account, loading, backendReady,
-    loadBooks, loadOffers, loadAccount, getBook, cartRows,
+    books, offers, authors, account, loading, backendReady,
+    loadBooks, loadOffers, loadAuthors, loadAccount, getBook, cartRows,
     addToCart, updateCart, removeFromCart, toggleWishlist,
     addAddress, updateAddress, deleteAddress, setDefaultAddress,
     placeOrder, getOrders, getOrder
-  }), [books, offers, account, loading, backendReady])
+  }), [books, offers, authors, account, loading, backendReady])
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
 }
