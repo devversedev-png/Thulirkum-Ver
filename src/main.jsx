@@ -5,6 +5,7 @@ import App from './App'
 import { AuthProvider } from './context/AuthContext'
 import { StoreProvider } from './context/StoreContext'
 import './styles.css'
+import './concept-c.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

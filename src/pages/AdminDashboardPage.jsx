@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import PremiumConfirm from '../components/PremiumConfirm'
+import PremiumSelect from '../components/PremiumSelect'
+import PremiumDatePicker from '../components/PremiumDatePicker'
 
 const emptyBook = {
   title: '', author: '', category: '', language: '', publisher: '', isbn: '', description: '', image: '',
@@ -456,42 +458,28 @@ export default function AdminDashboardPage() {
               </div>
             </section>
 
-            <section className="admin-kpi-grid-v6">
-              <KpiCard label="Order value" value={`₹${Math.round(stats.revenue).toLocaleString()}`} detail="Excludes cancelled orders" icon="₹" />
-              <KpiCard label="Orders" value={stats.orders} detail={`${stats.toProcess} need processing`} icon="▣" />
-              <KpiCard label="Customers" value={stats.customers} detail="Registered customer accounts" icon="◎" />
-              <KpiCard label="Catalogue" value={stats.books} detail={`${stats.lowStock} stock alerts`} icon="▤" />
+            <section className="admin-kpi-grid-v6 concept-kpi-grid">
+              <KpiCard label="Total Orders" value={stats.orders} detail={`${stats.toProcess} need processing`} icon="▣" />
+              <KpiCard label="Total Revenue" value={`₹${Math.round(stats.revenue).toLocaleString()}`} detail="Excludes cancelled orders" icon="₹" />
+              <KpiCard label="Total Customers" value={stats.customers} detail="Registered accounts" icon="◎" />
+              <KpiCard label="Total Books" value={stats.books} detail={`${stats.lowStock} stock alerts`} icon="▤" />
             </section>
 
-            <section className="admin-status-grid-v6">
-              <StatusCard label="To process" value={stats.toProcess} onClick={() => setTab('orders')} />
-              <StatusCard label="In transit" value={stats.inTransit} onClick={() => setTab('orders')} />
-              <StatusCard label="Delivered" value={stats.delivered} onClick={() => setTab('orders')} />
-              <StatusCard label="Cancelled" value={stats.cancelled} onClick={() => setTab('orders')} />
-              <StatusCard label="Out of stock" value={stats.outOfStock} onClick={() => setTab('inventory')} />
-              <StatusCard label="Live offers" value={stats.activeOffers} onClick={() => setTab('offers')} />
+            <section className="admin-analytics-grid-c8">
+              <div className="admin-panel-v6 concept-chart-panel">
+                <PanelTitle eyebrow="PERFORMANCE" title="Sales Overview" copy="Order value trend from your live order data." />
+                <SalesTrendChart orders={orders} />
+              </div>
+              <div className="admin-panel-v6 concept-chart-panel">
+                <PanelTitle eyebrow="CATALOGUE" title="Catalogue Overview" copy="Book distribution across your main categories." />
+                <CatalogueOverview books={books} />
+              </div>
             </section>
 
-            <div className="admin-overview-v6">
-              <section className="admin-panel-v6 glass-panel">
-                <PanelTitle eyebrow="FULFILMENT" title="Recent orders" copy="Open an order to see available workflow actions." action={<button onClick={() => setTab('orders')}>View all →</button>} />
-                <OrderTable orders={orders.slice(0, 7)} onOpen={openOrder} />
-              </section>
-
-              <section className="admin-panel-v6 glass-panel">
-                <PanelTitle eyebrow="INVENTORY" title="Stock attention" copy="Low-stock or unavailable catalogue items." action={<button onClick={() => setTab('inventory')}>Manage →</button>} />
-                <div className="stock-list-v6">
-                  {books.filter(book => book.stock <= 5 || book.available === false).slice(0, 7).map(book => (
-                    <div className="stock-row-v6" key={book.id}>
-                      <img src={book.image} alt="" />
-                      <div><strong>{book.title}</strong><small>{book.category}</small></div>
-                      <span className={book.stock === 0 || book.available === false ? 'critical' : ''}>{book.stock === 0 || book.available === false ? 'Out' : `${book.stock} left`}</span>
-                    </div>
-                  ))}
-                  {!books.some(book => book.stock <= 5 || book.available === false) && <div className="admin-empty-v6">Inventory looks healthy.</div>}
-                </div>
-              </section>
-            </div>
+            <section className="admin-panel-v6 concept-recent-orders">
+              <PanelTitle eyebrow="FULFILMENT" title="Recent Orders" copy="Latest customer orders and their current status." action={<button onClick={() => setTab('orders')}>View all</button>} />
+              <OrderTable orders={orders.slice(0, 7)} onOpen={openOrder} />
+            </section>
           </>
         )}
 
@@ -500,13 +488,15 @@ export default function AdminDashboardPage() {
             <PanelTitle eyebrow="ORDER DESK" title="Orders" copy="Search, filter and open an order to manage its next valid action." />
             <form className="admin-filters-v6" onSubmit={applyOrderFilters}>
               <input name="q" value={orderFilters.q} onChange={orderFilterChange} placeholder="Order number, customer, email..." />
-              <select name="status" value={orderFilters.status} onChange={orderFilterChange}>
-                <option value="">All statuses</option>
-                {statusOptions.map(value => <option key={value} value={value}>{statusLabel(value)}</option>)}
-              </select>
-              <label><span>From</span><input type="date" name="from" value={orderFilters.from} onChange={orderFilterChange} /></label>
-              <label><span>To</span><input type="date" name="to" value={orderFilters.to} onChange={orderFilterChange} /></label>
-              <label><span>Month</span><input type="month" name="month" value={orderFilters.month} onChange={orderFilterChange} /></label>
+              <PremiumSelect
+                value={orderFilters.status}
+                options={[{ value: '', label: 'All statuses' }, ...statusOptions.map(value => ({ value, label: statusLabel(value) }))]}
+                onChange={value => setOrderFilters(current => ({ ...current, status: value }))}
+                className="admin-filter-select-c8"
+              />
+              <label><span>From</span><PremiumDatePicker value={orderFilters.from} onChange={value => setOrderFilters(current => ({ ...current, from: value }))} /></label>
+              <label><span>To</span><PremiumDatePicker value={orderFilters.to} onChange={value => setOrderFilters(current => ({ ...current, to: value }))} /></label>
+              <label><span>Month</span><PremiumDatePicker mode="month" value={orderFilters.month} onChange={value => setOrderFilters(current => ({ ...current, month: value }))} /></label>
               <button className="admin-primary-v6" type="submit">Apply</button>
               <button className="admin-secondary-v6" type="button" onClick={clearOrderFilters}>Clear</button>
             </form>
@@ -574,63 +564,55 @@ export default function AdminDashboardPage() {
         )}
 
         {tab === 'authors' && (
-          <>
-            <section className="admin-panel-v6 glass-panel">
-              <PanelTitle
-                eyebrow="AUTHOR MANAGER"
-                title={editingAuthor ? 'Edit author' : 'Add author'}
-                copy="Control the author profiles shown in the Home page author section without changing code."
-                action={editingAuthor ? <button onClick={() => { setEditingAuthor(null); setAuthorForm(emptyAuthor) }}>Cancel edit</button> : null}
-              />
-              <form className="admin-form-grid-v6 author-form-v75" onSubmit={saveAuthor}>
-                <label>Author name<input name="name" value={authorForm.name} onChange={authorChange} required /></label>
-                <label>Language<input name="language" value={authorForm.language} onChange={authorChange} placeholder="English / Tamil" /></label>
-                <label className="wide">Portrait image URL<input name="image" value={authorForm.image} onChange={authorChange} placeholder="https://..." /></label>
-                <label>Display order<input type="number" min="0" name="displayOrder" value={authorForm.displayOrder} onChange={authorChange} /></label>
-                <label className="wide">Short bio<textarea name="bio" value={authorForm.bio} onChange={authorChange} rows="3" placeholder="Short line shown under the author name" /></label>
-                <div className="admin-toggle-row-v6 wide">
-                  <label className="premium-check-v73"><input name="featured" type="checkbox" checked={authorForm.featured !== false} onChange={authorChange} /> Show on Home page</label>
-                  <label className="premium-check-v73"><input name="active" type="checkbox" checked={authorForm.active !== false} onChange={authorChange} /> Active author</label>
-                </div>
-                <button className="admin-primary-v6" type="submit">{editingAuthor ? 'Update author' : 'Add author'}</button>
-              </form>
-            </section>
+          <section className="admin-panel-v6 admin-authors-shell-c8">
+            <div className="admin-authors-head-c8">
+              <div><span className="admin-kicker-v6">AUTHOR MANAGER</span><h2>Authors</h2><p>Manage author profiles, language, portrait, biography and Home page visibility.</p></div>
+              <button className="admin-primary-v6" onClick={() => { setEditingAuthor(null); setAuthorForm(emptyAuthor) }}>+ Add new author</button>
+            </div>
 
-            <section className="admin-panel-v6 glass-panel">
-              <PanelTitle
-                eyebrow="FEATURED AUTHORS"
-                title={`Authors (${filteredAuthors.length})`}
-                copy="The first five active featured authors by display order are shown on the Home page."
-                action={<input className="admin-search-v6" value={authorSearch} onChange={e => setAuthorSearch(e.target.value)} placeholder="Search authors..." />}
-              />
-              <div className="admin-author-grid-v75">
-                {filteredAuthors.map(author => {
-                  const titleCount = books.filter(book => String(book.author || '').toLowerCase() === String(author.name || '').toLowerCase()).length
-                  return (
-                    <article className={`admin-author-card-v75 glass-card ${author.active === false ? 'inactive' : ''}`} key={author.id}>
-                      <div className="admin-author-avatar-v75">
-                        {author.image ? <img src={author.image} alt={author.name} /> : <span>{author.name?.charAt(0)?.toUpperCase()}</span>}
-                      </div>
-                      <div className="admin-author-info-v75">
-                        <div><strong>{author.name}</strong><span>{author.language || 'Language not set'}</span></div>
-                        <p>{author.bio || 'No author bio added yet.'}</p>
-                        <small>{titleCount} {titleCount === 1 ? 'book' : 'books'} linked · Order {author.displayOrder || 0}</small>
-                        <div className="admin-author-badges-v75">
-                          <span className={author.active === false ? 'off' : ''}>{author.active === false ? 'Inactive' : 'Active'}</span>
-                          <span className={author.featured === false ? 'off' : ''}>{author.featured === false ? 'Hidden from Home' : 'Home featured'}</span>
-                        </div>
-                      </div>
-                      <div className="admin-author-actions-v75">
-                        <button onClick={() => editAuthor(author)}>Edit</button>
-                        <button className="danger" onClick={() => deleteAuthor(author)}>Remove</button>
-                      </div>
-                    </article>
-                  )
-                })}
-                {!filteredAuthors.length && <div className="admin-empty-v6">No author profiles found. Add the first author above.</div>}
+            <div className="admin-authors-layout-c8">
+              <div className="author-directory-c8">
+                <div className="author-search-row-c8"><input value={authorSearch} onChange={e => setAuthorSearch(e.target.value)} placeholder="Search authors..." /><span>{filteredAuthors.length} authors</span></div>
+                <div className="author-list-c8">
+                  {filteredAuthors.map(author => {
+                    const titleCount = books.filter(book => String(book.author || '').toLowerCase() === String(author.name || '').toLowerCase()).length
+                    return (
+                      <button type="button" key={author.id} className={`author-list-row-c8 ${editingAuthor === author.id ? 'active' : ''}`} onClick={() => editAuthor(author)}>
+                        <span className="author-list-avatar-c8">{author.image ? <img src={author.image} alt="" /> : author.name?.charAt(0)?.toUpperCase()}</span>
+                        <span className="author-list-copy-c8"><strong>{author.name}</strong><small>{author.language || 'Language not set'} · {titleCount} {titleCount === 1 ? 'book' : 'books'}</small></span>
+                        <span className={`author-state-dot-c8 ${author.active === false ? 'off' : ''}`} />
+                      </button>
+                    )
+                  })}
+                  {!filteredAuthors.length && <div className="admin-empty-v6">No authors found.</div>}
+                </div>
               </div>
-            </section>
-          </>
+
+              <div className="author-editor-c8">
+                <div className="author-editor-title-c8">
+                  <div className="author-editor-avatar-c8">{authorForm.image ? <img src={authorForm.image} alt="" /> : <span>{authorForm.name?.charAt(0)?.toUpperCase() || 'A'}</span>}</div>
+                  <div><span>{editingAuthor ? 'EDIT AUTHOR' : 'NEW AUTHOR'}</span><h3>{authorForm.name || 'Author details'}</h3><p>{editingAuthor ? 'Update this author profile and save the changes.' : 'Create a profile that can be featured on the Home page.'}</p></div>
+                </div>
+
+                <form className="admin-form-grid-v6 author-form-v75 author-form-c8" onSubmit={saveAuthor}>
+                  <label>Author name<input name="name" value={authorForm.name} onChange={authorChange} required /></label>
+                  <label>Language<input name="language" value={authorForm.language} onChange={authorChange} placeholder="English / Tamil" /></label>
+                  <label className="wide">Portrait image URL<input name="image" value={authorForm.image} onChange={authorChange} placeholder="https://..." /></label>
+                  <label>Display order<input type="number" min="0" name="displayOrder" value={authorForm.displayOrder} onChange={authorChange} /></label>
+                  <label className="wide">Short bio<textarea name="bio" value={authorForm.bio} onChange={authorChange} rows="4" placeholder="Short biography shown with this author" /></label>
+                  <div className="admin-toggle-row-v6 wide">
+                    <label className="premium-check-v73"><input name="featured" type="checkbox" checked={authorForm.featured !== false} onChange={authorChange} /> Show on Home page</label>
+                    <label className="premium-check-v73"><input name="active" type="checkbox" checked={authorForm.active !== false} onChange={authorChange} /> Active author</label>
+                  </div>
+                  <div className="author-editor-actions-c8 wide">
+                    {editingAuthor && <button type="button" className="admin-secondary-v6 danger" onClick={() => { const author = authors.find(item => item.id === editingAuthor); if (author) deleteAuthor(author) }}>Remove</button>}
+                    <button type="button" className="admin-secondary-v6" onClick={() => { setEditingAuthor(null); setAuthorForm(emptyAuthor) }}>Cancel</button>
+                    <button className="admin-primary-v6" type="submit">{editingAuthor ? 'Save changes' : 'Add author'}</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </section>
         )}
 
         {tab === 'offers' && (
@@ -640,11 +622,11 @@ export default function AdminDashboardPage() {
               <form className="admin-form-grid-v6" onSubmit={saveOffer}>
                 <label>Offer title<input name="title" value={offerForm.title} onChange={offerChange} required /></label>
                 <label>Coupon code<input name="code" value={offerForm.code} onChange={offerChange} /></label>
-                <label>Discount type<select name="discountType" value={offerForm.discountType} onChange={offerChange}><option value="PERCENT">Percentage</option><option value="FIXED">Fixed amount</option></select></label>
+                <label>Discount type<PremiumSelect value={offerForm.discountType} options={[{ value: 'PERCENT', label: 'Percentage' }, { value: 'FIXED', label: 'Fixed amount' }]} onChange={value => setOfferForm(current => ({ ...current, discountType: value }))} /></label>
                 <label>Discount value<input type="number" min="0" name="discountValue" value={offerForm.discountValue} onChange={offerChange} /></label>
                 <label>Minimum order<input type="number" min="0" name="minOrderAmount" value={offerForm.minOrderAmount} onChange={offerChange} /></label>
-                <label>Start date<input type="date" name="startDate" value={offerForm.startDate || ''} onChange={offerChange} /></label>
-                <label>End date<input type="date" name="endDate" value={offerForm.endDate || ''} onChange={offerChange} /></label>
+                <label>Start date<PremiumDatePicker value={offerForm.startDate || ''} onChange={value => setOfferForm(current => ({ ...current, startDate: value }))} /></label>
+                <label>End date<PremiumDatePicker value={offerForm.endDate || ''} onChange={value => setOfferForm(current => ({ ...current, endDate: value }))} /></label>
                 <label className="wide">Description<textarea name="description" value={offerForm.description} onChange={offerChange} rows="4" /></label>
                 <div className="admin-toggle-row-v6 wide"><label className="premium-check-v73"><input type="checkbox" name="active" checked={offerForm.active} onChange={offerChange} /> Publish this offer</label></div>
                 <button className="admin-primary-v6" type="submit">{editingOffer ? 'Update offer' : 'Create offer'}</button>
@@ -714,6 +696,66 @@ export default function AdminDashboardPage() {
         dialog={confirmDialog}
         onClose={() => setConfirmDialog(null)}
       />
+    </div>
+  )
+}
+
+
+function SalesTrendChart({ orders = [] }) {
+  const months = Array.from({ length: 6 }, (_, index) => {
+    const date = new Date()
+    date.setMonth(date.getMonth() - (5 - index))
+    return { key: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`, label: date.toLocaleString('en', { month: 'short' }), value: 0 }
+  })
+  orders.forEach(order => {
+    if (!order.createdAt || order.status === 'CANCELLED') return
+    const date = new Date(order.createdAt)
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+    const slot = months.find(item => item.key === key)
+    if (slot) slot.value += Number(order.total || 0)
+  })
+  const max = Math.max(...months.map(item => item.value), 1)
+  const points = months.map((item, index) => {
+    const x = 24 + index * (352 / Math.max(months.length - 1, 1))
+    const y = 148 - (item.value / max) * 108
+    return `${x},${y}`
+  }).join(' ')
+  return (
+    <div className="sales-chart-c8">
+      <svg viewBox="0 0 400 180" role="img" aria-label="Sales trend">
+        {[40, 76, 112, 148].map(y => <line key={y} x1="24" x2="376" y1={y} y2={y} className="chart-grid-line" />)}
+        <polyline points={points} className="chart-line" fill="none" />
+        {points.split(' ').map((point, index) => {
+          const [cx, cy] = point.split(',')
+          return <circle key={index} cx={cx} cy={cy} r="4" className="chart-dot" />
+        })}
+      </svg>
+      <div className="sales-chart-labels-c8">{months.map(item => <span key={item.key}>{item.label}</span>)}</div>
+    </div>
+  )
+}
+
+function CatalogueOverview({ books = [] }) {
+  const groups = Object.entries(books.reduce((result, book) => {
+    const key = book.category || 'Other'
+    result[key] = (result[key] || 0) + 1
+    return result
+  }, {})).sort((a, b) => b[1] - a[1]).slice(0, 5)
+  const total = Math.max(groups.reduce((sum, [, count]) => sum + count, 0), 1)
+  const colors = ['#2f6b45', '#78a36a', '#d8a85f', '#7d9bb7', '#b58a74']
+  let cursor = 0
+  const stops = groups.map(([name, count], index) => {
+    const start = cursor
+    cursor += (count / total) * 100
+    return `${colors[index]} ${start}% ${cursor}%`
+  }).join(', ')
+  return (
+    <div className="catalogue-chart-c8">
+      <div className="catalogue-donut-c8" style={{ background: `conic-gradient(${stops || '#e7eee7 0 100%'})` }}><span><strong>{books.length}</strong><small>Books</small></span></div>
+      <div className="catalogue-legend-c8">
+        {groups.map(([name, count], index) => <div key={name}><i style={{ background: colors[index] }} /><span>{name}</span><b>{count}</b></div>)}
+        {!groups.length && <p>No catalogue data yet.</p>}
+      </div>
     </div>
   )
 }

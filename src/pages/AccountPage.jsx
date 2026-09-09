@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
 import PremiumConfirm from '../components/PremiumConfirm'
+import PremiumSelect from '../components/PremiumSelect'
 
 function statusLabel(value) {
   if (!value) return 'Status unavailable'
@@ -407,7 +408,7 @@ export default function AccountPage() {
 
             <form className="address-form-v7" onSubmit={saveAddress}>
               <div className="address-form-grid-v7">
-                <div><label>Address label</label><select name="label" value={addressForm.label} onChange={changeAddress}><option>Home</option><option>Work</option><option>Other</option></select></div>
+                <div><label>Address label</label><PremiumSelect value={addressForm.label} options={[{ value: 'Home', label: 'Home' }, { value: 'Work', label: 'Work' }, { value: 'Other', label: 'Other' }]} onChange={value => setAddressForm(current => ({ ...current, label: value }))} /></div>
                 <div><label>Full name</label><input name="fullName" value={addressForm.fullName} onChange={changeAddress} required /></div>
                 <div><label>Mobile number</label><input name="mobile" value={addressForm.mobile} onChange={changeAddress} required /></div>
                 <div className="wide"><label>Flat / House / Street</label><input name="line1" value={addressForm.line1} onChange={changeAddress} required /></div>
