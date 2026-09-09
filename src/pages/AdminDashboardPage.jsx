@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../api/client'
 import { useAuth } from '../context/AuthContext'
+import PremiumConfirm from '../components/PremiumConfirm'
 
 const emptyBook = {
   title: '', author: '', category: '', language: '', publisher: '', isbn: '', description: '', image: '',
@@ -38,8 +38,15 @@ export default function AdminDashboardPage() {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [orderActions, setOrderActions] = useState([])
   const [orderActionBusy, setOrderActionBusy] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState(null)
+  const stockDrafts = useRef({})
+  const stockTimers = useRef({})
 
-  useEffect(() => { loadEverything() }, [])
+  useEffect(() => {
+    loadEverything()
+    return () => Object.values(stockTimers.current).forEach(clearTimeout)
+  }, [])
 
   async function loadEverything() {
     try {
@@ -53,6 +60,17 @@ export default function AdminDashboardPage() {
       setStatusOptions([...new Set(orderData.map(order => order.status).filter(Boolean))])
     } catch (err) {
       setMessage(err.message)
+    }
+  }
+
+  async function refreshEverything() {
+    if (refreshing) return
+    try {
+      setRefreshing(true)
+      await loadEverything()
+      setMessage('Latest store data loaded')
+    } finally {
+      setRefreshing(false)
     }
   }
 
@@ -123,17 +141,62 @@ export default function AdminDashboardPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  async function deleteBook(book) {
-    if (!window.confirm(`Delete ${book.title}?`)) return
-    await api(`/admin/books/${book.id}`, { method: 'DELETE' })
-    setBooks(await api('/admin/books'))
+  function deleteBook(book) {
+    setConfirmDialog({
+      eyebrow: 'CATALOGUE',
+      title: 'Delete this book?',
+      message: `${book.title} will be removed from the catalogue. This action cannot be undone.`,
+      confirmLabel: 'Delete book',
+      tone: 'danger',
+      onConfirm: async () => {
+        await api(`/admin/books/${book.id}`, { method: 'DELETE' })
+        setBooks(current => current.filter(item => item.id !== book.id))
+        setMessage(`${book.title} removed from catalogue`)
+      }
+    })
   }
 
-  async function quickStock(book, nextStock, available = book.available !== false) {
-    const updated = await api(`/admin/books/${book.id}/stock`, {
-      method: 'PATCH', body: JSON.stringify({ stock: Math.max(0, nextStock), available })
-    })
-    setBooks(current => current.map(item => item.id === updated.id ? updated : item))
+  function queueStockSave(bookId) {
+    clearTimeout(stockTimers.current[bookId])
+    stockTimers.current[bookId] = setTimeout(async () => {
+      const draft = stockDrafts.current[bookId]
+      if (!draft) return
+      const sent = { ...draft }
+      try {
+        const updated = await api(`/admin/books/${bookId}/stock`, {
+          method: 'PATCH',
+          body: JSON.stringify({ stock: sent.stock, available: sent.available })
+        })
+        const latest = stockDrafts.current[bookId]
+        if (latest && latest.stock === sent.stock && latest.available === sent.available) {
+          delete stockDrafts.current[bookId]
+          setBooks(current => current.map(item => item.id === updated.id ? updated : item))
+        }
+      } catch (error) {
+        delete stockDrafts.current[bookId]
+        setMessage(error.message)
+        setBooks(await api('/admin/books'))
+      }
+    }, 220)
+  }
+
+  function adjustStock(book, delta) {
+    const existing = stockDrafts.current[book.id]
+    const currentStock = existing ? existing.stock : Number(book.stock || 0)
+    const available = existing ? existing.available : book.available !== false
+    const stock = Math.max(0, currentStock + delta)
+    stockDrafts.current[book.id] = { stock, available }
+    setBooks(current => current.map(item => item.id === book.id ? { ...item, stock, available } : item))
+    queueStockSave(book.id)
+  }
+
+  function toggleBookAvailability(book) {
+    const existing = stockDrafts.current[book.id]
+    const stock = existing ? existing.stock : Number(book.stock || 0)
+    const available = !(existing ? existing.available : book.available !== false)
+    stockDrafts.current[book.id] = { stock, available }
+    setBooks(current => current.map(item => item.id === book.id ? { ...item, stock, available } : item))
+    queueStockSave(book.id)
   }
 
   async function openOrder(order) {
@@ -146,11 +209,8 @@ export default function AdminDashboardPage() {
     }
   }
 
-  async function performOrderAction(action) {
+  async function executeOrderAction(action) {
     if (!selectedOrder || orderActionBusy) return
-    const needsConfirm = action.action === 'CANCEL' || action.action === 'REOPEN'
-    if (needsConfirm && !window.confirm(`${action.label} #${selectedOrder.orderNumber}?`)) return
-
     try {
       setOrderActionBusy(true)
       const updated = await api(`/admin/orders/${selectedOrder.id}/status`, {
@@ -168,6 +228,24 @@ export default function AdminDashboardPage() {
     } finally {
       setOrderActionBusy(false)
     }
+  }
+
+  function performOrderAction(action) {
+    if (!selectedOrder || orderActionBusy) return
+    if (action.action === 'CANCEL' || action.action === 'REOPEN') {
+      setConfirmDialog({
+        eyebrow: 'ORDER WORKFLOW',
+        title: action.action === 'CANCEL' ? 'Cancel this order?' : 'Reopen this order?',
+        message: action.action === 'CANCEL'
+          ? `Order #${selectedOrder.orderNumber} will be cancelled and reserved stock will be returned.`
+          : `Order #${selectedOrder.orderNumber} will move back to Booking Confirmed if stock is available.`,
+        confirmLabel: action.label,
+        tone: action.action === 'CANCEL' ? 'danger' : 'success',
+        onConfirm: () => executeOrderAction(action)
+      })
+      return
+    }
+    executeOrderAction(action)
   }
 
   function orderFilterChange(event) {
@@ -205,10 +283,19 @@ export default function AdminDashboardPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  async function deleteOffer(offer) {
-    if (!window.confirm(`Delete offer ${offer.title}?`)) return
-    await api(`/admin/offers/${offer.id}`, { method: 'DELETE' })
-    setOffers(await api('/admin/offers'))
+  function deleteOffer(offer) {
+    setConfirmDialog({
+      eyebrow: 'PROMOTIONS',
+      title: 'Delete this promotion?',
+      message: `${offer.title} will no longer be available in the admin console or customer offers.`,
+      confirmLabel: 'Delete promotion',
+      tone: 'danger',
+      onConfirm: async () => {
+        await api(`/admin/offers/${offer.id}`, { method: 'DELETE' })
+        setOffers(current => current.filter(item => item.id !== offer.id))
+        setMessage(`${offer.title} deleted`)
+      }
+    })
   }
 
   const navItems = [
@@ -224,7 +311,14 @@ export default function AdminDashboardPage() {
           <div><strong>Thulirkum Ver</strong><span>Commerce Console</span></div>
         </div>
 
-        <Link className="admin-storefront-link" to="/home">↗ View Storefront</Link>
+        <div className="admin-sprout-glass-v73" aria-hidden="true">
+          <svg viewBox="0 0 120 120" role="presentation">
+            <path d="M60 94V50" />
+            <path d="M59 67C42 64 31 54 28 38c16 1 28 10 31 29Z" />
+            <path d="M61 56c4-16 15-27 32-30-1 17-12 29-32 30Z" />
+            <path d="M60 80c12-8 22-8 32-4-6 11-16 17-32 16" />
+          </svg>
+        </div>
 
         <nav className="admin-nav-v6">
           {navItems.map(([key, icon, label]) => (
@@ -251,9 +345,10 @@ export default function AdminDashboardPage() {
             <p>Live data from your catalogue, customers and orders.</p>
           </div>
           <div className="admin-top-actions-v6">
-            <Link to="/home" className="admin-view-store-btn">View website</Link>
-            <button onClick={loadEverything}>↻ Refresh</button>
-            <span>● Live</span>
+            <a href="/home" target="_blank" rel="noreferrer" className="admin-view-store-btn">View website ↗</a>
+            <button className={refreshing ? 'is-refreshing' : ''} onClick={refreshEverything} disabled={refreshing}>
+              <span className="refresh-icon-v73">↻</span>{refreshing ? 'Refreshing...' : 'Refresh'}
+            </button>
           </div>
         </header>
 
@@ -350,9 +445,9 @@ export default function AdminDashboardPage() {
                 <label>Review count<input name="reviewCount" type="number" min="0" value={bookForm.reviewCount} onChange={bookChange} /></label>
                 <label className="wide">Description<textarea name="description" value={bookForm.description} onChange={bookChange} rows="4" /></label>
                 <div className="admin-toggle-row-v6 wide">
-                  <label><input name="available" type="checkbox" checked={bookForm.available !== false} onChange={bookChange} /> Available for sale</label>
-                  <label><input name="featured" type="checkbox" checked={bookForm.featured} onChange={bookChange} /> Featured</label>
-                  <label><input name="newArrival" type="checkbox" checked={bookForm.newArrival} onChange={bookChange} /> New arrival</label>
+                  <label className="premium-check-v73"><input name="available" type="checkbox" checked={bookForm.available !== false} onChange={bookChange} /> Available for sale</label>
+                  <label className="premium-check-v73"><input name="featured" type="checkbox" checked={bookForm.featured} onChange={bookChange} /> Featured</label>
+                  <label className="premium-check-v73"><input name="newArrival" type="checkbox" checked={bookForm.newArrival} onChange={bookChange} /> New arrival</label>
                 </div>
                 <button className="admin-primary-v6" type="submit">{editingBook ? 'Update book' : 'Add book'}</button>
               </form>
@@ -366,10 +461,10 @@ export default function AdminDashboardPage() {
                     <img src={book.image} alt="" />
                     <div className="inventory-info-v6"><strong>{book.title}</strong><span>{book.author}</span><small>{book.category}</small></div>
                     <div className="inventory-stock-v6"><span>Stock</span><strong>{book.stock}</strong><small>{book.available === false || book.stock === 0 ? 'Unavailable' : book.stock <= 5 ? 'Low stock' : 'Available'}</small></div>
-                    <div className="inventory-stepper-v6"><button onClick={() => quickStock(book, book.stock + 1)}>+1</button><button onClick={() => quickStock(book, book.stock + 5)}>+5</button><button disabled={book.stock === 0} onClick={() => quickStock(book, book.stock - 1)}>−1</button></div>
+                    <div className="inventory-stepper-v6"><button onClick={() => adjustStock(book, 1)}>+1</button><button onClick={() => adjustStock(book, 5)}>+5</button><button disabled={book.stock === 0} onClick={() => adjustStock(book, -1)}>−1</button></div>
                     <div className="inventory-actions-v6">
                       <button onClick={() => editBook(book)}>Edit</button>
-                      <button onClick={() => quickStock(book, book.stock, book.available === false)}>{book.available === false ? 'Make available' : 'Mark unavailable'}</button>
+                      <button onClick={() => toggleBookAvailability(book)}>{book.available === false ? 'Make available' : 'Mark unavailable'}</button>
                       <button className="danger" onClick={() => deleteBook(book)}>Delete</button>
                     </div>
                   </article>
@@ -384,7 +479,7 @@ export default function AdminDashboardPage() {
             <PanelTitle eyebrow="CUSTOMER CRM" title="Customers" copy="Registered customers and order activity from your database." />
             <div className="customer-tools-v6">
               <input value={customerSearch} onChange={e => setCustomerSearch(e.target.value)} placeholder="Search name, email or mobile..." />
-              <label><input type="checkbox" checked={orderedOnly} onChange={e => setOrderedOnly(e.target.checked)} /> Customers with orders only</label>
+              <label className="premium-check-v73 customer-order-check-v73"><input type="checkbox" checked={orderedOnly} onChange={e => setOrderedOnly(e.target.checked)} /> Customers with orders only</label>
             </div>
             <div className="admin-table-wrap-v6"><table className="admin-table-v6"><thead><tr><th>Customer</th><th>Mobile</th><th>Registered</th><th>Last login</th><th>Orders</th><th>Total spent</th><th>Last order</th></tr></thead><tbody>{filteredCustomers.map(customer => <tr key={customer.id}><td><strong>{customer.name}</strong><span>{customer.email}</span></td><td>{customer.mobile || '—'}</td><td>{formatDate(customer.createdAt)}</td><td>{formatDateTime(customer.lastLoginAt)}</td><td><b>{customer.orderCount}</b></td><td>₹{Math.round(customer.totalSpent || 0).toLocaleString()}</td><td>{formatDateTime(customer.lastOrderAt)}</td></tr>)}</tbody></table></div>
           </section>
@@ -403,7 +498,7 @@ export default function AdminDashboardPage() {
                 <label>Start date<input type="date" name="startDate" value={offerForm.startDate || ''} onChange={offerChange} /></label>
                 <label>End date<input type="date" name="endDate" value={offerForm.endDate || ''} onChange={offerChange} /></label>
                 <label className="wide">Description<textarea name="description" value={offerForm.description} onChange={offerChange} rows="4" /></label>
-                <div className="admin-toggle-row-v6 wide"><label><input type="checkbox" name="active" checked={offerForm.active} onChange={offerChange} /> Publish this offer</label></div>
+                <div className="admin-toggle-row-v6 wide"><label className="premium-check-v73"><input type="checkbox" name="active" checked={offerForm.active} onChange={offerChange} /> Publish this offer</label></div>
                 <button className="admin-primary-v6" type="submit">{editingOffer ? 'Update offer' : 'Create offer'}</button>
               </form>
             </section>
@@ -466,6 +561,11 @@ export default function AdminDashboardPage() {
           </section>
         </div>
       )}
+
+      <PremiumConfirm
+        dialog={confirmDialog}
+        onClose={() => setConfirmDialog(null)}
+      />
     </div>
   )
 }

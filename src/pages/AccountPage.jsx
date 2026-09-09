@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
+import PremiumConfirm from '../components/PremiumConfirm'
 
 function statusLabel(value) {
   if (!value) return 'Status unavailable'
@@ -66,6 +67,8 @@ export default function AccountPage() {
   const [addressError, setAddressError] = useState('')
   const [locationBusy, setLocationBusy] = useState(false)
   const [locationMessage, setLocationMessage] = useState('')
+  const [accountNotice, setAccountNotice] = useState('')
+  const [confirmDialog, setConfirmDialog] = useState(null)
 
   async function loadOrders() {
     try {
@@ -204,25 +207,36 @@ export default function AccountPage() {
     }
   }
 
-  async function removeAddress(address) {
-    if (!window.confirm(`Remove ${address.label || 'this'} address?`)) return
-    try {
-      await deleteAddress(address.id)
-    } catch (error) {
-      alert(error.message)
-    }
+  function removeAddress(address) {
+    setConfirmDialog({
+      eyebrow: 'SAVED ADDRESS',
+      title: 'Remove this address?',
+      message: `${address.label || 'This'} address will be removed from your saved delivery addresses.`,
+      confirmLabel: 'Remove address',
+      tone: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteAddress(address.id)
+          setAccountNotice('Address removed')
+        } catch (error) {
+          setAccountNotice(error.message)
+        }
+      }
+    })
   }
 
   async function makeDefault(address) {
     try {
       await setDefaultAddress(address.id)
+      setAccountNotice(`${address.label || 'Address'} set as default`)
     } catch (error) {
-      alert(error.message)
+      setAccountNotice(error.message)
     }
   }
 
   return (
     <section className="page-width account-page premium-account-page min-page account-page-v7">
+      {accountNotice && <button className="account-action-toast-v73" onClick={() => setAccountNotice('')}>{accountNotice}<span>×</span></button>}
       <aside className="account-sidebar premium-account-sidebar glass-panel account-sidebar-v7">
         <Link className="account-home-link" to="/home">← Back to Home</Link>
         <div className="avatar">{user?.name?.charAt(0)?.toUpperCase()}</div>
@@ -403,7 +417,7 @@ export default function AccountPage() {
                 <div><label>Pincode</label><input name="pincode" value={addressForm.pincode} onChange={changeAddress} inputMode="numeric" required /></div>
               </div>
 
-              <label className="default-address-check-v7"><input type="checkbox" name="defaultAddress" checked={Boolean(addressForm.defaultAddress)} onChange={changeAddress} /> <span>Use this as my default delivery address</span></label>
+              <label className="default-address-check-v7 premium-check-v73"><input type="checkbox" name="defaultAddress" checked={Boolean(addressForm.defaultAddress)} onChange={changeAddress} /> <span>Use this as my default delivery address</span></label>
 
               <div className="address-modal-actions-v7">
                 <button type="button" className="outline-btn" onClick={closeAddressEditor}>Cancel</button>
@@ -413,6 +427,7 @@ export default function AccountPage() {
           </div>
         </div>
       )}
+      <PremiumConfirm dialog={confirmDialog} onClose={() => setConfirmDialog(null)} />
     </section>
   )
 }

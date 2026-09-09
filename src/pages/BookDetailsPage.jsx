@@ -22,7 +22,7 @@ export default function BookDetailsPage() {
   async function cart() {
     if (!available || busy) return
     if (!backendReady && book.id.startsWith('demo-')) {
-      alert('Connect the backend to use cart actions.')
+      setMessage('Cart is temporarily unavailable. Please try again in a moment.')
       return
     }
     setBusy(true)

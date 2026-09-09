@@ -16,7 +16,7 @@ export default function BookCard({ book, variant = 'default' }) {
   async function cartClick() {
     if (!available || busy) return
     if (!backendReady && book.id.startsWith('demo-')) {
-      alert('Connect the Spring Boot backend and MongoDB Atlas to use cart actions.')
+      setError('Cart is temporarily unavailable. Please try again in a moment.')
       return
     }
     setBusy(true)
