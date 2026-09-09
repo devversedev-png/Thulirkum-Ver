@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
 
@@ -12,12 +12,60 @@ function statusLabel(value) {
     .join(' ')
 }
 
+function blankAddress(user) {
+  return {
+    label: 'Home',
+    fullName: user?.name || '',
+    mobile: user?.mobile || '',
+    line1: '',
+    line2: '',
+    city: '',
+    state: '',
+    pincode: '',
+    latitude: null,
+    longitude: null,
+    locationLabel: '',
+    defaultAddress: false
+  }
+}
+
+function mapEmbedUrl(latitude, longitude) {
+  if (latitude == null || longitude == null) return ''
+  const lat = Number(latitude)
+  const lon = Number(longitude)
+  const left = lon - 0.008
+  const right = lon + 0.008
+  const bottom = lat - 0.005
+  const top = lat + 0.005
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(`${left},${bottom},${right},${top}`)}&layer=mapnik&marker=${encodeURIComponent(`${lat},${lon}`)}`
+}
+
+function mapOpenUrl(latitude, longitude) {
+  return `https://www.openstreetmap.org/?mlat=${encodeURIComponent(latitude)}&mlon=${encodeURIComponent(longitude)}#map=17/${encodeURIComponent(latitude)}/${encodeURIComponent(longitude)}`
+}
+
 export default function AccountPage() {
+  const location = useLocation()
   const { user, logout } = useAuth()
-  const { account, getOrders } = useStore()
+  const {
+    account,
+    getOrders,
+    addAddress,
+    updateAddress,
+    deleteAddress,
+    setDefaultAddress
+  } = useStore()
+
   const [orders, setOrders] = useState([])
   const [selectedId, setSelectedId] = useState(null)
   const [filter, setFilter] = useState('ALL')
+  const [addressEditorOpen, setAddressEditorOpen] = useState(false)
+  const [editingAddressId, setEditingAddressId] = useState(null)
+  const [addressForm, setAddressForm] = useState(() => blankAddress(user))
+  const [addressBusy, setAddressBusy] = useState(false)
+  const [addressError, setAddressError] = useState('')
+  const [locationBusy, setLocationBusy] = useState(false)
+  const [locationMessage, setLocationMessage] = useState('')
 
   async function loadOrders() {
     try {
@@ -35,45 +83,195 @@ export default function AccountPage() {
     return () => clearInterval(timer)
   }, [])
 
+  useEffect(() => {
+    if (!location.hash) return
+    const timer = setTimeout(() => {
+      document.getElementById(location.hash.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 80)
+    return () => clearTimeout(timer)
+  }, [location.hash])
+
   const visibleOrders = useMemo(() => orders.filter(order => {
     if (filter === 'ALL') return true
     if (filter === 'ACTIVE') return !['DELIVERED', 'CANCELLED'].includes(order.status)
     return order.status === filter
   }), [orders, filter])
 
-  const selected = orders.find(order => order.id === selectedId) || orders[0]
+  const selected = visibleOrders.find(order => order.id === selectedId) || visibleOrders[0] || null
+  const addresses = account?.addresses || []
+  const wishlistCount = account?.wishlist?.length || 0
+  const defaultAddress = addresses.find(address => address.defaultAddress) || addresses[0]
+
+  function openAddAddress() {
+    const draft = blankAddress(user)
+    draft.defaultAddress = addresses.length === 0
+    setEditingAddressId(null)
+    setAddressForm(draft)
+    setAddressError('')
+    setLocationMessage('')
+    setAddressEditorOpen(true)
+  }
+
+  function openEditAddress(address) {
+    setEditingAddressId(address.id)
+    setAddressForm({ ...blankAddress(user), ...address })
+    setAddressError('')
+    setLocationMessage(address.latitude != null && address.longitude != null ? 'Saved map location loaded.' : '')
+    setAddressEditorOpen(true)
+  }
+
+  function closeAddressEditor() {
+    if (addressBusy || locationBusy) return
+    setAddressEditorOpen(false)
+    setEditingAddressId(null)
+    setAddressError('')
+    setLocationMessage('')
+  }
+
+  function changeAddress(event) {
+    const { name, value, type, checked } = event.target
+    setAddressForm(current => ({ ...current, [name]: type === 'checkbox' ? checked : value }))
+  }
+
+  async function reverseGeocode(latitude, longitude) {
+    const baseUrl = import.meta.env.VITE_REVERSE_GEOCODE_URL || 'https://nominatim.openstreetmap.org/reverse'
+    const separator = baseUrl.includes('?') ? '&' : '?'
+    const url = `${baseUrl}${separator}format=jsonv2&addressdetails=1&lat=${encodeURIComponent(latitude)}&lon=${encodeURIComponent(longitude)}`
+    const response = await fetch(url, { headers: { 'Accept-Language': 'en' } })
+    if (!response.ok) throw new Error('Unable to read the address from the map')
+    return response.json()
+  }
+
+  function useCurrentLocation() {
+    setAddressError('')
+    setLocationMessage('')
+
+    if (!navigator.geolocation) {
+      setAddressError('Location access is not supported by this browser.')
+      return
+    }
+
+    setLocationBusy(true)
+    navigator.geolocation.getCurrentPosition(async position => {
+      const latitude = Number(position.coords.latitude.toFixed(6))
+      const longitude = Number(position.coords.longitude.toFixed(6))
+      setAddressForm(current => ({ ...current, latitude, longitude }))
+
+      try {
+        const place = await reverseGeocode(latitude, longitude)
+        const data = place.address || {}
+        const road = [data.house_number, data.road || data.pedestrian || data.residential].filter(Boolean).join(' ')
+        const locality = data.suburb || data.neighbourhood || data.quarter || data.hamlet || ''
+        const city = data.city || data.town || data.village || data.municipality || data.county || ''
+        setAddressForm(current => ({
+          ...current,
+          latitude,
+          longitude,
+          line1: road || current.line1,
+          line2: locality || current.line2,
+          city: city || current.city,
+          state: data.state || current.state,
+          pincode: data.postcode || current.pincode,
+          locationLabel: place.display_name || current.locationLabel
+        }))
+        setLocationMessage('Live location captured and address details filled. You can edit them before saving.')
+      } catch {
+        setLocationMessage('Live location captured. Please complete the address fields before saving.')
+      } finally {
+        setLocationBusy(false)
+      }
+    }, error => {
+      setLocationBusy(false)
+      if (error.code === error.PERMISSION_DENIED) setAddressError('Location permission was denied. Allow location access in the browser and try again.')
+      else setAddressError('Unable to fetch your live location right now. You can still enter the address manually.')
+    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 })
+  }
+
+  async function saveAddress(event) {
+    event.preventDefault()
+    setAddressBusy(true)
+    setAddressError('')
+    try {
+      if (editingAddressId) await updateAddress(editingAddressId, addressForm)
+      else await addAddress(addressForm)
+      setAddressEditorOpen(false)
+      setEditingAddressId(null)
+      setLocationMessage('')
+    } catch (error) {
+      setAddressError(error.message)
+    } finally {
+      setAddressBusy(false)
+    }
+  }
+
+  async function removeAddress(address) {
+    if (!window.confirm(`Remove ${address.label || 'this'} address?`)) return
+    try {
+      await deleteAddress(address.id)
+    } catch (error) {
+      alert(error.message)
+    }
+  }
+
+  async function makeDefault(address) {
+    try {
+      await setDefaultAddress(address.id)
+    } catch (error) {
+      alert(error.message)
+    }
+  }
 
   return (
-    <section className="page-width account-page premium-account-page min-page account-page-v6">
-      <aside className="account-sidebar premium-account-sidebar glass-panel">
+    <section className="page-width account-page premium-account-page min-page account-page-v7">
+      <aside className="account-sidebar premium-account-sidebar glass-panel account-sidebar-v7">
         <Link className="account-home-link" to="/home">← Back to Home</Link>
         <div className="avatar">{user?.name?.charAt(0)?.toUpperCase()}</div>
         <h3>{user?.name}</h3>
         <span>{user?.email}</span>
+
+        <div className="account-side-stats">
+          <div><strong>{orders.length}</strong><span>Orders</span></div>
+          <div><strong>{wishlistCount}</strong><span>Wishlist</span></div>
+          <div><strong>{addresses.length}</strong><span>Addresses</span></div>
+        </div>
+
         <nav>
-          <a href="#orders">My Orders</a>
-          <Link to="/wishlist">My Wishlist</Link>
-          <a href="#address">My Addresses</a>
-          <button onClick={logout}>Logout</button>
+          <a href="#orders"><span>▣</span> My Orders</a>
+          <Link to="/wishlist"><span>♡</span> My Wishlist <b>{wishlistCount || ''}</b></Link>
+          <a href="#address"><span>⌖</span> My Addresses</a>
+          <button onClick={logout}><span>↪</span> Logout</button>
         </nav>
       </aside>
 
       <div className="account-content">
-        <div className="account-welcome premium-account-welcome glass-panel">
-          <div><span className="eyebrow">MY ACCOUNT</span><h1>Hello, {user?.name?.split(' ')[0]}</h1><p>View your purchases, current status and saved delivery details.</p></div>
-          <div className="account-mini-stat"><strong>{orders.length}</strong><span>Total Orders</span></div>
+        <div className="account-welcome premium-account-welcome glass-panel account-welcome-v7">
+          <div>
+            <span className="eyebrow">MY ACCOUNT</span>
+            <h1>Hello, {user?.name?.split(' ')[0]}</h1>
+            <p>Manage orders, saved books and delivery addresses from one place.</p>
+          </div>
+          <div className="account-welcome-actions">
+            <Link className="outline-btn compact" to="/shop">Continue shopping</Link>
+            <button className="primary-btn compact" onClick={openAddAddress}>+ Add address</button>
+          </div>
         </div>
 
-        <section id="orders" className="account-box premium-orders-box glass-panel">
+        <div className="account-overview-grid">
+          <a href="#orders" className="account-overview-card glass-card"><span>▣</span><div><strong>{orders.length}</strong><small>Orders & tracking</small></div><b>→</b></a>
+          <Link to="/wishlist" className="account-overview-card glass-card"><span>♡</span><div><strong>{wishlistCount}</strong><small>Saved books</small></div><b>→</b></Link>
+          <a href="#address" className="account-overview-card glass-card"><span>⌖</span><div><strong>{addresses.length}</strong><small>Delivery addresses</small></div><b>→</b></a>
+        </div>
+
+        <section id="orders" className="account-box premium-orders-box glass-panel account-section-v7">
           <div className="section-heading order-section-head">
-            <div><h2>My Orders</h2><p>Select an order to view its items and tracking history.</p></div>
-            <button className="outline-btn compact" onClick={loadOrders}>Refresh</button>
+            <div><span className="eyebrow">PURCHASES</span><h2>My Orders</h2><p>Select an order to see items and live status history.</p></div>
+            <button className="outline-btn compact" onClick={loadOrders}>↻ Refresh</button>
           </div>
 
           <div className="order-filter-tabs">
             {['ALL', 'ACTIVE', 'DELIVERED', 'CANCELLED'].map(item => (
               <button key={item} className={filter === item ? 'active' : ''} onClick={() => setFilter(item)}>
-                {item === 'ALL' ? 'All' : item === 'ACTIVE' ? 'Active' : statusLabel(item)}
+                {item === 'ALL' ? 'All orders' : item === 'ACTIVE' ? 'Active' : statusLabel(item)}
               </button>
             ))}
           </div>
@@ -84,20 +282,20 @@ export default function AccountPage() {
                 <button className={`customer-order-card glass-card ${selected?.id === order.id ? 'selected' : ''}`} key={order.id} onClick={() => setSelectedId(order.id)}>
                   <div className="order-card-top"><strong>#{order.orderNumber}</strong><span className={`status-chip status-${String(order.status).toLowerCase()}`}>{statusLabel(order.status)}</span></div>
                   <span className="order-date">{order.createdAt ? new Date(order.createdAt).toLocaleString() : 'Date unavailable'}</span>
-                  <div className="order-card-bottom"><span>{order.items?.length || 0} item types</span><strong>₹{order.total}</strong></div>
+                  <div className="order-card-bottom"><span>{order.items?.reduce((sum, item) => sum + Number(item.quantity || 0), 0) || 0} books</span><strong>₹{order.total}</strong></div>
                 </button>
-              )) : <div className="muted account-no-order">No orders in this filter.</div>}
+              )) : <div className="account-empty-v7"><span>▣</span><h4>No orders here</h4><p>Orders matching this filter will appear here.</p><Link to="/shop">Browse books</Link></div>}
             </div>
 
             {selected ? (
               <div className="order-track-panel glass-card">
                 <div className="track-panel-head">
-                  <div><span className="eyebrow">ORDER TRACKING</span><h3>#{selected.orderNumber}</h3></div>
+                  <div><span className="eyebrow">ORDER TRACKING</span><h3>#{selected.orderNumber}</h3><small>{selected.createdAt ? new Date(selected.createdAt).toLocaleString() : ''}</small></div>
                   <span className={`status-chip status-${String(selected.status).toLowerCase()}`}>{statusLabel(selected.status)}</span>
                 </div>
 
                 {selected.status === 'CANCELLED' && (
-                  <div className="cancelled-order-banner"><b>Order cancelled</b><span>The order is closed. If the store reopens it, a new tracking event will appear here.</span></div>
+                  <div className="cancelled-order-banner"><b>Order cancelled</b><span>If the store reopens this order, the next tracking event will appear here automatically.</span></div>
                 )}
 
                 <div className="tracking-history-v6">
@@ -121,23 +319,100 @@ export default function AccountPage() {
                 </div>
               </div>
             ) : (
-              <div className="order-track-panel empty-track glass-card"><h3>No order selected</h3><p>Your order tracking will appear here after checkout.</p></div>
+              <div className="order-track-panel empty-track glass-card"><span className="empty-icon-v7">◎</span><h3>No order selected</h3><p>Select an order to view tracking details.</p></div>
             )}
           </div>
         </section>
 
-        <section id="address" className="account-box glass-panel">
-          <div className="section-heading"><div><h2>Saved Address</h2><p>Your delivery details</p></div></div>
-          {account?.addresses?.length ? account.addresses.map((address, index) => (
-            <div className="address-card glass-card" key={index}>
-              <strong>{address.fullName}</strong>
-              <span>{address.line1}{address.line2 ? `, ${address.line2}` : ''}</span>
-              <span>{address.city}, {address.state} - {address.pincode}</span>
-              <span>{address.mobile}</span>
+        <section id="address" className="account-box glass-panel account-section-v7 address-section-v7">
+          <div className="section-heading address-heading-v7">
+            <div><span className="eyebrow">DELIVERY</span><h2>My Addresses</h2><p>Save multiple addresses, use your live location and choose a default delivery address.</p></div>
+            <button className="primary-btn compact" onClick={openAddAddress}>+ Add new address</button>
+          </div>
+
+          {addresses.length ? (
+            <div className="address-grid-v7">
+              {addresses.map(address => (
+                <article className={`address-card-v7 glass-card ${address.defaultAddress ? 'is-default' : ''}`} key={address.id}>
+                  <div className="address-card-head-v7">
+                    <div><span className="address-label-v7">{address.label || 'Address'}</span>{address.defaultAddress && <span className="default-address-chip">Default</span>}</div>
+                    {address.latitude != null && address.longitude != null && <span className="location-saved-chip">⌖ Location saved</span>}
+                  </div>
+                  <strong>{address.fullName}</strong>
+                  <p>{address.line1}{address.line2 ? `, ${address.line2}` : ''}<br />{address.city}, {address.state} - {address.pincode}</p>
+                  <span className="address-mobile-v7">☎ {address.mobile}</span>
+                  {address.locationLabel && <small className="address-location-label-v7">{address.locationLabel}</small>}
+                  <div className="address-actions-v7">
+                    <button onClick={() => openEditAddress(address)}>Edit</button>
+                    {!address.defaultAddress && <button onClick={() => makeDefault(address)}>Set default</button>}
+                    {address.latitude != null && address.longitude != null && <a href={mapOpenUrl(address.latitude, address.longitude)} target="_blank" rel="noreferrer">View map</a>}
+                    <button className="danger-link-v7" onClick={() => removeAddress(address)}>Remove</button>
+                  </div>
+                </article>
+              ))}
             </div>
-          )) : <p className="muted">Your first checkout address will be saved here.</p>}
+          ) : (
+            <div className="address-empty-v7">
+              <div className="address-empty-icon-v7">⌖</div>
+              <div><h3>No saved address yet</h3><p>Add a delivery address manually or fetch your current location from the map.</p></div>
+              <button className="primary-btn compact" onClick={openAddAddress}>+ Add address</button>
+            </div>
+          )}
+
+          {defaultAddress && <div className="default-delivery-note-v7">✓ <span><b>{defaultAddress.label || 'Default address'}</b> will be preselected during checkout.</span></div>}
         </section>
       </div>
+
+      {addressEditorOpen && (
+        <div className="address-modal-backdrop-v7" onMouseDown={event => event.target === event.currentTarget && closeAddressEditor()}>
+          <div className="address-modal-v7 glass-panel" role="dialog" aria-modal="true" aria-label={editingAddressId ? 'Edit address' : 'Add address'}>
+            <div className="address-modal-head-v7">
+              <div><span className="eyebrow">DELIVERY ADDRESS</span><h2>{editingAddressId ? 'Edit saved address' : 'Add a new address'}</h2><p>Enter the address manually or capture your live location.</p></div>
+              <button type="button" onClick={closeAddressEditor} aria-label="Close">×</button>
+            </div>
+
+            <div className="location-capture-panel-v7">
+              <div>
+                <span className="location-icon-v7">⌖</span>
+                <div><strong>Use your current location</strong><p>We will ask for browser permission, show the location on a map and fill available address fields.</p></div>
+              </div>
+              <button type="button" className="location-button-v7" onClick={useCurrentLocation} disabled={locationBusy}>
+                {locationBusy ? 'Locating...' : addressForm.latitude != null ? '↻ Refresh location' : '⌖ Use current location'}
+              </button>
+            </div>
+
+            {addressForm.latitude != null && addressForm.longitude != null && (
+              <div className="address-map-wrap-v7">
+                <iframe title="Saved delivery location" src={mapEmbedUrl(addressForm.latitude, addressForm.longitude)} loading="lazy" />
+                <div><span>Latitude {addressForm.latitude} · Longitude {addressForm.longitude}</span><a href={mapOpenUrl(addressForm.latitude, addressForm.longitude)} target="_blank" rel="noreferrer">Open full map ↗</a></div>
+              </div>
+            )}
+
+            {locationMessage && <div className="location-success-v7">✓ {locationMessage}</div>}
+            {addressError && <div className="form-error">{addressError}</div>}
+
+            <form className="address-form-v7" onSubmit={saveAddress}>
+              <div className="address-form-grid-v7">
+                <div><label>Address label</label><select name="label" value={addressForm.label} onChange={changeAddress}><option>Home</option><option>Work</option><option>Other</option></select></div>
+                <div><label>Full name</label><input name="fullName" value={addressForm.fullName} onChange={changeAddress} required /></div>
+                <div><label>Mobile number</label><input name="mobile" value={addressForm.mobile} onChange={changeAddress} required /></div>
+                <div className="wide"><label>Flat / House / Street</label><input name="line1" value={addressForm.line1} onChange={changeAddress} required /></div>
+                <div className="wide"><label>Area / Landmark</label><input name="line2" value={addressForm.line2} onChange={changeAddress} /></div>
+                <div><label>City</label><input name="city" value={addressForm.city} onChange={changeAddress} required /></div>
+                <div><label>State</label><input name="state" value={addressForm.state} onChange={changeAddress} required /></div>
+                <div><label>Pincode</label><input name="pincode" value={addressForm.pincode} onChange={changeAddress} inputMode="numeric" required /></div>
+              </div>
+
+              <label className="default-address-check-v7"><input type="checkbox" name="defaultAddress" checked={Boolean(addressForm.defaultAddress)} onChange={changeAddress} /> <span>Use this as my default delivery address</span></label>
+
+              <div className="address-modal-actions-v7">
+                <button type="button" className="outline-btn" onClick={closeAddressEditor}>Cancel</button>
+                <button className="primary-btn" disabled={addressBusy}>{addressBusy ? 'Saving...' : editingAddressId ? 'Save changes' : 'Save address'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

@@ -14,7 +14,7 @@ export default function Header() {
 
   const cartCount = account?.cart?.reduce((sum, item) => sum + item.quantity, 0) || 0
   const wishlistCount = account?.wishlist?.length || 0
-  const deliveryAddress = account?.addresses?.[0]
+  const deliveryAddress = account?.addresses?.find(address => address.defaultAddress) || account?.addresses?.[0]
   const supportEmail = import.meta.env.VITE_SUPPORT_EMAIL || ''
 
   const categories = useMemo(() => {
@@ -86,7 +86,7 @@ export default function Header() {
     <>
       <div className="market-topbar glass-topbar">
         <div className="market-topbar-inner">
-          <Link to="/account" className="delivery-link">⌖ Deliver to <strong>{deliveryText}</strong></Link>
+          <Link to="/account#address" className="delivery-link">⌖ Deliver to <strong>{deliveryText}</strong></Link>
           <span className="market-trust">Genuine books · Secure checkout · Live order tracking</span>
           {supportEmail ? <a href={`mailto:${supportEmail}`}>Need help? {supportEmail}</a> : <Link to="/account">Help & account</Link>}
         </div>

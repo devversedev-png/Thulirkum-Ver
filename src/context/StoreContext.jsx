@@ -81,6 +81,31 @@ export function StoreProvider({ children }) {
     setAccount(data)
   }
 
+
+  async function addAddress(address) {
+    const data = await api('/account/addresses', { method: 'POST', body: JSON.stringify(address) })
+    setAccount(data)
+    return data
+  }
+
+  async function updateAddress(addressId, address) {
+    const data = await api(`/account/addresses/${addressId}`, { method: 'PUT', body: JSON.stringify(address) })
+    setAccount(data)
+    return data
+  }
+
+  async function deleteAddress(addressId) {
+    const data = await api(`/account/addresses/${addressId}`, { method: 'DELETE' })
+    setAccount(data)
+    return data
+  }
+
+  async function setDefaultAddress(addressId) {
+    const data = await api(`/account/addresses/${addressId}/default`, { method: 'PUT' })
+    setAccount(data)
+    return data
+  }
+
   async function placeOrder(payload) {
     const order = await api('/orders', { method: 'POST', body: JSON.stringify(payload) })
     await Promise.all([loadAccount(), loadBooks(true)])
@@ -100,6 +125,7 @@ export function StoreProvider({ children }) {
     books, offers, account, loading, backendReady,
     loadBooks, loadOffers, loadAccount, getBook, cartRows,
     addToCart, updateCart, removeFromCart, toggleWishlist,
+    addAddress, updateAddress, deleteAddress, setDefaultAddress,
     placeOrder, getOrders, getOrder
   }), [books, offers, account, loading, backendReady])
 

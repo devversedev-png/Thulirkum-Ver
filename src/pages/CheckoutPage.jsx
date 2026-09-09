@@ -1,27 +1,44 @@
-import { useMemo, useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Navigate, Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
 
-const emptyAddress = {
-  fullName: '',
-  mobile: '',
-  line1: '',
-  line2: '',
-  city: '',
-  state: 'Tamil Nadu',
-  pincode: ''
+function blankAddress(user) {
+  return {
+    label: 'Home',
+    fullName: user?.name || '',
+    mobile: user?.mobile || '',
+    line1: '',
+    line2: '',
+    city: '',
+    state: '',
+    pincode: '',
+    latitude: null,
+    longitude: null,
+    locationLabel: '',
+    defaultAddress: false
+  }
 }
 
 export default function CheckoutPage() {
+  const { user } = useAuth()
   const { cartRows, placeOrder, account, offers } = useStore()
   const navigate = useNavigate()
   const rows = cartRows()
-  const firstAddress = account?.addresses?.[0]
-  const [address, setAddress] = useState(firstAddress || emptyAddress)
+  const addresses = account?.addresses || []
+  const preferredAddress = addresses.find(item => item.defaultAddress) || addresses[0]
+  const [selectedAddressId, setSelectedAddressId] = useState(preferredAddress?.id || 'NEW')
+  const [address, setAddress] = useState(preferredAddress ? { ...preferredAddress } : blankAddress(user))
   const [paymentMethod, setPaymentMethod] = useState('COD')
   const [couponCode, setCouponCode] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!addresses.length) return
+    const current = addresses.find(item => item.id === selectedAddressId)
+    if (current) setAddress({ ...current })
+  }, [account?.addresses])
 
   const subtotal = rows.reduce((sum, row) => sum + row.book.price * row.quantity, 0)
   const shipping = subtotal >= 499 ? 0 : 60
@@ -39,6 +56,16 @@ export default function CheckoutPage() {
     setAddress({ ...address, [event.target.name]: event.target.value })
   }
 
+  function chooseSavedAddress(item) {
+    setSelectedAddressId(item.id)
+    setAddress({ ...item })
+  }
+
+  function chooseNewAddress() {
+    setSelectedAddressId('NEW')
+    setAddress(blankAddress(user))
+  }
+
   async function submit(event) {
     event.preventDefault()
     setBusy(true)
@@ -54,11 +81,24 @@ export default function CheckoutPage() {
   }
 
   return (
-    <section className="page-width checkout-page min-page">
+    <section className="page-width checkout-page min-page checkout-page-v7">
       <div className="checkout-steps"><span className="active">1 Address</span><span>2 Delivery</span><span>3 Payment</span><span>4 Review</span></div>
       <div className="checkout-layout">
         <form className="checkout-form" onSubmit={submit}>
-          <h2>Delivery Address</h2>
+          <div className="checkout-section-head-v7"><div><span className="eyebrow">DELIVERY</span><h2>Delivery Address</h2></div><Link to="/account#address">Manage saved addresses</Link></div>
+
+          {addresses.length > 0 && (
+            <div className="checkout-address-picker-v7">
+              {addresses.map(item => (
+                <button type="button" key={item.id} className={`checkout-address-option-v7 ${selectedAddressId === item.id ? 'selected' : ''}`} onClick={() => chooseSavedAddress(item)}>
+                  <span className="checkout-radio-v7">{selectedAddressId === item.id ? '●' : '○'}</span>
+                  <div><strong>{item.label || 'Address'} {item.defaultAddress && <small>Default</small>}</strong><p>{item.line1}{item.line2 ? `, ${item.line2}` : ''}, {item.city} - {item.pincode}</p></div>
+                </button>
+              ))}
+              <button type="button" className={`checkout-address-option-v7 new ${selectedAddressId === 'NEW' ? 'selected' : ''}`} onClick={chooseNewAddress}><span>＋</span><div><strong>Use a new address</strong><p>This address will be saved to your account after checkout.</p></div></button>
+            </div>
+          )}
+
           <div className="form-grid">
             <div><label>Full Name</label><input name="fullName" value={address.fullName} onChange={change} required /></div>
             <div><label>Mobile Number</label><input name="mobile" value={address.mobile} onChange={change} required /></div>
@@ -74,7 +114,7 @@ export default function CheckoutPage() {
             <label><input type="radio" name="payment" checked={paymentMethod === 'COD'} onChange={() => setPaymentMethod('COD')} /> Cash on Delivery</label>
             <label><input type="radio" name="payment" checked={paymentMethod === 'UPI'} onChange={() => setPaymentMethod('UPI')} /> UPI / Online Payment</label>
           </div>
-          {paymentMethod === 'UPI' && <div className="payment-note">Payment gateway credentials are not included yet. Connect Razorpay or another gateway before production launch.</div>}
+          {paymentMethod === 'UPI' && <div className="payment-note">Online payment will be enabled when the production payment gateway is connected.</div>}
 
           <h2 className="payment-title">Offer Code</h2>
           <div className="checkout-coupon-box">
