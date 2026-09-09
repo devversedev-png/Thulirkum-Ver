@@ -92,6 +92,7 @@ export default function Header() {
         </div>
       </div>
 
+      <div className="commerce-sticky-shell">
       <header className="market-header glass-market-header">
         <Link className="market-brand" to="/home" aria-label="Thulirkum Ver home">
           <img src="/logo.png" alt="Thulirkum Ver Book Store" />
@@ -177,6 +178,7 @@ export default function Header() {
           ))}
           <NavLink className="market-offer-link" to="/offers">⚡ Offers</NavLink>
         </div>
+      </div>
       </div>
     </>
   )

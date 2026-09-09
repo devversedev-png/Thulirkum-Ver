@@ -3,19 +3,84 @@ import { useMemo } from 'react'
 import { useStore } from '../context/StoreContext'
 import BookCard from '../components/BookCard'
 
+function languageKey(value = '') {
+  const text = String(value).trim().toLowerCase()
+  if (text.includes('tamil') || text.includes('தமிழ்')) return 'Tamil'
+  if (text.includes('english')) return 'English'
+  return value || 'Other'
+}
+
 export default function HomePage() {
   const { books, offers, loading, backendReady } = useStore()
 
   const categoryRows = useMemo(() => {
-    const counts = new Map()
+    const groups = new Map()
+
     books.forEach(book => {
       if (!book.category) return
-      counts.set(book.category, (counts.get(book.category) || 0) + 1)
+      if (!groups.has(book.category)) groups.set(book.category, [])
+      groups.get(book.category).push(book)
     })
-    return [...counts.entries()]
-      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+
+    return [...groups.entries()]
+      .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
       .slice(0, 8)
-      .map(([name, count]) => ({ name, count }))
+      .map(([name, categoryBooks]) => ({
+        name,
+        count: categoryBooks.length,
+        covers: categoryBooks
+          .filter(book => book.image)
+          .sort((a, b) => Number(b.featured || false) - Number(a.featured || false) || Number(b.rating || 0) - Number(a.rating || 0))
+          .slice(0, 3)
+          .map(book => ({ id: book.id, image: book.image, title: book.title }))
+      }))
+  }, [books])
+
+  const authorRows = useMemo(() => {
+    const groups = new Map()
+
+    books.forEach(book => {
+      const author = String(book.author || '').trim()
+      if (!author) return
+      if (!groups.has(author)) groups.set(author, [])
+      groups.get(author).push(book)
+    })
+
+    const authors = [...groups.entries()].map(([name, authorBooks]) => {
+      const languageCounts = authorBooks.reduce((result, book) => {
+        const key = languageKey(book.language)
+        result[key] = (result[key] || 0) + 1
+        return result
+      }, {})
+
+      const language = Object.entries(languageCounts)
+        .sort((a, b) => b[1] - a[1])[0]?.[0] || 'Other'
+
+      const sortedBooks = [...authorBooks].sort((a, b) =>
+        Number(b.featured || false) - Number(a.featured || false)
+        || Number(b.rating || 0) - Number(a.rating || 0)
+        || String(a.title || '').localeCompare(String(b.title || ''))
+      )
+
+      return {
+        name,
+        language,
+        count: authorBooks.length,
+        rating: authorBooks.reduce((sum, book) => sum + Number(book.rating || 0), 0) / Math.max(authorBooks.length, 1),
+        books: sortedBooks.slice(0, 3)
+      }
+    })
+
+    const sortAuthors = list => [...list].sort((a, b) =>
+      b.count - a.count || b.rating - a.rating || a.name.localeCompare(b.name)
+    )
+
+    const english = sortAuthors(authors.filter(author => author.language === 'English')).slice(0, 3)
+    const tamil = sortAuthors(authors.filter(author => author.language === 'Tamil')).slice(0, 2)
+    const selectedNames = new Set([...english, ...tamil].map(author => author.name))
+    const remaining = sortAuthors(authors.filter(author => !selectedNames.has(author.name)))
+
+    return [...english, ...tamil, ...remaining].slice(0, 5)
   }, [books])
 
   const featuredBooks = books.filter(book => book.featured && book.available !== false && book.stock > 0)
@@ -78,15 +143,29 @@ export default function HomePage() {
       {categoryRows.length > 0 && (
         <section className="page-width home-section-v6">
           <div className="section-head-v6">
-            <div><span>DISCOVER</span><h2>Shop by category</h2><p>Browse the catalogue the way you prefer.</p></div>
+            <div><span>DISCOVER</span><h2>Shop by category</h2><p>Visual shelves built directly from the books available in each category.</p></div>
             <Link to="/shop">View all books →</Link>
           </div>
-          <div className="category-grid-v6">
-            {categoryRows.map(({ name, count }) => (
-              <Link key={name} to={`/shop?category=${encodeURIComponent(name)}`} className="category-card-v6 glass-card">
-                <span className="category-monogram-v6">{name.charAt(0).toUpperCase()}</span>
-                <div><strong>{name}</strong><small>{count} {count === 1 ? 'book' : 'books'}</small></div>
-                <b>→</b>
+          <div className="category-grid-v7">
+            {categoryRows.map(({ name, count, covers }) => (
+              <Link key={name} to={`/shop?category=${encodeURIComponent(name)}`} className="category-card-v7 glass-card">
+                <div className="category-art-v7" aria-hidden="true">
+                  {covers.length ? covers.map((cover, index) => (
+                    <img
+                      key={`${cover.id}-${index}`}
+                      className={`category-cover-v7 category-cover-${index + 1}`}
+                      src={cover.image}
+                      alt=""
+                    />
+                  )) : <span>{name.charAt(0).toUpperCase()}</span>}
+                  <i />
+                </div>
+                <div className="category-copy-v7">
+                  <small>EXPLORE CATEGORY</small>
+                  <strong>{name}</strong>
+                  <span>{count} {count === 1 ? 'book' : 'books'} in catalogue</span>
+                </div>
+                <b>Browse →</b>
               </Link>
             ))}
           </div>
@@ -140,6 +219,43 @@ export default function HomePage() {
           </div>
           <div className="market-product-grid v6-product-grid">
             {topRated.map(book => <BookCard key={book.id} book={book} />)}
+          </div>
+        </section>
+      )}
+
+      {authorRows.length > 0 && (
+        <section className="page-width home-section-v6 author-section-v7 glass-panel">
+          <div className="section-head-v6 author-section-head-v7">
+            <div>
+              <span>AUTHOR SPOTLIGHT</span>
+              <h2>Browse by author</h2>
+              <p>Three English and two Tamil author shelves are selected automatically from your live catalogue whenever those languages are available.</p>
+            </div>
+            <Link to="/shop">Explore the full catalogue →</Link>
+          </div>
+
+          <div className="author-grid-v7">
+            {authorRows.map(author => (
+              <Link key={author.name} to={`/shop?q=${encodeURIComponent(author.name)}`} className="author-card-v7 glass-card">
+                <div className="author-book-stack-v7" aria-hidden="true">
+                  {author.books.map((book, index) => (
+                    <img
+                      key={`${book.id}-${index}`}
+                      className={`author-cover-v7 author-cover-${index + 1}`}
+                      src={book.image}
+                      alt=""
+                    />
+                  ))}
+                  {!author.books.length && <span>{author.name.charAt(0).toUpperCase()}</span>}
+                </div>
+                <div className="author-copy-v7">
+                  <span>{author.language}</span>
+                  <strong>{author.name}</strong>
+                  <small>{author.count} {author.count === 1 ? 'title' : 'titles'} available</small>
+                </div>
+                <b>View books →</b>
+              </Link>
+            ))}
           </div>
         </section>
       )}
