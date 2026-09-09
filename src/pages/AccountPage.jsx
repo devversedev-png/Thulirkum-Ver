@@ -3,18 +3,14 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
 
-const statusLabels = {
-  BOOKING_CONFIRMED: 'Booking Confirmed',
-  CONFIRMED: 'Confirmed',
-  PACKED: 'Packed',
-  SHIPPED: 'Shipped',
-  OUT_FOR_DELIVERY: 'Out for Delivery',
-  DELIVERED: 'Delivered',
-  CANCELLED: 'Cancelled',
-  Processing: 'Processing'
+function statusLabel(value) {
+  if (!value) return 'Status unavailable'
+  return String(value)
+    .toLowerCase()
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 }
-
-const flow = ['BOOKING_CONFIRMED', 'CONFIRMED', 'PACKED', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED']
 
 export default function AccountPage() {
   const { user, logout } = useAuth()
@@ -48,8 +44,9 @@ export default function AccountPage() {
   const selected = orders.find(order => order.id === selectedId) || orders[0]
 
   return (
-    <section className="page-width account-page premium-account-page min-page">
-      <aside className="account-sidebar premium-account-sidebar">
+    <section className="page-width account-page premium-account-page min-page account-page-v6">
+      <aside className="account-sidebar premium-account-sidebar glass-panel">
+        <Link className="account-home-link" to="/home">← Back to Home</Link>
         <div className="avatar">{user?.name?.charAt(0)?.toUpperCase()}</div>
         <h3>{user?.name}</h3>
         <span>{user?.email}</span>
@@ -62,21 +59,21 @@ export default function AccountPage() {
       </aside>
 
       <div className="account-content">
-        <div className="account-welcome premium-account-welcome">
-          <div><span className="eyebrow">My Account</span><h1>Hello, {user?.name?.split(' ')[0]}</h1><p>Track every order from booking confirmation to delivery.</p></div>
+        <div className="account-welcome premium-account-welcome glass-panel">
+          <div><span className="eyebrow">MY ACCOUNT</span><h1>Hello, {user?.name?.split(' ')[0]}</h1><p>View your purchases, current status and saved delivery details.</p></div>
           <div className="account-mini-stat"><strong>{orders.length}</strong><span>Total Orders</span></div>
         </div>
 
-        <section id="orders" className="account-box premium-orders-box">
+        <section id="orders" className="account-box premium-orders-box glass-panel">
           <div className="section-heading order-section-head">
-            <div><h2>My Orders</h2><p>Select an order to view items and live tracking.</p></div>
+            <div><h2>My Orders</h2><p>Select an order to view its items and tracking history.</p></div>
             <button className="outline-btn compact" onClick={loadOrders}>Refresh</button>
           </div>
 
           <div className="order-filter-tabs">
             {['ALL', 'ACTIVE', 'DELIVERED', 'CANCELLED'].map(item => (
               <button key={item} className={filter === item ? 'active' : ''} onClick={() => setFilter(item)}>
-                {item === 'ALL' ? 'All' : item === 'ACTIVE' ? 'Active' : statusLabels[item]}
+                {item === 'ALL' ? 'All' : item === 'ACTIVE' ? 'Active' : statusLabel(item)}
               </button>
             ))}
           </div>
@@ -84,8 +81,8 @@ export default function AccountPage() {
           <div className="customer-order-layout">
             <div className="customer-order-list">
               {visibleOrders.length ? visibleOrders.map(order => (
-                <button className={`customer-order-card ${selected?.id === order.id ? 'selected' : ''}`} key={order.id} onClick={() => setSelectedId(order.id)}>
-                  <div className="order-card-top"><strong>#{order.orderNumber}</strong><span className={`status-chip status-${String(order.status).toLowerCase()}`}>{statusLabels[order.status] || order.status}</span></div>
+                <button className={`customer-order-card glass-card ${selected?.id === order.id ? 'selected' : ''}`} key={order.id} onClick={() => setSelectedId(order.id)}>
+                  <div className="order-card-top"><strong>#{order.orderNumber}</strong><span className={`status-chip status-${String(order.status).toLowerCase()}`}>{statusLabel(order.status)}</span></div>
                   <span className="order-date">{order.createdAt ? new Date(order.createdAt).toLocaleString() : 'Date unavailable'}</span>
                   <div className="order-card-bottom"><span>{order.items?.length || 0} item types</span><strong>₹{order.total}</strong></div>
                 </button>
@@ -93,29 +90,24 @@ export default function AccountPage() {
             </div>
 
             {selected ? (
-              <div className="order-track-panel">
+              <div className="order-track-panel glass-card">
                 <div className="track-panel-head">
-                  <div><span className="eyebrow">Order tracking</span><h3>#{selected.orderNumber}</h3></div>
-                  <span className={`status-chip status-${String(selected.status).toLowerCase()}`}>{statusLabels[selected.status] || selected.status}</span>
+                  <div><span className="eyebrow">ORDER TRACKING</span><h3>#{selected.orderNumber}</h3></div>
+                  <span className={`status-chip status-${String(selected.status).toLowerCase()}`}>{statusLabel(selected.status)}</span>
                 </div>
 
-                {selected.status === 'CANCELLED' ? (
-                  <div className="cancelled-order-banner"><b>Order Cancelled</b><span>This order was cancelled. Reserved stock was returned to inventory.</span></div>
-                ) : (
-                  <div className="tracking-timeline">
-                    {flow.map((step, index) => {
-                      const currentIndex = flow.indexOf(selected.status)
-                      const historyEvent = selected.statusHistory?.find(event => event.status === step)
-                      const done = currentIndex >= index || Boolean(historyEvent)
-                      return (
-                        <div key={step} className={`tracking-step ${done ? 'done' : ''} ${selected.status === step ? 'current' : ''}`}>
-                          <b>{done ? '✓' : index + 1}</b>
-                          <div><strong>{statusLabels[step]}</strong><span>{historyEvent?.at ? new Date(historyEvent.at).toLocaleString() : done ? 'Completed' : 'Waiting for update'}</span>{historyEvent?.note && <small>{historyEvent.note}</small>}</div>
-                        </div>
-                      )
-                    })}
-                  </div>
+                {selected.status === 'CANCELLED' && (
+                  <div className="cancelled-order-banner"><b>Order cancelled</b><span>The order is closed. If the store reopens it, a new tracking event will appear here.</span></div>
                 )}
+
+                <div className="tracking-history-v6">
+                  {(selected.statusHistory || []).length ? [...selected.statusHistory].map((event, index) => (
+                    <div className="history-step-v6" key={`${event.status}-${event.at || index}`}>
+                      <span className="history-dot-v6">{index + 1}</span>
+                      <div><strong>{statusLabel(event.status)}</strong><small>{event.at ? new Date(event.at).toLocaleString() : 'Time unavailable'}</small>{event.note && <p>{event.note}</p>}</div>
+                    </div>
+                  )) : <p className="muted">Tracking updates will appear here as your order progresses.</p>}
+                </div>
 
                 <div className="tracked-items">
                   <h4>Items in this order</h4>
@@ -129,15 +121,15 @@ export default function AccountPage() {
                 </div>
               </div>
             ) : (
-              <div className="order-track-panel empty-track"><h3>No order selected</h3><p>Your order tracking will appear here after checkout.</p></div>
+              <div className="order-track-panel empty-track glass-card"><h3>No order selected</h3><p>Your order tracking will appear here after checkout.</p></div>
             )}
           </div>
         </section>
 
-        <section id="address" className="account-box">
+        <section id="address" className="account-box glass-panel">
           <div className="section-heading"><div><h2>Saved Address</h2><p>Your delivery details</p></div></div>
           {account?.addresses?.length ? account.addresses.map((address, index) => (
-            <div className="address-card" key={index}>
+            <div className="address-card glass-card" key={index}>
               <strong>{address.fullName}</strong>
               <span>{address.line1}{address.line2 ? `, ${address.line2}` : ''}</span>
               <span>{address.city}, {address.state} - {address.pincode}</span>

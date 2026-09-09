@@ -3,10 +3,6 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
 
-const quickCategories = [
-  'Tamil Literature', 'Fiction', 'Children Books', 'Educational', 'Spiritual', 'Biography', 'Competitive Exams', 'Self Help'
-]
-
 export default function Header() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -18,6 +14,18 @@ export default function Header() {
 
   const cartCount = account?.cart?.reduce((sum, item) => sum + item.quantity, 0) || 0
   const wishlistCount = account?.wishlist?.length || 0
+  const deliveryAddress = account?.addresses?.[0]
+  const supportEmail = import.meta.env.VITE_SUPPORT_EMAIL || ''
+
+  const categories = useMemo(() => {
+    return [...new Set(books.map(book => book.category).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b))
+      .slice(0, 8)
+  }, [books])
+
+  const deliveryText = deliveryAddress?.city
+    ? `${deliveryAddress.city}${deliveryAddress.pincode ? ` ${deliveryAddress.pincode}` : ''}`
+    : 'Choose delivery address'
 
   const suggestions = useMemo(() => {
     const text = term.trim().toLowerCase()
@@ -29,8 +37,9 @@ export default function Header() {
         const author = (book.author || '').toLowerCase()
         const category = (book.category || '').toLowerCase()
         const publisher = (book.publisher || '').toLowerCase()
-        const score = title.startsWith(text) ? 0 : author.startsWith(text) ? 1 : category.startsWith(text) ? 2 : 3
-        return { book, score, match: `${title} ${author} ${category} ${publisher}`.includes(text) }
+        const isbn = (book.isbn || '').toLowerCase()
+        const score = title.startsWith(text) ? 0 : author.startsWith(text) ? 1 : category.startsWith(text) ? 2 : isbn.startsWith(text) ? 3 : 4
+        return { book, score, match: `${title} ${author} ${category} ${publisher} ${isbn}`.includes(text) }
       })
       .filter(item => item.match)
       .sort((a, b) => a.score - b.score || a.book.title.localeCompare(b.book.title))
@@ -75,15 +84,15 @@ export default function Header() {
 
   return (
     <>
-      <div className="market-topbar">
+      <div className="market-topbar glass-topbar">
         <div className="market-topbar-inner">
-          <span>📍 Deliver to Dharmapuri 636705</span>
-          <span className="market-trust">100% Genuine Books &nbsp;·&nbsp; Secure Checkout &nbsp;·&nbsp; Easy Order Tracking</span>
-          <span>Need help? thulirkumver@gmail.com</span>
+          <Link to="/account" className="delivery-link">⌖ Deliver to <strong>{deliveryText}</strong></Link>
+          <span className="market-trust">Genuine books · Secure checkout · Live order tracking</span>
+          {supportEmail ? <a href={`mailto:${supportEmail}`}>Need help? {supportEmail}</a> : <Link to="/account">Help & account</Link>}
         </div>
       </div>
 
-      <header className="market-header">
+      <header className="market-header glass-market-header">
         <Link className="market-brand" to="/home" aria-label="Thulirkum Ver home">
           <img src="/logo.png" alt="Thulirkum Ver Book Store" />
         </Link>
@@ -96,7 +105,7 @@ export default function Header() {
               onChange={change}
               onFocus={() => term.trim() && setOpen(true)}
               onBlur={() => setTimeout(() => setOpen(false), 160)}
-              placeholder="Search by title, author, ISBN or category"
+              placeholder="Search books by title, author, ISBN or category"
               autoComplete="off"
             />
             {term && (
@@ -112,10 +121,10 @@ export default function Header() {
           </form>
 
           {open && (
-            <div className="search-suggestions market-search-suggestions">
+            <div className="search-suggestions market-search-suggestions glass-popover">
               <div className="search-suggestion-head">
-                <span>Search suggestions</span>
-                <small>{suggestions.length ? `${suggestions.length} results` : 'No exact matches'}</small>
+                <span>Suggestions</span>
+                <small>{suggestions.length ? `${suggestions.length} matches` : 'No exact matches'}</small>
               </div>
               {suggestions.length ? suggestions.map(book => (
                 <button key={book.id} className="search-suggestion-row" type="button" onMouseDown={() => choose(book)}>
@@ -159,13 +168,14 @@ export default function Header() {
         </nav>
       </header>
 
-      <div className="market-category-nav">
+      <div className="market-category-nav glass-category-nav">
         <div className="market-category-inner">
+          <NavLink className="market-home-link" to="/home">⌂ Home</NavLink>
           <NavLink className="market-all-link" to="/shop">☰ All Books</NavLink>
-          {quickCategories.map(category => (
+          {categories.map(category => (
             <NavLink key={category} to={`/shop?category=${encodeURIComponent(category)}`}>{category}</NavLink>
           ))}
-          <NavLink className="market-offer-link" to="/offers">⚡ Today's Offers</NavLink>
+          <NavLink className="market-offer-link" to="/offers">⚡ Offers</NavLink>
         </div>
       </div>
     </>
