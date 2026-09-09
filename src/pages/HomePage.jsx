@@ -100,8 +100,8 @@ export default function HomePage() {
       <section className="page-width home-hero-v6 glass-panel">
         <div className="home-hero-copy-v6">
           <span className="home-kicker-v6">THULIRKUM VER · ONLINE BOOKSTORE</span>
-          <h1>Books for curious minds,<br /><em>delivered with care.</em></h1>
-          <p>Discover books across languages and interests with fast search, clear pricing, trusted stock information and simple order tracking.</p>
+          <h1 className="home-hero-title-v71"><span>Books that grow ideas,</span><em>roots that shape generations.</em></h1>
+          <p className="home-hero-description-v71">Discover Tamil literature, fiction, self-help, children books and more in one simple place.</p>
           <div className="home-hero-actions-v6">
             <Link className="premium-solid-btn" to="/shop">Explore all books <span>→</span></Link>
             {topOffer && <Link className="premium-ghost-btn" to="/offers">See current offers</Link>}
