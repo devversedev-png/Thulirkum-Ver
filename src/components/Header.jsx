@@ -77,11 +77,6 @@ export default function Header() {
 
   return (
     <div className="commerce-sticky-shell" id="top">
-      <div className="store-topbar">
-        <span>🚚 Free delivery on orders above ₹499</span>
-        <span>🌿 Genuine books · Secure checkout · Live order tracking</span>
-        <span>Read · Learn · Grow</span>
-      </div>
 
       <header className="market-header">
         <Link className="market-brand" to="/home" aria-label="Thulirkum Ver home">
