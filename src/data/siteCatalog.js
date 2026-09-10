@@ -1,26 +1,31 @@
 const bookVisualsByKey = {
   'atomic habits': {
-    image: '/refcrops/cover_atomic.png',
+    image: 'https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg',
+    fallbackImage: '/covers/atomic-habits.svg',
     price: 399,
     originalPrice: 499,
     rating: 4.7,
     reviewCount: 98,
     category: 'Self Help',
     language: 'English',
-    featured: true
+    featured: true,
+    homeBadge: 'Bestseller'
   },
   ikigai: {
-    image: '/refcrops/cover_ikigai.png',
+    image: 'https://covers.openlibrary.org/b/isbn/9780143130727-L.jpg',
+    fallbackImage: '/covers/ikigai.svg',
     price: 320,
     originalPrice: 399,
     rating: 4.6,
     reviewCount: 89,
     category: 'Self Help',
     language: 'English',
-    featured: true
+    featured: true,
+    homeBadge: '20% OFF'
   },
   'ponniyin selvan': {
-    image: '/refcrops/cover_ponniyin.png',
+    image: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1635910123i/59525602.jpg',
+    fallbackImage: '/covers/ponniyin-selvan.svg',
     price: 450,
     originalPrice: 550,
     rating: 4.7,
@@ -28,27 +33,32 @@ const bookVisualsByKey = {
     category: 'Tamil Literature',
     language: 'Tamil',
     featured: true,
-    newArrival: true
+    newArrival: true,
+    homeBadge: 'New'
   },
   'siru maatrangal periya vazhkai': {
-    image: '/refcrops/cover_siru.png',
+    image: '/covers/siru-maatrangal.svg',
+    fallbackImage: '/covers/siru-maatrangal.svg',
     price: 299,
     originalPrice: 349,
     rating: 4.6,
     reviewCount: 86,
     category: 'Self Help',
     language: 'Tamil',
-    featured: true
+    featured: true,
+    homeBadge: 'Popular'
   },
   'the alchemist': {
-    image: '/refcrops/cover_alchemist.png',
+    image: 'https://covers.openlibrary.org/b/id/15121528-L.jpg',
+    fallbackImage: '/covers/alchemist.svg',
     price: 320,
     originalPrice: 399,
     rating: 4.6,
     reviewCount: 88,
     category: 'Fiction',
     language: 'English',
-    featured: true
+    featured: true,
+    homeBadge: '20% OFF'
   },
   'children books starter set': {
     image: '/covers/kutti-kathaigal.svg',
@@ -80,13 +90,13 @@ const bookVisualsByKey = {
 }
 
 const authorPortraitByKey = {
-  'kalki krishnamurthy': '/covers/authors/kalki.svg',
-  'paulo coelho': '/covers/authors/paulo.svg',
-  'james clear': '/covers/authors/james.svg',
-  'hector garcia': '/covers/authors/hector.svg',
-  'jay shetty': '/covers/authors/jay.svg',
-  'r balakrishnan': '/covers/authors/balakrishnan.svg',
-  'r. balakrishnan': '/covers/authors/balakrishnan.svg',
+  'kalki krishnamurthy': 'https://tamildigitallibrary.in/assets/docs/uploads/primary_files/author_bio_images/TVA_BIO_0009_%E0%AE%95%E0%AE%B2%E0%AF%8D%E0%AE%95%E0%AE%BF1.jpg',
+  'paulo coelho': 'https://commons.wikimedia.org/wiki/Special:FilePath/Paulo%20Coelho%202007-04-09%20001.jpg?width=320',
+  'james clear': 'https://images-na.ssl-images-amazon.com/images/S/amzn-author-media-prod/rec58e62v0epfogin4i1o6mu55.jpg',
+  'hector garcia': 'https://is1-ssl.mzstatic.com/image/thumb/Podcasts126/v4/23/c8/30/23c8305c-f912-3c7f-9e95-513df3186a1e/mza_12558583633289369001.png/1200x1200bf.webp',
+  'jay shetty': 'https://www.caa.com/caaspeakers/partyHeadshot/jay-shetty.png',
+  'r balakrishnan': 'https://media.assettype.com/deccanherald%2Fimport%2Fsites%2Fdh%2Ffiles%2Farticleimages%2F2021%2F09%2F19%2Ffile7hldjpj0noyraz83nbi-1031815-1632011401.jpg?auto=format%2Ccompress&fit=max&w=600',
+  'r. balakrishnan': 'https://media.assettype.com/deccanherald%2Fimport%2Fsites%2Fdh%2Ffiles%2Farticleimages%2F2021%2F09%2F19%2Ffile7hldjpj0noyraz83nbi-1031815-1632011401.jpg?auto=format%2Ccompress&fit=max&w=600',
   'editorial team': '/covers/authors/editorial.svg'
 }
 
@@ -201,10 +211,10 @@ export const demoAuthors = [
 ].map(decorateAuthor)
 
 export const homeCategories = [
-  { name: 'Children Books', subtitle: 'For young readers', icon: '👶', color: 'peach' },
-  { name: 'Competitive Exams', subtitle: 'Study. Prepare. Succeed.', icon: '🧾', color: 'apricot' },
-  { name: 'Fiction', subtitle: 'Stories for every soul', icon: '📘', color: 'blue' },
-  { name: 'Self Help', subtitle: 'A better you', icon: '🍃', color: 'green' },
+  { name: 'Children Books', subtitle: 'For young readers', icon: '♙', color: 'peach' },
+  { name: 'Competitive Exams', subtitle: 'Study. Prepare. Succeed.', icon: '▤', color: 'apricot' },
+  { name: 'Fiction', subtitle: 'Stories for every soul', icon: '▥', color: 'blue' },
+  { name: 'Self Help', subtitle: 'A better you', icon: '❧', color: 'green' },
   { name: 'Tamil Literature', subtitle: 'Roots of reading', icon: 'அ', color: 'purple' }
 ]
 
@@ -229,6 +239,7 @@ export function decorateBook(book = {}) {
     ...preset,
     ...book,
     image: book.image || preset.image || '/covers/atomic-habits.svg',
+    fallbackImage: book.fallbackImage || preset.fallbackImage || '/covers/atomic-habits.svg',
     originalPrice: Number(book.originalPrice || preset.originalPrice || book.price || 0),
     price: Number(book.price || preset.price || 0),
     rating: Number(book.rating || preset.rating || 0),

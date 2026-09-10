@@ -1,26 +1,22 @@
-# Thulirkum Ver — UI Redesign
+# Thulirkum Ver — Premium UI Revision
 
-This version applies the approved cream + forest-green editorial bookstore design across the customer and admin experiences.
+This revision keeps the existing React/API behaviour and refines the approved cream + forest-green bookstore direction.
 
-## Redesigned
-- Global top bar, header, search, navigation and footer
-- Home page
-- All Books / Shop filters and 12-book pagination
-- Book Details page
-- Cart page
-- Checkout page
-- Wishlist page
-- Order Confirmation page
-- My Account / order tracking / addresses
-- Offers page
-- Customer login / registration
-- Admin login
-- Admin dashboard, tables, forms, inventory, customers, authors and offers
+## Home page fixes
+- Rebuilt header and navigation spacing for a clean single alignment grid.
+- Replaced the blurry low-resolution hero crop with a new high-resolution local hero visual.
+- Replaced the old offer crop with a clean high-resolution local offer visual.
+- Featured book cards now use real high-resolution cover URLs when available, with crisp local SVG fallbacks.
+- Featured author cards use real portrait URLs with a safe local fallback.
+- Increased card cover area, typography, button sizing and spacing.
+- Restored all five navigation categories even when the API is unavailable.
+- Added exact badge treatments: Bestseller, 20% OFF, New and Popular.
 
-## CSS cleanup
-- Removed the legacy `concept-c.css` file.
-- Replaced the previous 6,000+ line legacy stylesheet with one clean `src/styles.css` design system.
-- Removed stale V4/V6/V7/Concept visual layers while keeping the current React/API behavior.
+## Cleanup
+- Removed the old low-resolution `public/refcrops` assets.
+- Removed the unused duplicate demo book data file.
+- Removed unused author placeholder SVG files, keeping only the required fallback.
+- Consolidated the latest home-page overrides into a single premium V3 CSS section.
 
 ## Run
 ```bash
@@ -28,4 +24,4 @@ npm install
 npm run dev
 ```
 
-The backend/API source was not included in the original ZIP, so API endpoints and contracts were kept intact.
+The backend/API source was not included in the original ZIP, so existing API contracts are unchanged.

@@ -18,12 +18,7 @@ export default function Header() {
   const cartCount = account?.cart?.reduce((sum, item) => sum + Number(item.quantity || 0), 0) || 0
   const wishlistCount = account?.wishlist?.length || 0
 
-  const categories = useMemo(() => {
-    const all = [...new Set(books.map(book => book.category).filter(Boolean))]
-    const preferred = preferredNav.filter(name => all.includes(name))
-    const rest = all.filter(name => !preferred.includes(name)).sort((a, b) => a.localeCompare(b))
-    return [...preferred, ...rest].slice(0, 5)
-  }, [books])
+  const categories = preferredNav
 
   const suggestions = useMemo(() => {
     const text = term.trim().toLowerCase()

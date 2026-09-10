@@ -32,17 +32,18 @@ export default function BookCard({ book, variant = 'default' }) {
     await toggleWishlist(book.id)
   }
 
-  const label = book.newArrival ? 'Bestseller' : discount >= 15 ? `${discount}% Off` : book.featured ? 'Popular' : ''
+  const label = book.homeBadge || (book.newArrival ? 'New' : discount >= 15 ? `${discount}% OFF` : book.featured ? 'Bestseller' : '')
+  const labelClass = label.toLowerCase().includes('new') ? 'badge-new' : label.toLowerCase().includes('popular') ? 'badge-popular' : 'badge-green'
 
   return (
     <article className={`book-card ${shopCard ? 'shop-book-card' : ''} ${homeRefCard ? 'home-ref-book-card' : ''} ${!available ? 'book-card-out' : ''}`}>
       <div className="market-card-topline">
-        {label ? <span className="market-discount-label">{label}</span> : <span />}
+        {label ? <span className={`market-discount-label ${labelClass}`}>{label}</span> : <span />}
         <button className={`market-wishlist-button ${inWishlist ? 'selected' : ''}`} onClick={wishClick} title="Wishlist" aria-label="Add to wishlist">{inWishlist ? '♥' : '♡'}</button>
       </div>
 
       <Link to={`/book/${book.id}`} className="cover-wrap market-cover-wrap">
-        <img src={book.image} alt={book.title} />
+        <img src={book.image} alt={book.title} loading="lazy" onError={event => { event.currentTarget.onerror = null; event.currentTarget.src = book.fallbackImage || '/covers/atomic-habits.svg' }} />
         {!available && <span className="out-cover-badge">Out of Stock</span>}
       </Link>
 
