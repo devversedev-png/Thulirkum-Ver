@@ -3,6 +3,8 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
 
+const preferredNav = ['Children Books', 'Competitive Exams', 'Fiction', 'Self Help', 'Tamil Literature']
+
 export default function Header() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -11,20 +13,21 @@ export default function Header() {
   const initialQuery = new URLSearchParams(location.search).get('q') || ''
   const [term, setTerm] = useState(initialQuery)
   const [open, setOpen] = useState(false)
+  const activeCategory = new URLSearchParams(location.search).get('category') || ''
 
-  const cartCount = account?.cart?.reduce((sum, item) => sum + item.quantity, 0) || 0
+  const cartCount = account?.cart?.reduce((sum, item) => sum + Number(item.quantity || 0), 0) || 0
   const wishlistCount = account?.wishlist?.length || 0
 
   const categories = useMemo(() => {
-    return [...new Set(books.map(book => book.category).filter(Boolean))]
-      .sort((a, b) => a.localeCompare(b))
-      .slice(0, 6)
+    const all = [...new Set(books.map(book => book.category).filter(Boolean))]
+    const preferred = preferredNav.filter(name => all.includes(name))
+    const rest = all.filter(name => !preferred.includes(name)).sort((a, b) => a.localeCompare(b))
+    return [...preferred, ...rest].slice(0, 5)
   }, [books])
 
   const suggestions = useMemo(() => {
     const text = term.trim().toLowerCase()
     if (!text) return []
-
     return books
       .map(book => {
         const title = (book.title || '').toLowerCase()
@@ -55,6 +58,7 @@ export default function Header() {
     if (location.pathname === '/shop') {
       const next = new URLSearchParams(location.search)
       value.trim() ? next.set('q', value.trim()) : next.delete('q')
+      next.delete('page')
       navigate(`/shop${next.toString() ? `?${next.toString()}` : ''}`, { replace: true })
     }
   }
@@ -65,6 +69,7 @@ export default function Header() {
     if (location.pathname === '/shop') {
       const next = new URLSearchParams(location.search)
       next.delete('q')
+      next.delete('page')
       navigate(`/shop${next.toString() ? `?${next.toString()}` : ''}`, { replace: true })
     }
   }
@@ -76,15 +81,20 @@ export default function Header() {
   }
 
   return (
-    <div className="commerce-sticky-shell concept-c-header-shell" id="top">
-      <header className="market-header glass-market-header concept-c-header">
+    <div className="commerce-sticky-shell" id="top">
+      <div className="store-topbar">
+        <span>🚚 Free delivery on orders above ₹499</span>
+        <span>🌿 Genuine books · Secure checkout · Live order tracking</span>
+        <span>Read · Learn · Grow</span>
+      </div>
+
+      <header className="market-header">
         <Link className="market-brand" to="/home" aria-label="Thulirkum Ver home">
           <img src="/logo.png" alt="Thulirkum Ver Book Store" />
         </Link>
 
         <div className="smart-search-wrap market-search-wrap">
-          <form className="market-search concept-search" onSubmit={submit}>
-            <span className="market-search-icon">⌕</span>
+          <form className="market-search" onSubmit={submit}>
             <input
               value={term}
               onChange={change}
@@ -94,11 +104,11 @@ export default function Header() {
               autoComplete="off"
             />
             {term && <button type="button" className="market-search-clear" aria-label="Clear search" onMouseDown={e => e.preventDefault()} onClick={clearSearch}>×</button>}
-            <button type="submit" className="market-search-button">Search</button>
+            <button type="submit" className="market-search-button"><span>⌕</span> Search</button>
           </form>
 
           {open && (
-            <div className="search-suggestions market-search-suggestions glass-popover concept-search-popover">
+            <div className="search-suggestions market-search-suggestions">
               <div className="search-suggestion-head"><span>Search suggestions</span><small>{suggestions.length ? `${suggestions.length} matches` : 'No exact matches'}</small></div>
               {suggestions.length ? suggestions.map(book => (
                 <button key={book.id} className="search-suggestion-row" type="button" onMouseDown={() => choose(book)}>
@@ -112,26 +122,27 @@ export default function Header() {
           )}
         </div>
 
-        <nav className="market-header-actions concept-header-actions">
-          <NavLink to="/wishlist" className="market-action-link market-action-simple">
-            <span className="market-action-icon">♡</span><span><small>Saved</small><strong>Wishlist</strong></span>
+        <nav className="market-header-actions">
+          <NavLink to="/wishlist" className="market-action-link">
+            <span className="market-action-icon">♡</span><strong>Wishlist</strong>
             {wishlistCount > 0 && <b className="market-count-badge">{wishlistCount}</b>}
           </NavLink>
-          <NavLink to="/cart" className="market-action-link market-cart-action">
-            <span className="market-action-icon">▣</span><span><small>Your</small><strong>Cart</strong></span><b className="market-count-badge">{cartCount}</b>
+          <NavLink to="/cart" className="market-action-link">
+            <span className="market-action-icon">🛒</span><strong>Cart</strong>
+            {cartCount > 0 && <b className="market-count-badge">{cartCount}</b>}
           </NavLink>
-          <NavLink to="/account" className="market-action-link">
+          <NavLink to="/account" className="market-action-link account-action">
             <span className="market-action-icon">♙</span><span><small>Hello, {user?.name?.split(' ')[0] || 'Reader'}</small><strong>Account</strong></span>
           </NavLink>
         </nav>
       </header>
 
-      <div className="market-category-nav glass-category-nav concept-c-nav">
-        <div className="market-category-inner concept-c-nav-inner">
+      <div className="market-category-nav">
+        <div className="market-category-inner">
           <NavLink className="market-home-link" to="/home">Home</NavLink>
-          <NavLink className="market-all-link" to="/shop">All Books</NavLink>
-          {categories.map(category => <NavLink key={category} to={`/shop?category=${encodeURIComponent(category)}`}>{category}</NavLink>)}
-          <NavLink className="market-offer-link" to="/offers">Offers</NavLink>
+          <Link className={`market-all-link ${location.pathname === '/shop' && !activeCategory ? 'active' : ''}`} to="/shop">All Books</Link>
+          {categories.map(category => <Link className={location.pathname === '/shop' && activeCategory === category ? 'active' : ''} key={category} to={`/shop?category=${encodeURIComponent(category)}`}>{category}</Link>)}
+          <NavLink className="market-offer-link" to="/offers">🎁 Offers</NavLink>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
+import { Navigate, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
-import { Navigate, Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
 
@@ -8,29 +8,27 @@ function blankAddress(user) {
     label: 'Home',
     fullName: user?.name || '',
     mobile: user?.mobile || '',
+    email: user?.email || '',
     line1: '',
     line2: '',
     city: '',
     state: '',
-    pincode: '',
-    latitude: null,
-    longitude: null,
-    locationLabel: '',
-    defaultAddress: false
+    pincode: ''
   }
 }
 
 export default function CheckoutPage() {
   const { user } = useAuth()
-  const { cartRows, placeOrder, account, offers } = useStore()
+  const { cartRows, account, offers, placeOrder } = useStore()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const rows = cartRows()
   const addresses = account?.addresses || []
   const preferredAddress = addresses.find(item => item.defaultAddress) || addresses[0]
   const [selectedAddressId, setSelectedAddressId] = useState(preferredAddress?.id || 'NEW')
   const [address, setAddress] = useState(preferredAddress ? { ...preferredAddress } : blankAddress(user))
   const [paymentMethod, setPaymentMethod] = useState('COD')
-  const [couponCode, setCouponCode] = useState('')
+  const [couponCode, setCouponCode] = useState(searchParams.get('coupon') || '')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -38,9 +36,9 @@ export default function CheckoutPage() {
     if (!addresses.length) return
     const current = addresses.find(item => item.id === selectedAddressId)
     if (current) setAddress({ ...current })
-  }, [account?.addresses])
+  }, [account?.addresses, selectedAddressId])
 
-  const subtotal = rows.reduce((sum, row) => sum + row.book.price * row.quantity, 0)
+  const subtotal = rows.reduce((sum, row) => sum + Number(row.book.price || 0) * Number(row.quantity || 0), 0)
   const shipping = subtotal >= 499 ? 0 : 60
   const matchedOffer = useMemo(() => offers.find(offer => offer.code?.toLowerCase() === couponCode.trim().toLowerCase()), [offers, couponCode])
   const estimateDiscount = matchedOffer && subtotal >= Number(matchedOffer.minOrderAmount || 0)
@@ -81,63 +79,75 @@ export default function CheckoutPage() {
   }
 
   return (
-    <section className="page-width checkout-page min-page checkout-page-v7">
-      <div className="checkout-steps"><span className="active">1 Address</span><span>2 Delivery</span><span>3 Payment</span><span>4 Review</span></div>
-      <div className="checkout-layout">
+    <section className="checkout-page min-page">
+      <div className="page-title-banner">
+        <div className="page-width checkout-title-row"><div><div className="breadcrumbs">Home &nbsp;›&nbsp; Cart &nbsp;›&nbsp; Checkout</div><h1>Checkout</h1><p>Almost there! Complete your order and let great books find their way to you.</p></div><blockquote>“A small step<br />for a brighter you.”</blockquote></div>
+      </div>
+
+      <div className="page-width checkout-steps"><span className="active"><b>1</b> Address</span><span className="active"><b>2</b> Payment</span><span><b>3</b> Review</span></div>
+
+      <div className="page-width checkout-layout">
         <form className="checkout-form" onSubmit={submit}>
-          <div className="checkout-section-head-v7"><div><span className="eyebrow">DELIVERY</span><h2>Delivery Address</h2></div><Link to="/account#address">Manage saved addresses</Link></div>
+          <section className="checkout-card">
+            <div className="checkout-section-head-v7"><div><span className="checkout-section-icon">⌖</span><div><h2>Shipping Address</h2><p>Where should we deliver your books?</p></div></div>{addresses.length > 0 && <button type="button" className="text-btn" onClick={() => document.querySelector('.checkout-address-picker-v7')?.scrollIntoView({ behavior: 'smooth' })}>Select saved address →</button>}</div>
 
-          {addresses.length > 0 && (
-            <div className="checkout-address-picker-v7">
-              {addresses.map(item => (
-                <button type="button" key={item.id} className={`checkout-address-option-v7 ${selectedAddressId === item.id ? 'selected' : ''}`} onClick={() => chooseSavedAddress(item)}>
-                  <span className="checkout-radio-v7">{selectedAddressId === item.id ? '●' : '○'}</span>
-                  <div><strong>{item.label || 'Address'} {item.defaultAddress && <small>Default</small>}</strong><p>{item.line1}{item.line2 ? `, ${item.line2}` : ''}, {item.city} - {item.pincode}</p></div>
-                </button>
-              ))}
-              <button type="button" className={`checkout-address-option-v7 new ${selectedAddressId === 'NEW' ? 'selected' : ''}`} onClick={chooseNewAddress}><span>＋</span><div><strong>Use a new address</strong><p>This address will be saved to your account after checkout.</p></div></button>
+            {addresses.length > 0 && (
+              <div className="checkout-address-picker-v7">
+                {addresses.map(item => (
+                  <button type="button" key={item.id} className={`checkout-address-option-v7 ${selectedAddressId === item.id ? 'selected' : ''}`} onClick={() => chooseSavedAddress(item)}>
+                    <span className="checkout-radio-v7">{selectedAddressId === item.id ? '●' : '○'}</span>
+                    <div><strong>{item.label || 'Address'} {item.defaultAddress && <small>Default</small>}</strong><p>{item.line1}{item.line2 ? `, ${item.line2}` : ''}, {item.city} - {item.pincode}</p></div>
+                  </button>
+                ))}
+                <button type="button" className={`checkout-address-option-v7 new ${selectedAddressId === 'NEW' ? 'selected' : ''}`} onClick={chooseNewAddress}><span>＋</span><div><strong>Use a new address</strong><p>Enter a different delivery address.</p></div></button>
+              </div>
+            )}
+
+            <div className="form-grid checkout-form-grid">
+              <div><label>Full Name *</label><input name="fullName" value={address.fullName || ''} onChange={change} required /></div>
+              <div><label>Phone Number *</label><input name="mobile" value={address.mobile || ''} onChange={change} required /></div>
+              <div className="wide"><label>Email Address *</label><input type="email" value={user?.email || ''} readOnly /><small>We’ll send order updates to this email.</small></div>
+              <div className="wide"><label>Address Line *</label><input name="line1" value={address.line1 || ''} onChange={change} required /></div>
+              <div><label>City *</label><input name="city" value={address.city || ''} onChange={change} required /></div>
+              <div><label>State *</label><input name="state" value={address.state || ''} onChange={change} required /></div>
+              <div><label>Pincode *</label><input name="pincode" value={address.pincode || ''} onChange={change} required /></div>
+              <div className="wide"><label>Delivery Notes (Optional)</label><textarea name="line2" value={address.line2 || ''} onChange={change} placeholder="House name, nearby landmark, delivery instructions..." rows="3" /></div>
             </div>
-          )}
+          </section>
 
-          <div className="form-grid">
-            <div><label>Full Name</label><input name="fullName" value={address.fullName} onChange={change} required /></div>
-            <div><label>Mobile Number</label><input name="mobile" value={address.mobile} onChange={change} required /></div>
-            <div className="wide"><label>Address Line 1</label><input name="line1" value={address.line1} onChange={change} required /></div>
-            <div className="wide"><label>Address Line 2</label><input name="line2" value={address.line2} onChange={change} /></div>
-            <div><label>City</label><input name="city" value={address.city} onChange={change} required /></div>
-            <div><label>State</label><input name="state" value={address.state} onChange={change} required /></div>
-            <div><label>Pincode</label><input name="pincode" value={address.pincode} onChange={change} required /></div>
-          </div>
-
-          <h2 className="payment-title">Payment Method</h2>
-          <div className="payment-options">
-            <label><input type="radio" name="payment" checked={paymentMethod === 'COD'} onChange={() => setPaymentMethod('COD')} /> Cash on Delivery</label>
-            <label><input type="radio" name="payment" checked={paymentMethod === 'UPI'} onChange={() => setPaymentMethod('UPI')} /> UPI / Online Payment</label>
-          </div>
-          {paymentMethod === 'UPI' && <div className="payment-note">Online payment will be enabled when the production payment gateway is connected.</div>}
-
-          <h2 className="payment-title">Offer Code</h2>
-          <div className="checkout-coupon-box">
-            <input value={couponCode} onChange={event => setCouponCode(event.target.value.toUpperCase())} placeholder="Enter coupon code" />
-            {matchedOffer && subtotal >= Number(matchedOffer.minOrderAmount || 0) && <span>✓ {matchedOffer.title} applied</span>}
-          </div>
-          {offers.length > 0 && (
-            <div className="checkout-offer-chips">
-              {offers.slice(0, 4).map(offer => <button type="button" key={offer.id} onClick={() => setCouponCode(offer.code || '')}>{offer.code || offer.title}</button>)}
+          <section className="checkout-card payment-card">
+            <div className="checkout-section-head-v7"><div><span className="checkout-section-icon">▣</span><div><h2>Payment Method</h2><p>🔒 Your payment information is secure and encrypted.</p></div></div></div>
+            <div className="payment-options">
+              <label className={paymentMethod === 'UPI' ? 'selected' : ''}><input type="radio" name="payment" checked={paymentMethod === 'UPI'} onChange={() => setPaymentMethod('UPI')} /><span className="payment-icon">◉</span><strong>UPI</strong><small>GPay, PhonePe, Paytm</small></label>
+              <label className={paymentMethod === 'COD' ? 'selected' : ''}><input type="radio" name="payment" checked={paymentMethod === 'COD'} onChange={() => setPaymentMethod('COD')} /><span className="payment-icon">₹</span><strong>Cash on Delivery</strong><small>Pay when you receive</small></label>
             </div>
-          )}
+            {paymentMethod === 'UPI' && <div className="payment-note">Online payment will be enabled when the production payment gateway is connected.</div>}
+
+            <div className="checkout-coupon-box">
+              <label>Offer Code</label>
+              <div><input value={couponCode} onChange={event => setCouponCode(event.target.value.toUpperCase())} placeholder="Enter coupon code" /></div>
+              {matchedOffer && subtotal >= Number(matchedOffer.minOrderAmount || 0) && <span>✓ {matchedOffer.title} applied</span>}
+            </div>
+            {offers.length > 0 && <div className="checkout-offer-chips">{offers.slice(0, 4).map(offer => <button type="button" key={offer.id} onClick={() => setCouponCode(offer.code || '')}>{offer.code || offer.title}</button>)}</div>}
+          </section>
 
           {error && <div className="form-error">{error}</div>}
-          <button className="primary-btn big" disabled={busy}>{busy ? 'Placing order...' : 'Place Order →'}</button>
         </form>
 
         <aside className="summary-card checkout-summary">
-          <h3>Your Order</h3>
-          {rows.map(row => <div className="mini-order" key={row.book.id}><span>{row.book.title} × {row.quantity}</span><strong>₹{row.book.price * row.quantity}</strong></div>)}
-          <div><span>Subtotal</span><strong>₹{subtotal}</strong></div>
-          <div><span>Shipping</span><strong>{shipping ? `₹${shipping}` : 'Free'}</strong></div>
-          {estimateDiscount > 0 && <div className="checkout-discount"><span>Offer Discount</span><strong>− ₹{Math.round(estimateDiscount)}</strong></div>}
-          <div className="summary-total"><span>Total</span><strong>₹{Math.round(total)}</strong></div>
+          <div className="checkout-summary-title"><h3>🛒 Order Summary</h3><span>{rows.length} items</span></div>
+          <div className="checkout-summary-items">
+            {rows.map(row => <div className="mini-order" key={row.book.id}><img src={row.book.image} alt="" /><span><strong>{row.book.title}</strong><small>{row.book.author}</small><b>₹{row.book.price} <del>{Number(row.book.originalPrice || 0) > Number(row.book.price || 0) ? `₹${row.book.originalPrice}` : ''}</del></b></span><small>Qty: {row.quantity}</small></div>)}
+          </div>
+          <div><span>Subtotal ({rows.length} items)</span><strong>₹{subtotal}</strong></div>
+          {estimateDiscount > 0 && <div className="checkout-discount"><span>Discount</span><strong>− ₹{Math.round(estimateDiscount)}</strong></div>}
+          <div><span>Shipping</span><strong className="free-text">{shipping ? `₹${shipping}` : 'Free'}</strong></div>
+          <div className="summary-total"><span>Total Amount</span><strong>₹{Math.round(total)}</strong></div>
+          {estimateDiscount > 0 && <div className="checkout-savings">🏷 You’re saving ₹{Math.round(estimateDiscount)} on this order!</div>}
+          <button className="primary-btn full big" type="button" onClick={() => document.querySelector('.checkout-form')?.requestSubmit()} disabled={busy}>{busy ? 'Placing order...' : '🔒 Place Order →'}</button>
+          <small className="checkout-terms">By placing this order, you agree to our Terms & Conditions and Privacy Policy.</small>
+          <div className="summary-trust checkout-trust"><span>◆ <b>Secure Payment</b><small>Protected checkout</small></span><span>🚚 <b>Fast Delivery</b><small>Across India</small></span><span>♧ <b>Dedicated Support</b><small>We’re here to help</small></span></div>
+          <Link className="continue-link" to="/cart">← Back to cart</Link>
         </aside>
       </div>
     </section>

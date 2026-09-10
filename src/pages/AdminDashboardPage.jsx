@@ -389,8 +389,8 @@ export default function AdminDashboardPage() {
   }
 
   const navItems = [
-    ['overview', '▦', 'Dashboard'], ['orders', '▣', 'Orders'], ['inventory', '▤', 'Catalogue'],
-    ['customers', '◎', 'Customers'], ['authors', '✎', 'Authors'], ['offers', '✦', 'Promotions']
+    ['overview', '▦', 'Dashboard'], ['orders', '▣', 'Orders'], ['inventory', '▤', 'Books'],
+    ['customers', '◎', 'Customers'], ['authors', '✎', 'Authors'], ['offers', '✦', 'Offers']
   ]
 
   return (

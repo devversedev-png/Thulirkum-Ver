@@ -113,8 +113,8 @@ export default function HomePage() {
             clear pricing and easy order tracking.
           </p>
           <div className="c9-hero-actions">
-            <Link to="/shop" className="c9-primary-btn">Explore Books <span>→</span></Link>
-            {topOffer && <Link to="/offers" className="c9-text-link">View current offers</Link>}
+            <Link to="/shop" className="c9-primary-btn">Explore all books <span>→</span></Link>
+            {topOffer && <Link to="/offers" className="c9-text-link">🎁 View Offers</Link>}
           </div>
         </div>
 
@@ -124,8 +124,8 @@ export default function HomePage() {
           </div>
           <div className="c9-book-stack">
             {heroBooks.length ? heroBooks.map((book, index) => (
-              <Link to={`/book/${book.id}`} className={`c9-hero-book c9-hero-book-${index + 1}`} key={book.id}>
-                <img src={book.image} alt={book.title} />
+              <Link to={`/book/${book.id}`} className={`c9-hero-book c9-hero-book-${index + 1}`} key={book.id} aria-label={book.title}>
+                <strong>{book.title}</strong><small>{book.author}</small>
               </Link>
             )) : (
               <div className="c9-empty-book-stack" aria-hidden="true">
@@ -147,7 +147,7 @@ export default function HomePage() {
       {categoryRows.length > 0 && (
         <section className="page-width c9-home-section">
           <div className="c9-section-heading">
-            <div><span>EXPLORE</span><h2>Featured Categories</h2><p>Find the shelf that fits what you want to read next.</p></div>
+            <div><span>EXPLORE</span><h2>Explore by Category</h2><p>Find the shelf that fits what you want to read next.</p></div>
             <Link to="/shop">View all <span>→</span></Link>
           </div>
           <div className="c9-category-grid">

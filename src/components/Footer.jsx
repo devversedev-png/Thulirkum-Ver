@@ -5,20 +5,18 @@ export default function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="footer market-footer footer-v6">
-      <div className="market-footer-top"><a href="#top">Back to top ↑</a></div>
-      <div className="footer-grid market-footer-grid">
-        <div>
+    <footer className="footer market-footer">
+      <div className="footer-grid market-footer-grid page-width">
+        <div className="footer-brand-block">
           <img className="footer-logo" src="/logo.png" alt="Thulirkum Ver" />
-          <p>Books that grow ideas, roots that shape generations.</p>
-          <div className="market-footer-badges"><span>✓ Genuine catalogue</span><span>🔒 Secure orders</span></div>
+          <p>Books that take roots, readers that shape generations.</p>
         </div>
         <div>
-          <h4>Explore</h4>
-          <Link to="/home">Home</Link>
+          <h4>Quick Links</h4>
+          <Link to="/home">About Us</Link>
           <Link to="/shop">All Books</Link>
-          <Link to="/shop?sort=new">New Arrivals</Link>
-          <Link to="/offers">Offers</Link>
+          <Link to="/shop">Shipping & Delivery</Link>
+          <Link to="/offers">Returns & Refunds</Link>
         </div>
         <div>
           <h4>Your Account</h4>
@@ -29,12 +27,19 @@ export default function Footer() {
         </div>
         <div>
           <h4>Support</h4>
-          <Link to="/account">Order tracking</Link>
-          <Link to="/account">Saved addresses</Link>
+          <Link to="/account">FAQs</Link>
+          <Link to="/account">Order Tracking</Link>
+          <Link to="/account#address">Saved Addresses</Link>
           {supportEmail && <a href={`mailto:${supportEmail}`}>{supportEmail}</a>}
         </div>
+        <div>
+          <h4>Follow Us</h4>
+          <div className="footer-socials"><span>f</span><span>◎</span><span>▶</span><span>𝕏</span></div>
+        </div>
       </div>
-      <div className="footer-bottom market-footer-bottom">© {year} Thulirkum Ver Book Store.</div>
+      <div className="footer-bottom market-footer-bottom">
+        <div className="page-width"><span>© {year} Thulirkum Ver Book Store. All rights reserved.</span><span>Terms & Conditions &nbsp; | &nbsp; Privacy Policy &nbsp; | &nbsp; Read · Learn · Grow</span></div>
+      </div>
     </footer>
   )
 }

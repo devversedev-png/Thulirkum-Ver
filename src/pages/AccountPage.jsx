@@ -236,34 +236,36 @@ export default function AccountPage() {
   }
 
   return (
-    <section className="page-width account-page premium-account-page min-page account-page-v7">
+    <>
+      <div className="page-title-banner account-title-banner">
+        <div className="page-width page-title-row">
+          <div><div className="breadcrumbs">Home &nbsp;›&nbsp; My Account</div><h1>My Account</h1><p>Manage your orders, wishlist, addresses and more.</p></div>
+          <blockquote>“A reader today,<br />a brighter tomorrow.”</blockquote>
+        </div>
+      </div>
+      <section className="page-width account-page premium-account-page min-page account-page-v7">
       {accountNotice && <button className="account-action-toast-v73" onClick={() => setAccountNotice('')}>{accountNotice}<span>×</span></button>}
       <aside className="account-sidebar premium-account-sidebar glass-panel account-sidebar-v7">
-        <Link className="account-home-link" to="/home">← Back to Home</Link>
-        <div className="avatar">{user?.name?.charAt(0)?.toUpperCase()}</div>
-        <h3>{user?.name}</h3>
-        <span>{user?.email}</span>
-
-        <div className="account-side-stats">
-          <div><strong>{orders.length}</strong><span>Orders</span></div>
-          <div><strong>{wishlistCount}</strong><span>Wishlist</span></div>
-          <div><strong>{addresses.length}</strong><span>Addresses</span></div>
-        </div>
-
+        <h2 className="account-sidebar-title">My Account</h2>
         <nav>
+          <a href="#overview"><span>⌂</span> Overview</a>
           <a href="#orders"><span>▣</span> My Orders</a>
-          <Link to="/wishlist"><span>♡</span> My Wishlist <b>{wishlistCount || ''}</b></Link>
-          <a href="#address"><span>⌖</span> My Addresses</a>
+          <Link to="/wishlist"><span>♡</span> Wishlist <b>{wishlistCount || ''}</b></Link>
+          <a href="#address"><span>⌖</span> Addresses</a>
+          <a href="#overview"><span>♙</span> Profile Settings</a>
           <button onClick={logout}><span>↪</span> Logout</button>
         </nav>
+        <div className="account-sidebar-quote">
+          <span>🌿</span>
+          <blockquote>“Good books<br />grow better<br />human beings.”</blockquote>
+        </div>
       </aside>
 
       <div className="account-content">
-        <div className="account-welcome premium-account-welcome glass-panel account-welcome-v7">
-          <div>
-            <span className="eyebrow">MY ACCOUNT</span>
-            <h1>Hello, {user?.name?.split(' ')[0]}</h1>
-            <p>Manage orders, saved books and delivery addresses from one place.</p>
+        <div id="overview" className="account-welcome premium-account-welcome glass-panel account-welcome-v7">
+          <div className="account-welcome-profile">
+            <div className="avatar">{user?.name?.charAt(0)?.toUpperCase()}</div>
+            <div><span className="eyebrow">ACCOUNT OVERVIEW</span><h1>Welcome back, {user?.name?.split(' ')[0]}</h1><p>{user?.email}</p></div>
           </div>
           <div className="account-welcome-actions">
             <Link className="outline-btn compact" to="/shop">Continue shopping</Link>
@@ -429,6 +431,7 @@ export default function AccountPage() {
         </div>
       )}
       <PremiumConfirm dialog={confirmDialog} onClose={() => setConfirmDialog(null)} />
-    </section>
+      </section>
+    </>
   )
 }

@@ -1,15 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
 
-const statusLabels = {
-  BOOKING_CONFIRMED: 'Booking Confirmed',
-  CONFIRMED: 'Confirmed',
-  PACKED: 'Packed',
-  SHIPPED: 'Shipped',
-  OUT_FOR_DELIVERY: 'Out for Delivery',
-  DELIVERED: 'Delivered',
-  CANCELLED: 'Cancelled'
-}
-
 export default function OrderConfirmationPage() {
   const { state } = useLocation()
   const order = state?.order
@@ -18,18 +8,21 @@ export default function OrderConfirmationPage() {
     <section className="confirmation-page page-width min-page">
       <div className="confirmation-card">
         <div className="success-icon">✓</div>
-        <h1>Thank You!</h1>
-        <p>Your order has been placed and the booking is confirmed.</p>
-        {order && <div className="order-number">Order No: <strong>#{order.orderNumber}</strong></div>}
+        <span className="eyebrow">ORDER CONFIRMED</span>
+        <h1>Order Placed Successfully!</h1>
+        <p>Thank you for your purchase. Your order has been confirmed and will be prepared soon.</p>
+        {order && (
+          <div className="confirmation-order-box">
+            <span>Order</span><strong>#{order.orderNumber}</strong>
+            <small>{order.estimatedDeliveryDate ? `Estimated delivery: ${new Date(order.estimatedDeliveryDate).toLocaleDateString()}` : 'You can follow every status update from My Account.'}</small>
+          </div>
+        )}
         <div className="order-track premium-confirm-track">
-          {['BOOKING_CONFIRMED', 'PACKED', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].map((step, index) => (
-            <div className={index === 0 ? 'active' : ''} key={step}><b>{index === 0 ? '✓' : index + 1}</b><span>{statusLabels[step]}</span></div>
+          {['Confirmed', 'Packed', 'Shipped', 'Delivered'].map((step, index) => (
+            <div className={index === 0 ? 'active' : ''} key={step}><b>{index === 0 ? '✓' : index + 1}</b><span>{step}</span></div>
           ))}
         </div>
-        <div className="confirmation-actions">
-          <Link className="primary-btn inline-btn" to="/account">Track My Order</Link>
-          <Link className="outline-btn inline-btn" to="/shop">Continue Shopping</Link>
-        </div>
+        <div className="confirmation-actions"><Link className="primary-btn inline-btn" to="/account#orders">Track Order</Link><Link className="outline-btn inline-btn" to="/shop">Continue Shopping</Link></div>
       </div>
     </section>
   )
