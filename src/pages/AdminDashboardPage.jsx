@@ -398,7 +398,7 @@ export default function AdminDashboardPage() {
       <aside className="admin-sidebar-v6 glass-admin-sidebar">
         <div className="admin-brand-v6">
           <img
-            src="/logo-original.png"
+            src="/logo.png"
             alt="Thulirkum Ver"
             className="admin-brand-logo"
           />

@@ -10084,3 +10084,563 @@ h1, h2, h3, h4, blockquote {
   }
 
 }
+
+/* ========================================================
+/* =========================
+   ADMIN CUSTOM CHECKBOX
+   ========================= */
+
+.admin-main-v6 input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+
+  width: 18px !important;
+  height: 18px !important;
+
+  min-width: 18px;
+  min-height: 18px;
+
+  margin: 0 !important;
+
+  border: 1.5px solid #aebfb7;
+  border-radius: 5px;
+
+  background: #ffffff;
+
+  display: inline-grid;
+  place-content: center;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+
+.admin-main-v6 input[type="checkbox"]::before {
+  content: "";
+
+  width: 8px;
+  height: 4px;
+
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+
+  transform:
+    rotate(-45deg)
+    scale(0);
+
+  transform-origin: center;
+
+  transition: transform 0.15s ease;
+}
+
+
+.admin-main-v6 input[type="checkbox"]:checked {
+  background: #0b6a4a;
+
+  border-color: #0b6a4a;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(11, 106, 74, 0.10);
+}
+
+
+.admin-main-v6 input[type="checkbox"]:checked::before {
+  transform:
+    rotate(-45deg)
+    scale(1);
+}
+
+
+.admin-main-v6 input[type="checkbox"]:hover {
+  border-color: #0b6a4a;
+}
+
+
+.admin-main-v6 input[type="checkbox"]:focus-visible {
+  outline: none;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(11, 106, 74, 0.14);
+}
+
+/* =========================================================
+   THULIRKUM VER — FINAL RESPONSIVE RESCUE PATCH
+   IMPORTANT: KEEP THIS AT THE VERY END OF styles.css
+   Desktop layout is untouched. These rules only repair
+   tablet/mobile overflow and the admin brand presentation.
+   ========================================================= */
+
+/* Never allow one fixed-width child to widen the whole page */
+html,
+body,
+#root,
+.site-shell {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* -------------------------
+   ADMIN LOGO — FINAL
+   ------------------------- */
+
+.admin-brand-v6 {
+  min-height: 104px !important;
+  padding: 10px 6px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+.admin-brand-v6 .admin-brand-logo,
+.admin-brand-v6 > img {
+  display: block !important;
+  width: 100% !important;
+  max-width: 218px !important;
+  height: 80px !important;
+  max-height: 80px !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  filter: none !important;
+  opacity: 1 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  transform: scale(1.10);
+  transform-origin: center;
+}
+
+/* -------------------------
+   TABLET / SMALL LAPTOP
+   ------------------------- */
+
+@media (max-width: 960px) {
+  .market-header {
+    width: calc(100% - 32px) !important;
+    grid-template-columns: 170px minmax(0, 1fr) !important;
+    gap: 12px !important;
+    min-height: auto !important;
+    padding: 10px 0 !important;
+  }
+
+  /* Actual wrapper in the project is smart-search-wrap.
+     Keep market-search-wrap too for compatibility. */
+  .smart-search-wrap,
+  .market-search-wrap {
+    min-width: 0 !important;
+    width: 100% !important;
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+  }
+
+  .market-search {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .market-header-actions {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    justify-content: flex-end !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  .market-category-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    justify-content: flex-start !important;
+    scrollbar-width: none;
+  }
+
+  .market-category-inner::-webkit-scrollbar {
+    display: none;
+  }
+
+  .market-category-inner a {
+    flex: 0 0 auto !important;
+  }
+
+  .admin-shell-v6 {
+    grid-template-columns: 190px minmax(0, 1fr) !important;
+  }
+
+  .admin-brand-v6 .admin-brand-logo,
+  .admin-brand-v6 > img {
+    max-width: 170px !important;
+    height: 68px !important;
+    max-height: 68px !important;
+  }
+
+  .admin-main-v6,
+  .admin-panel-v6,
+  .admin-analytics-grid-c8,
+  .admin-table-wrap-v6 {
+    min-width: 0 !important;
+  }
+
+  .admin-table-wrap-v6 {
+    width: 100% !important;
+    overflow-x: auto !important;
+  }
+}
+
+/* -------------------------
+   MOBILE
+   ------------------------- */
+
+@media (max-width: 720px) {
+  :root {
+    --page: 100%;
+  }
+
+  .page-width {
+    width: calc(100% - 24px) !important;
+    max-width: calc(100% - 24px) !important;
+  }
+
+  /* TOP BAR */
+  .store-topbar {
+    min-height: 28px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 5px 12px !important;
+    gap: 0 !important;
+    font-size: 8px !important;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .store-topbar span:nth-child(2),
+  .store-topbar span:nth-child(3) {
+    display: none !important;
+  }
+
+  /* CUSTOMER HEADER */
+  .market-header {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 8px 12px 10px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-rows: auto auto !important;
+    align-items: center !important;
+    gap: 8px 10px !important;
+  }
+
+  .market-brand {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    width: 145px !important;
+    max-width: 46vw !important;
+    min-width: 0 !important;
+  }
+
+  .market-brand img {
+    width: 100% !important;
+    height: 50px !important;
+    max-height: 50px !important;
+    object-fit: contain !important;
+    object-position: left center !important;
+  }
+
+  .market-header-actions {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 3px !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  .market-action-link {
+    min-width: 38px !important;
+    width: 38px !important;
+    min-height: 38px !important;
+    padding: 2px !important;
+  }
+
+  .market-action-link.account-action {
+    min-width: 38px !important;
+    width: 38px !important;
+  }
+
+  .market-action-link strong,
+  .market-action-link small,
+  .market-action-link.account-action span:last-child {
+    display: none !important;
+  }
+
+  .market-action-icon {
+    font-size: 17px !important;
+  }
+
+  .market-count-badge {
+    left: 24px !important;
+    top: -1px !important;
+  }
+
+  /* Search must occupy its own complete row */
+  .smart-search-wrap,
+  .market-search-wrap {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .market-search {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 42px !important;
+    grid-template-columns: minmax(0, 1fr) auto auto !important;
+  }
+
+  .market-search input {
+    min-width: 0 !important;
+    width: 100% !important;
+    padding: 0 11px !important;
+    font-size: 10.5px !important;
+  }
+
+  .market-search-button {
+    min-width: 78px !important;
+    height: 34px !important;
+    padding: 0 10px !important;
+    font-size: 9.5px !important;
+    white-space: nowrap !important;
+  }
+
+  /* CATEGORY NAV — scroll inside itself, never widen page */
+  .market-category-nav {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .market-category-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 40px !important;
+    padding: 0 10px !important;
+    display: flex !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .market-category-inner::-webkit-scrollbar {
+    display: none;
+  }
+
+  .market-category-inner a {
+    flex: 0 0 auto !important;
+    min-height: 40px !important;
+    padding: 0 12px !important;
+    font-size: 9.5px !important;
+  }
+
+  .market-offer-link {
+    margin-left: 0 !important;
+    min-width: auto !important;
+  }
+
+  /* SHOP / SLIDERS */
+  .shop-book-slider,
+  .shop-slider-shell,
+  .home-category-showcase,
+  .category-slider-shell,
+  .concept-shop-layout,
+  .concept-shop-results {
+    max-width: 100% !important;
+  }
+
+  .shop-slider-shell,
+  .category-slider-shell {
+    overflow: hidden !important;
+  }
+
+  /* ADMIN MOBILE */
+  .admin-shell-v6 {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .admin-sidebar-v6 {
+    position: relative !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    padding: 8px 10px !important;
+    overflow: hidden !important;
+  }
+
+  /* Keep branding visible and compact on mobile */
+  .admin-brand-v6 {
+    display: flex !important;
+    min-height: 58px !important;
+    padding: 2px 8px 7px !important;
+    border-bottom: 1px solid rgba(255,255,255,.12) !important;
+  }
+
+  .admin-brand-v6 .admin-brand-logo,
+  .admin-brand-v6 > img {
+    width: 145px !important;
+    max-width: 145px !important;
+    height: 48px !important;
+    max-height: 48px !important;
+    transform: scale(1.08) !important;
+  }
+
+  .admin-nav-v6 {
+    display: flex !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 5px !important;
+    padding: 8px 0 0 !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none;
+  }
+
+  .admin-nav-v6::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-nav-v6 button {
+    flex: 0 0 auto !important;
+    min-width: 102px !important;
+    min-height: 38px !important;
+    grid-template-columns: 22px 1fr auto !important;
+    padding: 0 8px !important;
+  }
+
+  .admin-nav-v6 button > span {
+    font-size: 15px !important;
+  }
+
+  .admin-nav-v6 button strong {
+    font-size: 8.8px !important;
+  }
+
+  .admin-profile-v6 {
+    display: none !important;
+  }
+
+  .admin-main-v6 {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 10px 20px !important;
+  }
+
+  .admin-top-v6 {
+    width: calc(100% + 20px) !important;
+    max-width: none !important;
+    margin: 0 -10px 10px !important;
+    padding: 10px 12px !important;
+    gap: 8px !important;
+  }
+
+  .admin-top-actions-v6 {
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+  }
+
+  .admin-hero-v6,
+  .admin-panel-v6 {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .admin-kpi-grid-v6 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .admin-analytics-grid-c8,
+  .admin-authors-layout-c8,
+  .admin-form-grid-v6,
+  .admin-filters-v6,
+  .customer-tools-v6 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-table-wrap-v6 {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-table-v6 {
+    min-width: 720px;
+  }
+
+  .customer-order-check-v73 {
+    width: fit-content !important;
+    max-width: 100% !important;
+  }
+}
+
+/* -------------------------
+   SMALL MOBILE
+   ------------------------- */
+
+@media (max-width: 480px) {
+  .market-brand {
+    width: 132px !important;
+    max-width: 42vw !important;
+  }
+
+  .market-brand img {
+    height: 45px !important;
+    max-height: 45px !important;
+  }
+
+  .market-header-actions {
+    gap: 1px !important;
+  }
+
+  .market-action-link,
+  .market-action-link.account-action {
+    width: 34px !important;
+    min-width: 34px !important;
+  }
+
+  .market-search-button {
+    min-width: 70px !important;
+    padding-inline: 8px !important;
+  }
+
+  .admin-kpi-grid-v6 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-brand-v6 .admin-brand-logo,
+  .admin-brand-v6 > img {
+    width: 132px !important;
+    max-width: 132px !important;
+  }
+}
