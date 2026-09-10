@@ -1604,3 +1604,363 @@ h1, h2, h3, h4, blockquote {
   .tv-offer-banner { grid-template-columns: 1fr; }
   .tv-offer-link { width: fit-content; }
 }
+/* =========================================================
+   FINAL FIX - ADMIN LOGO + STATUS + SHOP FIXED FILTER
+   ========================================================= */
+
+
+/* =========================
+   ADMIN LOGO
+   ========================= */
+
+.admin-brand-v6 {
+  padding: 14px 12px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 110px;
+}
+
+.admin-brand-v6 .admin-brand-logo {
+  width: 205px;
+  max-width: 100%;
+
+  height: auto;
+
+  object-fit: contain;
+  object-position: center;
+
+  display: block;
+
+  /* IMPORTANT */
+  filter: none !important;
+  opacity: 1 !important;
+
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+
+
+/* =========================
+   ADMIN ORDER STATUS
+   ========================= */
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 120px;
+  min-height: 30px;
+
+  padding: 5px 14px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  line-height: 1;
+
+  white-space: nowrap;
+
+  border: 1px solid transparent;
+}
+
+
+/* Delivered */
+
+.status-delivered {
+  background: #dff5e5 !important;
+  color: #137443 !important;
+
+  border: 1px solid #b9e4c7 !important;
+
+  font-weight: 700 !important;
+}
+
+
+/* Processing */
+
+.status-processing,
+.status-booking_confirmed,
+.status-confirmed,
+.status-packed {
+  background: #fff4d9 !important;
+  color: #946713 !important;
+  border-color: #efdca9 !important;
+}
+
+
+/* Shipped */
+
+.status-shipped,
+.status-out_for_delivery {
+  background: #e5f0fb !important;
+  color: #25628f !important;
+  border-color: #c4d9eb !important;
+}
+
+
+/* Cancelled */
+
+.status-cancelled {
+  background: #fde7e7 !important;
+  color: #b83c3c !important;
+  border-color: #efc5c5 !important;
+}
+
+
+
+/* =========================================================
+   SHOP PAGE
+   LEFT FILTER FIXED
+   RIGHT BOOKS SCROLL
+   ========================================================= */
+
+.concept-shop-layout {
+  display: grid;
+
+  grid-template-columns: 255px minmax(0, 1fr);
+
+  gap: 22px;
+
+  align-items: stretch;
+
+  /*
+    Header + title section already occupy top area.
+    Remaining viewport becomes shop area.
+  */
+  height: calc(100vh - 355px);
+
+  min-height: 520px;
+
+  padding-top: 18px;
+  padding-bottom: 18px;
+
+  overflow: hidden;
+}
+
+
+/* =========================
+   LEFT FILTER
+   ========================= */
+
+.concept-filter-panel {
+  position: relative !important;
+
+  top: auto !important;
+
+  width: 100%;
+
+  height: 100%;
+
+  max-height: none !important;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid #dfe5df;
+  border-radius: 12px;
+
+  scrollbar-gutter: stable;
+
+  box-shadow:
+    0 2px 4px rgba(19, 59, 43, 0.02),
+    0 8px 24px rgba(19, 59, 43, 0.04);
+}
+
+
+/* Filter heading stays visible */
+
+.concept-filter-head {
+  position: sticky;
+
+  top: 0;
+
+  z-index: 5;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #e8ece8;
+
+  padding: 16px 15px;
+}
+
+
+/* =========================
+   RIGHT BOOK RESULTS
+   ========================= */
+
+.concept-shop-results {
+  min-width: 0;
+
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+}
+
+
+/* Sort / result count stays at top */
+
+.shop-results-toolbar {
+  flex: 0 0 auto;
+
+  background: #fbfaf5;
+
+  position: relative;
+
+  z-index: 4;
+
+  margin-bottom: 10px;
+}
+
+
+/* Active filters stays top too */
+
+.concept-active-filters {
+  flex: 0 0 auto;
+}
+
+
+/* ONLY BOOKS AREA SCROLLS */
+
+.concept-shop-scroll-area {
+  flex: 1;
+
+  min-height: 0;
+
+  max-height: none !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden;
+
+  padding-right: 10px;
+  padding-bottom: 30px;
+
+  scrollbar-gutter: stable;
+}
+
+
+/* =========================
+   PREMIUM SCROLL BAR
+   ========================= */
+
+.concept-shop-scroll-area::-webkit-scrollbar,
+.concept-filter-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+
+.concept-shop-scroll-area::-webkit-scrollbar-track,
+.concept-filter-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+.concept-shop-scroll-area::-webkit-scrollbar-thumb,
+.concept-filter-panel::-webkit-scrollbar-thumb {
+  background: #c8d8cf;
+
+  border-radius: 20px;
+
+  border: 2px solid transparent;
+
+  background-clip: padding-box;
+}
+
+
+.concept-shop-scroll-area::-webkit-scrollbar-thumb:hover,
+.concept-filter-panel::-webkit-scrollbar-thumb:hover {
+  background: #8fb4a1;
+
+  background-clip: padding-box;
+}
+
+
+
+/* =========================
+   BOOK GRID ALIGNMENT
+   ========================= */
+
+.shop-grid {
+  align-items: stretch;
+}
+
+.shop-book-card {
+  height: 100%;
+}
+
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+  .concept-shop-layout {
+    grid-template-columns: 220px minmax(0, 1fr);
+
+    height: calc(100vh - 330px);
+
+    gap: 15px;
+  }
+
+}
+
+
+@media (max-width: 768px) {
+
+  .concept-shop-layout {
+    display: block;
+
+    height: auto;
+
+    overflow: visible;
+  }
+
+
+  .concept-filter-panel {
+    position: relative !important;
+
+    height: auto;
+
+    max-height: none;
+
+    margin-bottom: 18px;
+  }
+
+
+  .concept-filter-head {
+    position: relative;
+  }
+
+
+  .concept-shop-results {
+    height: auto;
+
+    overflow: visible;
+  }
+
+
+  .concept-shop-scroll-area {
+    max-height: none !important;
+
+    overflow: visible !important;
+
+    padding-right: 0;
+  }
+
+}

@@ -397,8 +397,11 @@ export default function AdminDashboardPage() {
     <div className="admin-shell-v6">
       <aside className="admin-sidebar-v6 glass-admin-sidebar">
         <div className="admin-brand-v6">
-          <img src="/logo.png" alt="Thulirkum Ver" />
-          <div><strong>Thulirkum Ver</strong><span>Commerce Console</span></div>
+          <img
+            src="/logo.png"
+            alt="Thulirkum Ver"
+            className="admin-brand-logo"
+          />
         </div>
 
         <div className="admin-sprout-glass-v73" aria-hidden="true">
