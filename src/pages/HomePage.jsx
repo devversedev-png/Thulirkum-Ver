@@ -61,13 +61,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="page-width tv-benefits" aria-label="Store benefits">
-        <article><span className="benefit-icon">▣</span><div><strong>Genuine Books</strong><small>100% original books</small></div></article>
-        <article><span className="benefit-icon">◆</span><div><strong>Secure Checkout</strong><small>Multiple payment options</small></div></article>
-        <article><span className="benefit-icon">▰</span><div><strong>Fast Delivery</strong><small>Across India</small></div></article>
-        <article><span className="benefit-icon">◉</span><div><strong>Dedicated Support</strong><small>We’re here to help</small></div></article>
-      </section>
-
       <section className="page-width tv-section">
         <div className="tv-section-head">
           <h2>Explore by Category</h2>

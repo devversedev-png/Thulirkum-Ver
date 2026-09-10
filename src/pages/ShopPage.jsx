@@ -81,7 +81,7 @@ export default function ShopPage() {
       <div className="shop-title-band">
         <div className="page-width market-shop-heading">
           <div>
-            <div className="market-breadcrumb">Home &nbsp;›&nbsp; All Books {category ? `› ${category}` : ''}</div>
+            {/* <div className="market-breadcrumb">Home &nbsp;›&nbsp; All Books {category ? `› ${category}` : ''}</div> */}
             <h1>{q ? `Search results for “${q}”` : category || 'All Books'}</h1>
             <p>Discover Tamil and English books that inform, inspire and uplift.</p>
           </div>
