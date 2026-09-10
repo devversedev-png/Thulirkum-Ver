@@ -107,7 +107,7 @@ useEffect(() => {
       promoBooks.length
     )
 
-  }, 4500)
+  }, 2500)
 
   return () =>
     clearInterval(timer)
