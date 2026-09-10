@@ -996,3 +996,391 @@ main { min-width: 0; }
 .account-welcome-profile .avatar { margin: 0; flex: 0 0 auto; }
 .account-welcome-profile h1 { margin-top: 4px; }
 .account-welcome-profile p { margin: 0; color: #6e7d75; font-size: 9.5px; }
+
+/* =========================================================
+   THULIRKUM VER - HOME PAGE EXACT REFERENCE STYLE
+   ========================================================= */
+.tv-homepage {
+  padding-bottom: 8px;
+}
+.tv-homepage .page-width {
+  max-width: 1360px;
+}
+.tv-hero {
+  display: grid;
+  grid-template-columns: 1.12fr .88fr;
+  align-items: center;
+  min-height: 238px;
+  background: linear-gradient(90deg, #fbf8ef 0%, #fcfaf3 72%, #f6f5ea 100%);
+  border-bottom: 1px solid #eaebe3;
+  padding: 22px 18px 8px;
+}
+.tv-hero-left {
+  padding: 8px 10px 12px 2px;
+}
+.tv-hero-kicker {
+  color: #7f8a7d;
+  font-size: 10px;
+  letter-spacing: .16em;
+  margin-bottom: 12px;
+}
+.tv-hero-left h1 {
+  margin: 0;
+  font-size: 62px;
+  line-height: .96;
+  color: #0c4a3d;
+  letter-spacing: -.04em;
+}
+.tv-hero-subtitle {
+  margin: 14px 0 18px;
+  color: #476e5e;
+  font-size: 15px;
+}
+.tv-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tv-btn-primary,
+.tv-btn-secondary,
+.tv-offer-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+}
+.tv-btn-primary {
+  background: #156847;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(21, 104, 71, .18);
+}
+.tv-btn-secondary {
+  color: #156847;
+  background: transparent;
+}
+.tv-hero-right {
+  position: relative;
+  min-height: 192px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tv-hero-right::before {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 18px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle at center, rgba(168, 188, 163, .35), rgba(168, 188, 163, 0));
+  filter: blur(16px);
+}
+.tv-hero-right img {
+  width: min(100%, 470px);
+  height: auto;
+  display: block;
+}
+.tv-hero-quote {
+  position: absolute;
+  right: 16px;
+  top: 8px;
+  margin: 0;
+  color: #44725f;
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.45;
+  text-align: right;
+}
+.tv-benefits {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: white;
+  border: 1px solid #ebede7;
+  border-top: 0;
+}
+.tv-benefits article {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-right: 1px solid #edf0ea;
+}
+.tv-benefits article:last-child { border-right: 0; }
+.tv-benefits span {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #f4f8f2;
+}
+.tv-benefits strong {
+  display: block;
+  font-size: 11px;
+  color: #193c31;
+}
+.tv-benefits small {
+  display: block;
+  color: #7a857f;
+  font-size: 9px;
+}
+.tv-section {
+  padding-top: 18px;
+}
+.tv-section-head-inline {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.tv-section-head-inline h2 {
+  margin: 0;
+  color: #173f34;
+  font-size: 20px;
+}
+.tv-section-head-inline p {
+  margin: 4px 0 0;
+  color: #6f7d76;
+  font-size: 11px;
+}
+.tv-inline-link {
+  color: #0d6848;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.tv-category-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+.tv-category-card {
+  min-height: 66px;
+  background: white;
+  border: 1px solid #e4e8df;
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: 38px 1fr 24px;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  box-shadow: 0 3px 8px rgba(20, 50, 38, .03);
+}
+.tv-category-card:hover { border-color: #cfdacc; }
+.tv-category-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  font-size: 17px;
+}
+.tv-category-card strong {
+  display: block;
+  color: #193d31;
+  font-size: 10.5px;
+}
+.tv-category-card small {
+  display: block;
+  color: #8a948d;
+  font-size: 8.8px;
+}
+.tv-category-card button {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid #d9dfd5;
+  background: #fff;
+  color: #4c6f62;
+  font-weight: 700;
+}
+.tv-tone-peach .tv-category-icon { background: #fdeed7; color: #b98721; }
+.tv-tone-apricot .tv-category-icon { background: #fee6dc; color: #da6c2e; }
+.tv-tone-blue .tv-category-icon { background: #e5eefc; color: #4a72ad; }
+.tv-tone-green .tv-category-icon { background: #eaf4e3; color: #4f8a46; }
+.tv-tone-purple .tv-category-icon { background: #efe7fb; color: #8d69c8; }
+.tv-featured-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+.home-ref-book-card {
+  border-radius: 12px;
+  padding: 10px 10px 12px;
+  box-shadow: 0 8px 18px rgba(20, 47, 36, .05);
+}
+.home-ref-book-card .market-card-topline {
+  min-height: 21px;
+}
+.home-ref-book-card .market-discount-label {
+  min-height: 18px;
+  padding: 0 7px;
+  border-radius: 5px;
+  font-size: 8px;
+  text-transform: lowercase;
+}
+.home-ref-book-card .market-discount-label::first-letter { text-transform: uppercase; }
+.home-ref-book-card .market-wishlist-button {
+  width: 24px;
+  height: 24px;
+  font-size: 18px;
+}
+.home-ref-book-card .cover-wrap {
+  height: 112px;
+  margin: 0 0 6px;
+}
+.home-ref-book-card .cover-wrap img {
+  max-height: 106px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 8px rgba(32, 44, 34, .12));
+}
+.home-ref-book-card .book-title {
+  min-height: 24px;
+  font-size: 11.3px;
+}
+.home-ref-book-card .market-book-author {
+  min-height: 12px;
+  font-size: 8.7px;
+}
+.home-ref-book-card .market-rating-row {
+  margin-top: 4px;
+  font-size: 9px;
+}
+.home-ref-book-card .price-line {
+  min-height: 22px;
+  margin: 2px 0 7px;
+}
+.home-ref-book-card .price-line strong {
+  font-size: 15px;
+}
+.home-ref-book-card .price-line del {
+  font-size: 9px;
+}
+.home-ref-book-card .market-cart-button {
+  min-height: 28px;
+  border-radius: 5px;
+  background: #156847;
+  color: white;
+  font-size: 9.5px;
+  font-weight: 700;
+}
+.tv-offer-banner {
+  margin-top: 18px;
+  min-height: 116px;
+  border: 1px solid #dfe6d7;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #f8f5ea 0%, #f7f4e7 55%, #f8f8ef 100%);
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+}
+.tv-offer-copy small {
+  display: inline-block;
+  color: #dc7c25;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.tv-offer-copy h3 {
+  margin: 0 0 5px;
+  color: #153c31;
+  font-size: 18px;
+}
+.tv-offer-copy p {
+  margin: 0 0 10px;
+  color: #61716a;
+  font-size: 11px;
+}
+.tv-offer-link {
+  min-height: 34px;
+  width: fit-content;
+  padding-inline: 14px;
+  background: #156847;
+  color: white;
+  font-size: 11px;
+}
+.tv-offer-art {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+}
+.tv-offer-art img {
+  width: 145px;
+  height: auto;
+}
+.tv-discount-badge {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid #dfe5d7;
+  color: #61715a;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  line-height: 1;
+}
+.tv-discount-badge span,
+.tv-discount-badge small {
+  display: block;
+  font-size: 10px;
+}
+.tv-discount-badge strong {
+  display: block;
+  font-size: 24px;
+  color: #2b6e55;
+  margin: 2px 0;
+}
+.tv-authors-section {
+  padding-top: 14px;
+}
+.tv-author-row {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+.tv-author-chip {
+  background: white;
+  border: 1px solid #e4e8df;
+  border-radius: 26px;
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 7px 10px;
+}
+.tv-author-chip img {
+  width: 34px;
+  height: 34px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid #dfdfdf;
+}
+.tv-author-chip strong {
+  display: block;
+  color: #1e4337;
+  font-size: 9.9px;
+}
+.tv-author-chip small {
+  display: block;
+  color: #868f89;
+  font-size: 8.5px;
+}
+
+@media (max-width: 1100px) {
+  .tv-featured-grid, .tv-category-row, .tv-author-row, .tv-benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tv-hero, .tv-offer-banner { grid-template-columns: 1fr; }
+}

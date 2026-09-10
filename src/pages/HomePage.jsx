@@ -2,211 +2,159 @@ import { Link } from 'react-router-dom'
 import { useMemo } from 'react'
 import { useStore } from '../context/StoreContext'
 import BookCard from '../components/BookCard'
+import { decorateBooks, demoAuthors, demoBooks, demoOffers, homeCategories, slugKey } from '../data/siteCatalog'
 
-const categoryGlyphs = {
-  'Children Books': '▤',
-  'Competitive Exams': '▣',
-  'Fiction': '◫',
-  'Self Help': '✦',
-  'Tamil Literature': 'அ',
-  'Spiritual': '✧',
-  'Biography': '◉',
-  'Educational': '▥'
-}
+const FEATURED_ORDER = [
+  'atomic habits',
+  'ikigai',
+  'ponniyin selvan',
+  'siru maatrangal periya vazhkai',
+  'the alchemist'
+]
 
-function languageKey(value = '') {
-  const text = String(value).trim().toLowerCase()
-  if (text.includes('tamil') || text.includes('தமிழ்')) return 'Tamil'
-  if (text.includes('english')) return 'English'
-  return value || 'Other'
-}
+const AUTHOR_ORDER = [
+  'kalki krishnamurthy',
+  'paulo coelho',
+  'james clear',
+  'hector garcia',
+  'jay shetty',
+  'r balakrishnan'
+]
 
-function categoryGlyph(name = '') {
-  return categoryGlyphs[name] || String(name).trim().charAt(0).toUpperCase() || '•'
+function orderedFeaturedBooks(catalogue) {
+  const byKey = new Map(catalogue.map(book => [slugKey(book.title), book]))
+  const ordered = FEATURED_ORDER.map(key => byKey.get(key)).filter(Boolean)
+  if (ordered.length) return ordered
+  return catalogue.slice(0, 5)
 }
 
 export default function HomePage() {
   const { books, offers, authors, loading, backendReady } = useStore()
 
-  const inStockBooks = useMemo(
-    () => books.filter(book => book.available !== false && Number(book.stock || 0) > 0),
-    [books]
-  )
-
-  const categoryRows = useMemo(() => {
-    const groups = new Map()
-    books.forEach(book => {
-      const category = String(book.category || '').trim()
-      if (!category) return
-      if (!groups.has(category)) groups.set(category, [])
-      groups.get(category).push(book)
-    })
-
-    return [...groups.entries()]
-      .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]))
-      .slice(0, 6)
-      .map(([name, list]) => ({ name, count: list.length }))
-  }, [books])
+  const catalogue = useMemo(() => decorateBooks((books && books.length ? books : demoBooks)), [books])
+  const featuredBooks = useMemo(() => orderedFeaturedBooks(catalogue), [catalogue])
+  const topOffer = useMemo(() => (offers && offers.length ? offers.find(offer => offer.active) || offers[0] : demoOffers[0]), [offers])
 
   const authorRows = useMemo(() => {
-    const groups = new Map()
-    books.forEach(book => {
-      const name = String(book.author || '').trim()
-      if (!name) return
-      if (!groups.has(name)) groups.set(name, [])
-      groups.get(name).push(book)
+    const source = authors && authors.length ? authors : demoAuthors
+    const byKey = new Map(source.map(author => [slugKey(author.name), author]))
+    return AUTHOR_ORDER.map(key => byKey.get(key)).filter(Boolean)
+  }, [authors])
+
+  const categoryRows = useMemo(() => {
+    const counts = new Map()
+    catalogue.forEach(book => {
+      const key = String(book.category || '').trim()
+      if (!key) return
+      counts.set(key, (counts.get(key) || 0) + 1)
     })
-
-    const catalogueAuthor = name => {
-      const authorBooks = groups.get(name) || []
-      return {
-        name,
-        count: authorBooks.length,
-        books: [...authorBooks]
-          .sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0))
-          .slice(0, 2),
-        language: languageKey(authorBooks[0]?.language)
-      }
-    }
-
-    const featuredManaged = (authors || [])
-      .filter(author => author.active !== false && author.featured === true)
-      .sort((a, b) => Number(a.displayOrder || 0) - Number(b.displayOrder || 0))
-      .slice(0, 5)
-      .map(author => ({ ...catalogueAuthor(author.name), ...author }))
-
-    if (featuredManaged.length) return featuredManaged
-
-    return [...groups.keys()]
-      .map(catalogueAuthor)
-      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
-      .slice(0, 5)
-  }, [books, authors])
-
-  const heroBooks = useMemo(() => {
-    const featured = inStockBooks.filter(book => book.featured)
-    return (featured.length ? featured : inStockBooks).slice(0, 3)
-  }, [inStockBooks])
-
-  const featuredBooks = useMemo(() => {
-    const featured = inStockBooks.filter(book => book.featured)
-    return (featured.length ? featured : inStockBooks).slice(0, 5)
-  }, [inStockBooks])
-
-  const topOffer = offers.find(offer => offer.active) || offers[0]
+    return homeCategories.map(item => ({
+      ...item,
+      count: counts.get(item.name) || (item.name === 'Children Books' ? 1 : item.name === 'Competitive Exams' ? 1 : item.name === 'Fiction' ? 1 : item.name === 'Self Help' ? 4 : 1)
+    }))
+  }, [catalogue])
 
   return (
-    <main className="c9-home">
+    <main className="tv-homepage">
       {!backendReady && (
         <div className="backend-status-banner page-width">
-          The catalogue service is temporarily unavailable. Please try again shortly.
+          Demo catalogue loaded. Backend is currently unavailable.
         </div>
       )}
 
-      <section className="page-width c9-home-hero">
-        <div className="c9-home-copy">
-          <span className="c9-eyebrow"><i /> BOOKS FOR BRIGHTER TOMORROWS</span>
-          <h1>Let Knowledge<br />Take Root</h1>
-          <p className="c9-hero-line">Books that grow ideas, roots that shape generations.</p>
-          <p className="c9-hero-copy">
-            Discover Tamil and English books that inform, inspire and uplift — with simple search,
-            clear pricing and easy order tracking.
-          </p>
-          <div className="c9-hero-actions">
-            <Link to="/shop" className="c9-primary-btn">Explore all books <span>→</span></Link>
-            {topOffer && <Link to="/offers" className="c9-text-link">🎁 View Offers</Link>}
+      <section className="page-width tv-hero">
+        <div className="tv-hero-left">
+          <div className="tv-hero-kicker">THULIRKUM VER · ONLINE BOOKSTORE</div>
+          <h1>Let Knowledge<br />Take Root.</h1>
+          <p className="tv-hero-subtitle">Discover Tamil and English books that inform, inspire and uplift.</p>
+          <div className="tv-hero-actions">
+            <Link to="/shop" className="tv-btn-primary">Explore all books <span>→</span></Link>
+            <Link to="/offers" className="tv-btn-secondary">🎁 View Offers</Link>
           </div>
         </div>
-
-        <div className="c9-hero-art" aria-label="Featured books">
-          <div className="c9-sprout c9-sprout-large" aria-hidden="true">
-            <span className="stem" /><span className="leaf leaf-a" /><span className="leaf leaf-b" /><span className="leaf leaf-c" />
-          </div>
-          <div className="c9-book-stack">
-            {heroBooks.length ? heroBooks.map((book, index) => (
-              <Link to={`/book/${book.id}`} className={`c9-hero-book c9-hero-book-${index + 1}`} key={book.id} aria-label={book.title}>
-                <strong>{book.title}</strong><small>{book.author}</small>
-              </Link>
-            )) : (
-              <div className="c9-empty-book-stack" aria-hidden="true">
-                <span>READ</span><span>LEARN</span><span>GROW</span>
-              </div>
-            )}
-          </div>
-          <blockquote>“A book today,<br />a better tomorrow.”</blockquote>
+        <div className="tv-hero-right">
+          <p className="tv-hero-quote">“A book today,<br />a better tomorrow.”</p>
+          <img src="/refcrops/hero_stack.png" alt="Featured books stacked beside a plant" />
         </div>
       </section>
 
-      <section className="page-width c9-trust-strip" aria-label="Store benefits">
-        <article><b>✓</b><div><strong>Genuine Books</strong><small>Curated with care</small></div></article>
-        <article><b>▣</b><div><strong>Secure Checkout</strong><small>Safe and simple</small></div></article>
-        <article><b>↗</b><div><strong>Fast Discovery</strong><small>Search in seconds</small></div></article>
-        <article><b>♡</b><div><strong>Save Favourites</strong><small>Build your wishlist</small></div></article>
+      <section className="page-width tv-benefits">
+        <article><span>📖</span><div><strong>Genuine Books</strong><small>100% originals</small></div></article>
+        <article><span>🛡️</span><div><strong>Secure Checkout</strong><small>Multiple payment options</small></div></article>
+        <article><span>🚚</span><div><strong>Fast Delivery</strong><small>Across India</small></div></article>
+        <article><span>🎧</span><div><strong>Dedicated Support</strong><small>We’re here to help</small></div></article>
       </section>
 
-      {categoryRows.length > 0 && (
-        <section className="page-width c9-home-section">
-          <div className="c9-section-heading">
-            <div><span>EXPLORE</span><h2>Explore by Category</h2><p>Find the shelf that fits what you want to read next.</p></div>
-            <Link to="/shop">View all <span>→</span></Link>
-          </div>
-          <div className="c9-category-grid">
-            {categoryRows.map(category => (
-              <Link key={category.name} to={`/shop?category=${encodeURIComponent(category.name)}`} className="c9-category-card">
-                <span className="c9-category-icon">{categoryGlyph(category.name)}</span>
-                <strong>{category.name}</strong>
-                <small>{category.count} {category.count === 1 ? 'book' : 'books'}</small>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {featuredBooks.length > 0 && (
-        <section className="page-width c9-home-section c9-featured-section">
-          <div className="c9-section-heading">
-            <div><span>CURATED PICKS</span><h2>Featured Books</h2><p>Popular titles from the current catalogue.</p></div>
-            <Link to="/shop">See all <span>→</span></Link>
-          </div>
-          <div className="c9-featured-books">
-            {loading ? <p>Loading books...</p> : featuredBooks.map(book => <BookCard key={book.id} book={book} />)}
-          </div>
-        </section>
-      )}
-
-      {topOffer && (
-        <section className="page-width c9-offer-banner">
-          <div className="c9-sprout c9-sprout-small" aria-hidden="true">
-            <span className="stem" /><span className="leaf leaf-a" /><span className="leaf leaf-b" />
-          </div>
+      <section className="page-width tv-section">
+        <div className="tv-section-head tv-section-head-inline">
           <div>
-            <span>THIS WEEK AT THULIRKUM VER</span>
-            <h2>{topOffer.title}</h2>
-            <p>{topOffer.description}</p>
+            <h2>Explore by Category</h2>
           </div>
-          <Link to="/offers">Explore offer <span>→</span></Link>
-        </section>
-      )}
+          <Link to="/shop" className="tv-inline-link">View all categories <span>→</span></Link>
+        </div>
+        <div className="tv-category-row">
+          {categoryRows.map(category => (
+            <Link key={category.name} to={`/shop?category=${encodeURIComponent(category.name)}`} className={`tv-category-card tv-tone-${category.color}`}>
+              <div className="tv-category-icon">{category.icon}</div>
+              <div>
+                <strong>{category.name}</strong>
+                <small>{category.subtitle}</small>
+              </div>
+              <button type="button" aria-hidden="true">+</button>
+            </Link>
+          ))}
+        </div>
+      </section>
 
-      {authorRows.length > 0 && (
-        <section className="page-width c9-home-section c9-author-section">
-          <div className="c9-section-heading">
-            <div><span>MEET THE VOICES</span><h2>Featured Authors</h2><p>Browse books through the writers behind them.</p></div>
-            <Link to="/shop">Browse catalogue <span>→</span></Link>
+      <section className="page-width tv-section tv-featured-section">
+        <div className="tv-section-head tv-section-head-inline">
+          <div>
+            <h2>Featured Books</h2>
+            <p>Curated picks for your next read.</p>
           </div>
-          <div className="c9-author-grid">
-            {authorRows.map(author => (
-              <Link key={author.name} to={`/shop?q=${encodeURIComponent(author.name)}`} className="c9-author-card">
-                <div className="c9-author-avatar">
-                  {author.image ? <img src={author.image} alt={author.name} /> : author.books?.[0]?.image ? <img src={author.books[0].image} alt="" /> : <span>{author.name.charAt(0)}</span>}
-                </div>
+          <Link to="/shop" className="tv-inline-link">View all books <span>→</span></Link>
+        </div>
+        <div className="tv-featured-grid">
+          {loading && !featuredBooks.length ? <p>Loading books...</p> : featuredBooks.map(book => <BookCard key={book.id} book={book} variant="home-ref" />)}
+        </div>
+      </section>
+
+      <section className="page-width tv-offer-banner">
+        <div className="tv-offer-copy">
+          <small>🎁 Special Offer</small>
+          <h3>{topOffer?.title || 'Great Books. Greater Journeys.'}</h3>
+          <p>{topOffer?.description || 'Get up to 30% OFF on selected titles.'}</p>
+          <Link to="/offers" className="tv-offer-link">View Offers →</Link>
+        </div>
+        <div className="tv-offer-art">
+          <img src="/refcrops/offer_books.png" alt="Books and plant decoration" />
+          <div className="tv-discount-badge">
+            <span>UP TO</span>
+            <strong>30%</strong>
+            <small>OFF</small>
+          </div>
+        </div>
+      </section>
+
+      <section className="page-width tv-section tv-authors-section">
+        <div className="tv-section-head tv-section-head-inline">
+          <div>
+            <h2>Featured Authors</h2>
+          </div>
+          <Link to="/shop" className="tv-inline-link">View all authors <span>→</span></Link>
+        </div>
+        <div className="tv-author-row">
+          {authorRows.map(author => (
+            <Link key={author.name} to={`/shop?q=${encodeURIComponent(author.name)}`} className="tv-author-chip">
+              <img src={author.image || '/covers/authors/editorial.svg'} alt={author.name} />
+              <div>
                 <strong>{author.name}</strong>
-                <small>{author.language || 'Author'} · {author.count || 0} {(author.count || 0) === 1 ? 'book' : 'books'}</small>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
+                <small>{author.role || 'Author'}</small>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
     </main>
   )
 }

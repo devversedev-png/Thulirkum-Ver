@@ -7,6 +7,7 @@ export default function BookCard({ book, variant = 'default' }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const inWishlist = account?.wishlist?.includes(book.id)
+  const homeRefCard = variant === 'home-ref'
   const shopCard = variant === 'shop'
   const available = book.available !== false && Number(book.stock || 0) > 0
   const discount = Number(book.originalPrice || 0) > Number(book.price || 0)
@@ -31,10 +32,12 @@ export default function BookCard({ book, variant = 'default' }) {
     await toggleWishlist(book.id)
   }
 
+  const label = book.newArrival ? 'Bestseller' : discount >= 15 ? `${discount}% Off` : book.featured ? 'Popular' : ''
+
   return (
-    <article className={`book-card ${shopCard ? 'shop-book-card' : ''} ${!available ? 'book-card-out' : ''}`}>
+    <article className={`book-card ${shopCard ? 'shop-book-card' : ''} ${homeRefCard ? 'home-ref-book-card' : ''} ${!available ? 'book-card-out' : ''}`}>
       <div className="market-card-topline">
-        {book.newArrival ? <span className="market-new-label">New</span> : discount > 0 ? <span className="market-discount-label">{discount}% OFF</span> : book.featured ? <span className="market-bestseller-label">Bestseller</span> : <span />}
+        {label ? <span className="market-discount-label">{label}</span> : <span />}
         <button className={`market-wishlist-button ${inWishlist ? 'selected' : ''}`} onClick={wishClick} title="Wishlist" aria-label="Add to wishlist">{inWishlist ? '♥' : '♡'}</button>
       </div>
 
@@ -52,7 +55,7 @@ export default function BookCard({ book, variant = 'default' }) {
           {Number(book.originalPrice || 0) > Number(book.price || 0) && <del>₹{book.originalPrice}</del>}
         </div>
         <button className="market-cart-button" onClick={cartClick} disabled={!available || busy}>
-          <span>🛒</span> {!available ? 'Out of Stock' : busy ? 'Adding...' : 'Add to Cart'}
+          {!available ? 'Out of Stock' : busy ? 'Adding...' : 'Add to Cart'}
         </button>
         {error && <small className="card-error">{error}</small>}
       </div>

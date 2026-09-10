@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { api } from '../api/client'
 import { useAuth } from './AuthContext'
+import { demoAuthors, demoBooks, demoOffers, decorateAuthors, decorateBooks } from '../data/siteCatalog'
 
 const StoreContext = createContext(null)
 
@@ -28,10 +29,10 @@ export function StoreProvider({ children }) {
     if (!silent) setLoading(true)
     try {
       const data = await api('/books')
-      setBooks(data)
+      setBooks(decorateBooks(data))
       setBackendReady(true)
     } catch {
-      setBooks([])
+      setBooks(demoBooks)
       setBackendReady(false)
     } finally {
       if (!silent) setLoading(false)
@@ -42,16 +43,16 @@ export function StoreProvider({ children }) {
     try {
       setOffers(await api('/offers/active'))
     } catch {
-      setOffers([])
+      setOffers(demoOffers)
     }
   }
 
 
   async function loadAuthors() {
     try {
-      setAuthors(await api('/authors'))
+      setAuthors(decorateAuthors(await api('/authors')))
     } catch {
-      setAuthors([])
+      setAuthors(demoAuthors)
     }
   }
 
