@@ -2892,3 +2892,291 @@ h1, h2, h3, h4, blockquote {
   }
 
 }
+
+/* =========================================================
+   SHOP HERO + PROMO TRACK FINAL ALIGNMENT
+   ========================================================= */
+
+.market-shop-heading {
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(360px, 0.72fr)
+    minmax(0, 1.28fr) !important;
+
+  align-items: center !important;
+
+  gap: 38px !important;
+
+  min-height: 132px !important;
+
+  padding-top: 18px !important;
+  padding-bottom: 18px !important;
+}
+
+
+/* LEFT TITLE */
+
+.shop-title-copy {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+
+.shop-small-label {
+  margin-bottom: 7px !important;
+}
+
+
+.market-shop-heading h1 {
+  margin: 0 !important;
+
+  line-height: 0.95 !important;
+}
+
+
+.market-shop-heading p {
+  margin-top: 9px !important;
+  margin-bottom: 0 !important;
+}
+
+
+/* =========================================================
+   PROMO TICKER
+   ========================================================= */
+
+.shop-promo-marquee {
+  width: 100%;
+
+  min-width: 0;
+
+  height: 62px;
+
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+
+  margin: 0 !important;
+
+  border: 1px solid #dbe8df;
+
+  border-radius: 14px;
+
+  background:
+    rgba(255, 255, 255, 0.92);
+
+  box-shadow:
+    0 5px 18px
+    rgba(20, 67, 49, 0.05);
+
+  position: relative;
+}
+
+
+/* soft fade at both sides */
+
+.shop-promo-marquee::before,
+.shop-promo-marquee::after {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+
+  width: 42px;
+
+  z-index: 5;
+
+  pointer-events: none;
+}
+
+
+.shop-promo-marquee::before {
+  left: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      #ffffff 20%,
+      rgba(255,255,255,0)
+    );
+}
+
+
+.shop-promo-marquee::after {
+  right: 0;
+
+  background:
+    linear-gradient(
+      270deg,
+      #ffffff 20%,
+      rgba(255,255,255,0)
+    );
+}
+
+
+/* moving row */
+
+.shop-promo-track {
+  width: max-content;
+
+  min-width: max-content;
+
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 0;
+
+  padding-left: 46px;
+
+  will-change: transform;
+
+  animation:
+    shopOfferTicker
+    30s
+    linear
+    infinite;
+}
+
+
+/* each offer */
+
+.shop-promo-track span {
+  min-height: 62px;
+
+  display: inline-flex;
+  align-items: center;
+
+  padding: 0 32px;
+
+  position: relative;
+
+  color: #0d6848;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  line-height: 1;
+
+  white-space: nowrap;
+}
+
+
+/* gold separator */
+
+.shop-promo-track span::after {
+  content: "•";
+
+  position: absolute;
+
+  right: -2px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #c9952d;
+
+  font-size: 17px;
+}
+
+
+/* pause when mouse over */
+
+.shop-promo-marquee:hover
+.shop-promo-track {
+  animation-play-state: paused;
+}
+
+
+/* smoother loop */
+
+@keyframes shopOfferTicker {
+
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+  .market-shop-heading {
+    grid-template-columns:
+      minmax(300px, 0.8fr)
+      minmax(0, 1.2fr)
+      !important;
+
+    gap: 24px !important;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  .market-shop-heading {
+    display: block !important;
+
+    min-height: 0 !important;
+
+    padding:
+      15px 14px
+      14px !important;
+  }
+
+
+  .shop-promo-marquee {
+    height: 44px;
+
+    margin-top: 14px !important;
+
+    border-radius: 10px;
+  }
+
+
+  .shop-promo-track {
+    height: 44px;
+
+    padding-left: 28px;
+
+    animation-duration: 24s;
+  }
+
+
+  .shop-promo-track span {
+    min-height: 44px;
+
+    padding: 0 23px;
+
+    font-size: 10px;
+  }
+
+
+  .shop-promo-marquee::before,
+  .shop-promo-marquee::after {
+    width: 28px;
+  }
+
+}
