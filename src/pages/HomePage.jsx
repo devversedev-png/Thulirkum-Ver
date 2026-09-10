@@ -146,7 +146,7 @@ export default function HomePage() {
       setActiveCategorySlide(current =>
         (current + 1) % categorySlides.length
       )
-    }, 4000)
+    }, 2500)
 
     return () => window.clearInterval(timer)
   }, [categoryPaused, categorySlides.length])
