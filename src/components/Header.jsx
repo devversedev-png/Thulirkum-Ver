@@ -128,6 +128,7 @@ export default function Header() {
 
       <div className="market-category-nav glass-category-nav concept-c-nav">
         <div className="market-category-inner concept-c-nav-inner">
+          <NavLink className="market-home-link" to="/home">Home</NavLink>
           <NavLink className="market-all-link" to="/shop">All Books</NavLink>
           {categories.map(category => <NavLink key={category} to={`/shop?category=${encodeURIComponent(category)}`}>{category}</NavLink>)}
           <NavLink className="market-offer-link" to="/offers">Offers</NavLink>
