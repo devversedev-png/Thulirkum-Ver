@@ -3,11 +3,17 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useStore } from '../context/StoreContext'
 import BookCard from '../components/BookCard'
 import PremiumSelect from '../components/PremiumSelect'
+import { demoBooks } from '../data/siteCatalog'
 
 const PAGE_SIZE = 12
 
 export default function ShopPage() {
   const { books } = useStore()
+
+  const catalogue = useMemo(() => {
+    return books?.length ? books : demoBooks
+  }, [books])
+
   const [params, setParams] = useSearchParams()
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [activeSlide, setActiveSlide] = useState(0)
@@ -25,21 +31,21 @@ export default function ShopPage() {
   const categories = useMemo(
     () =>
       [...new Set(
-        books
+        catalogue
           .map(book => book.category)
           .filter(Boolean)
       )].sort(),
-    [books]
+    [catalogue]
   )
 
   const languages = useMemo(
     () =>
       [...new Set(
-        books
+        catalogue
           .map(book => book.language)
           .filter(Boolean)
       )].sort(),
-    [books]
+    [catalogue]
   )
 
   const sortOptions = [
@@ -64,100 +70,100 @@ export default function ShopPage() {
 
   const promoBooks = useMemo(() => {
 
-  const promotional = books.filter(book => {
+    const promotional = catalogue.filter(book => {
 
-    const hasOffer =
-      Number(book.originalPrice || 0) >
-      Number(book.price || 0)
+      const hasOffer =
+        Number(book.originalPrice || 0) >
+        Number(book.price || 0)
 
-    const isNew =
-      book.newArrival === true
+      const isNew =
+        book.newArrival === true
 
-    return (
-      book.available !== false &&
-      Number(book.stock || 0) > 0 &&
-      (hasOffer || isNew)
-    )
-  })
-
-  if (promotional.length) {
-    return promotional.slice(0, 6)
-  }
-
-  return books
-    .filter(
-      book =>
+      return (
         book.available !== false &&
-        Number(book.stock || 0) > 0
-    )
-    .slice(0, 6)
+        Number(book.stock || 0) > 0 &&
+        (hasOffer || isNew)
+      )
+    })
 
-}, [books])
+    if (promotional.length) {
+      return promotional.slice(0, 6)
+    }
 
-useEffect(() => {
+    return catalogue
+      .filter(
+        book =>
+          book.available !== false &&
+          Number(book.stock || 0) > 0
+      )
+      .slice(0, 6)
 
-  if (promoBooks.length <= 1) {
-    return
-  }
+  }, [catalogue])
 
-  const timer = setInterval(() => {
+  useEffect(() => {
+
+    if (promoBooks.length <= 1) {
+      return
+    }
+
+    const timer = setInterval(() => {
+
+      setActiveSlide(current =>
+        (current + 1) %
+        promoBooks.length
+      )
+
+    }, 2500)
+
+    return () =>
+      clearInterval(timer)
+
+  }, [promoBooks.length])
+
+  function nextSlide() {
+
+    if (!promoBooks.length) return
 
     setActiveSlide(current =>
       (current + 1) %
       promoBooks.length
     )
 
-  }, 2500)
-
-  return () =>
-    clearInterval(timer)
-
-}, [promoBooks.length])
-
-function nextSlide() {
-
-  if (!promoBooks.length) return
-
-  setActiveSlide(current =>
-    (current + 1) %
-    promoBooks.length
-  )
-
-}
-
-
-function previousSlide() {
-
-  if (!promoBooks.length) return
-
-  setActiveSlide(current =>
-    (
-      current -
-      1 +
-      promoBooks.length
-    ) %
-    promoBooks.length
-  )
-
-}
-
-useEffect(() => {
-
-  if (
-    activeSlide >= promoBooks.length
-  ) {
-    setActiveSlide(0)
   }
 
-}, [
-  activeSlide,
-  promoBooks.length
-])
+
+  function previousSlide() {
+
+    if (!promoBooks.length) return
+
+    setActiveSlide(current =>
+      (
+        current -
+        1 +
+        promoBooks.length
+      ) %
+      promoBooks.length
+    )
+
+  }
+
+  useEffect(() => {
+
+    if (
+      activeSlide >= promoBooks.length
+    ) {
+      setActiveSlide(0)
+    }
+
+  }, [
+    activeSlide,
+    promoBooks.length
+  ])
 
   const filtered = useMemo(() => {
     const text = q.toLowerCase().trim()
 
-    let list = books.filter(book => {
+    let list = catalogue.filter(book => {
       const searchable = `
         ${book.title || ''}
         ${book.author || ''}
@@ -243,7 +249,7 @@ useEffect(() => {
 
     return list
   }, [
-    books,
+    catalogue,
     q,
     category,
     language,
@@ -293,7 +299,7 @@ useEffect(() => {
   }
 
   const countFor = predicate =>
-    books.filter(predicate).length
+    catalogue.filter(predicate).length
 
   const activeFilterCount = [
     category,
@@ -497,18 +503,17 @@ useEffect(() => {
                 const discount =
                   Number(book.originalPrice || 0) > Number(book.price || 0)
                     ? Math.round(
-                        ((Number(book.originalPrice) - Number(book.price)) /
-                          Number(book.originalPrice)) *
-                          100
-                      )
+                      ((Number(book.originalPrice) - Number(book.price)) /
+                        Number(book.originalPrice)) *
+                      100
+                    )
                     : 0
 
                 return (
                   <article
                     key={book.id}
-                    className={`shop-slider-slide ${
-                      index === activeSlide ? 'active' : ''
-                    }`}
+                    className={`shop-slider-slide ${index === activeSlide ? 'active' : ''
+                      }`}
                     aria-hidden={index !== activeSlide}
                   >
                     <div className="shop-slider-content">
@@ -530,8 +535,8 @@ useEffect(() => {
 
                           {Number(book.originalPrice || 0) >
                             Number(book.price || 0) && (
-                            <del>₹{book.originalPrice}</del>
-                          )}
+                              <del>₹{book.originalPrice}</del>
+                            )}
                         </div>
 
                         <Link
@@ -656,7 +661,7 @@ useEffect(() => {
                 Showing{' '}
                 {filtered.length
                   ? (safePage - 1) *
-                    PAGE_SIZE +
+                  PAGE_SIZE +
                   1
                   : 0}
                 –
@@ -872,18 +877,16 @@ useEffect(() => {
       ===================================== */}
 
       <div
-        className={`mobile-filter-overlay ${
-          mobileFiltersOpen ? 'show' : ''
-        }`}
+        className={`mobile-filter-overlay ${mobileFiltersOpen ? 'show' : ''
+          }`}
         onClick={() =>
           setMobileFiltersOpen(false)
         }
       />
 
       <aside
-        className={`mobile-filter-drawer ${
-          mobileFiltersOpen ? 'open' : ''
-        }`}
+        className={`mobile-filter-drawer ${mobileFiltersOpen ? 'open' : ''
+          }`}
       >
 
         <div className="mobile-filter-header">

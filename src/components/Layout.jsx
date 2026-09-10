@@ -5,8 +5,13 @@ export default function Layout({ children }) {
   return (
     <div className="site-shell">
       <Header />
-      <main>{children}</main>
+
+      <main>
+        {children}
+      </main>
+
       <Footer />
     </div>
   )
 }
+
