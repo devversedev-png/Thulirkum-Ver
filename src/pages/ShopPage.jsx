@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useStore } from '../context/StoreContext'
 import BookCard from '../components/BookCard'
@@ -9,6 +9,7 @@ const PAGE_SIZE = 12
 export default function ShopPage() {
   const { books } = useStore()
   const [params, setParams] = useSearchParams()
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
 
   const q = params.get('q') || ''
   const category = params.get('category') || ''
@@ -24,7 +25,7 @@ export default function ShopPage() {
     () =>
       [...new Set(
         books
-          .map((book) => book.category)
+          .map(book => book.category)
           .filter(Boolean)
       )].sort(),
     [books]
@@ -34,7 +35,7 @@ export default function ShopPage() {
     () =>
       [...new Set(
         books
-          .map((book) => book.language)
+          .map(book => book.language)
           .filter(Boolean)
       )].sort(),
     [books]
@@ -48,10 +49,29 @@ export default function ShopPage() {
     { value: 'price-high', label: 'Price: High to Low' }
   ]
 
+  const promoMessages = [
+    '🔥 Up to 30% OFF on selected books',
+    '📚 Special prices on Tamil Literature',
+    '🎁 Bestselling Self Help books on offer',
+    '🚚 Free delivery on orders above ₹499',
+    '✨ New arrivals added every week'
+  ]
+
+  useEffect(() => {
+    if (!mobileFiltersOpen) return
+
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previous
+    }
+  }, [mobileFiltersOpen])
+
   const filtered = useMemo(() => {
     const text = q.toLowerCase().trim()
 
-    let list = books.filter((book) => {
+    let list = books.filter(book => {
       const searchable = `
         ${book.title || ''}
         ${book.author || ''}
@@ -65,13 +85,20 @@ export default function ShopPage() {
       const priceMatch =
         !price ||
         (price === 'under-200' && amount < 200) ||
-        (price === '200-500' &&
+        (
+          price === '200-500' &&
           amount >= 200 &&
-          amount <= 500) ||
-        (price === '500-1000' &&
+          amount <= 500
+        ) ||
+        (
+          price === '500-1000' &&
           amount > 500 &&
-          amount <= 1000) ||
-        (price === '1000-plus' && amount > 1000)
+          amount <= 1000
+        ) ||
+        (
+          price === '1000-plus' &&
+          amount > 1000
+        )
 
       const stockMatch =
         !inStockOnly ||
@@ -83,7 +110,7 @@ export default function ShopPage() {
       const offerMatch =
         !offerOnly ||
         Number(book.originalPrice || 0) >
-          Number(book.price || 0)
+        Number(book.price || 0)
 
       return (
         (!text || searchable.includes(text)) &&
@@ -179,32 +206,210 @@ export default function ShopPage() {
     setParams(next)
   }
 
-  function viewAllBooks() {
-    setParams({})
-  }
-
-  const countFor = (predicate) =>
+  const countFor = predicate =>
     books.filter(predicate).length
 
-  const hasActiveFilters =
-    category ||
-    language ||
-    price ||
-    rating > 0 ||
-    inStockOnly ||
+  const activeFilterCount = [
+    category,
+    language,
+    price,
+    rating > 0,
+    inStockOnly,
     offerOnly
+  ].filter(Boolean).length
+
+  const hasActiveFilters = activeFilterCount > 0
+
+  function FiltersContent() {
+    return (
+      <>
+        <div className="concept-filter-section">
+          <h3>Categories</h3>
+
+          {categories.slice(0, 8).map(item => (
+            <button
+              type="button"
+              key={item}
+              className={category === item ? 'active' : ''}
+              onClick={() =>
+                update(
+                  'category',
+                  category === item ? '' : item
+                )
+              }
+            >
+              <span>
+                <i className="filter-check">
+                  {category === item ? '✓' : ''}
+                </i>
+
+                {item}
+              </span>
+
+              <b>
+                {countFor(
+                  book => book.category === item
+                )}
+              </b>
+            </button>
+          ))}
+        </div>
+
+        <div className="concept-filter-section">
+          <h3>Language</h3>
+
+          {languages.map(item => (
+            <button
+              type="button"
+              key={item}
+              className={language === item ? 'active' : ''}
+              onClick={() =>
+                update(
+                  'language',
+                  language === item ? '' : item
+                )
+              }
+            >
+              <span>
+                <i className="filter-check">
+                  {language === item ? '✓' : ''}
+                </i>
+
+                {item}
+              </span>
+
+              <b>
+                {countFor(
+                  book => book.language === item
+                )}
+              </b>
+            </button>
+          ))}
+        </div>
+
+        <div className="concept-filter-section">
+          <h3>Price Range</h3>
+
+          {[
+            ['under-200', 'Under ₹200'],
+            ['200-500', '₹200 – ₹500'],
+            ['500-1000', '₹500 – ₹1000'],
+            ['1000-plus', 'Above ₹1000']
+          ].map(([value, label]) => (
+            <button
+              type="button"
+              key={value}
+              className={price === value ? 'active' : ''}
+              onClick={() =>
+                update(
+                  'price',
+                  price === value ? '' : value
+                )
+              }
+            >
+              <span>
+                <i className="filter-check">
+                  {price === value ? '✓' : ''}
+                </i>
+
+                {label}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <div className="concept-filter-section">
+          <h3>Rating</h3>
+
+          {[4, 3].map(value => (
+            <button
+              type="button"
+              key={value}
+              className={rating === value ? 'active' : ''}
+              onClick={() =>
+                update(
+                  'rating',
+                  rating === value
+                    ? ''
+                    : String(value)
+                )
+              }
+            >
+              <span>
+                <i className="filter-check">
+                  {rating === value ? '✓' : ''}
+                </i>
+
+                {'★'.repeat(value)} & up
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <div className="concept-filter-section">
+          <h3>Availability</h3>
+
+          <button
+            type="button"
+            className={inStockOnly ? 'active' : ''}
+            onClick={() =>
+              update(
+                'stock',
+                inStockOnly ? '' : '1'
+              )
+            }
+          >
+            <span>
+              <i className="filter-check">
+                {inStockOnly ? '✓' : ''}
+              </i>
+
+              In Stock
+            </span>
+          </button>
+        </div>
+
+        <div className="concept-filter-section">
+          <h3>Offers</h3>
+
+          <button
+            type="button"
+            className={offerOnly ? 'active' : ''}
+            onClick={() =>
+              update(
+                'offer',
+                offerOnly ? '' : '1'
+              )
+            }
+          >
+            <span>
+              <i className="filter-check">
+                {offerOnly ? '✓' : ''}
+              </i>
+
+              On Sale
+            </span>
+          </button>
+        </div>
+      </>
+    )
+  }
 
   return (
     <section className="shop-page">
 
-      {/* ==============================
-          TITLE
-      ============================== */}
+      {/* =====================================
+          COMPACT HERO
+      ===================================== */}
 
       <div className="shop-title-band">
         <div className="page-width market-shop-heading">
 
-          <div>
+          <div className="shop-title-copy">
+            <span className="shop-small-label">
+              THULIRKUM VER BOOKSTORE
+            </span>
+
             <h1>
               {q
                 ? `Search results for “${q}”`
@@ -217,27 +422,36 @@ export default function ShopPage() {
             </p>
           </div>
 
-          <blockquote>
-            “Good books
-            <br />
-            grow better human beings.”
-          </blockquote>
+
+          {/* OFFER TICKER */}
+
+          <div className="shop-promo-marquee">
+            <div className="shop-promo-track">
+
+              {[...promoMessages, ...promoMessages].map(
+                (message, index) => (
+                  <span key={`${message}-${index}`}>
+                    {message}
+                  </span>
+                )
+              )}
+
+            </div>
+          </div>
 
         </div>
       </div>
 
 
-      {/* ==============================
-          SHOP BODY
-      ============================== */}
+      {/* =====================================
+          SHOP AREA
+      ===================================== */}
 
       <div className="page-width concept-shop-layout">
 
-        {/* ==============================
-            LEFT FILTER
-        ============================== */}
+        {/* DESKTOP FILTER */}
 
-        <aside className="concept-filter-panel">
+        <aside className="concept-filter-panel desktop-filter-panel">
 
           <div className="concept-filter-head">
             <strong>Filters</strong>
@@ -250,284 +464,67 @@ export default function ShopPage() {
             </button>
           </div>
 
-
-          {/* CATEGORIES */}
-
-          <div className="concept-filter-section">
-            <h3>Categories</h3>
-
-            {categories.slice(0, 8).map((item) => (
-              <button
-                type="button"
-                key={item}
-                className={
-                  category === item
-                    ? 'active'
-                    : ''
-                }
-                onClick={() =>
-                  update(
-                    'category',
-                    category === item
-                      ? ''
-                      : item
-                  )
-                }
-              >
-                <span>
-                  <i className="filter-check">
-                    {category === item
-                      ? '✓'
-                      : ''}
-                  </i>
-
-                  {item}
-                </span>
-
-                <b>
-                  {countFor(
-                    (book) =>
-                      book.category === item
-                  )}
-                </b>
-              </button>
-            ))}
-          </div>
-
-
-          {/* LANGUAGE */}
-
-          <div className="concept-filter-section">
-            <h3>Language</h3>
-
-            {languages.map((item) => (
-              <button
-                type="button"
-                key={item}
-                className={
-                  language === item
-                    ? 'active'
-                    : ''
-                }
-                onClick={() =>
-                  update(
-                    'language',
-                    language === item
-                      ? ''
-                      : item
-                  )
-                }
-              >
-                <span>
-                  <i className="filter-check">
-                    {language === item
-                      ? '✓'
-                      : ''}
-                  </i>
-
-                  {item}
-                </span>
-
-                <b>
-                  {countFor(
-                    (book) =>
-                      book.language === item
-                  )}
-                </b>
-              </button>
-            ))}
-          </div>
-
-
-          {/* PRICE */}
-
-          <div className="concept-filter-section">
-            <h3>Price Range</h3>
-
-            {[
-              ['under-200', 'Under ₹200'],
-              ['200-500', '₹200 – ₹500'],
-              ['500-1000', '₹500 – ₹1000'],
-              ['1000-plus', 'Above ₹1000']
-            ].map(([value, label]) => (
-
-              <button
-                type="button"
-                key={value}
-                className={
-                  price === value
-                    ? 'active'
-                    : ''
-                }
-                onClick={() =>
-                  update(
-                    'price',
-                    price === value
-                      ? ''
-                      : value
-                  )
-                }
-              >
-                <span>
-                  <i className="filter-check">
-                    {price === value
-                      ? '✓'
-                      : ''}
-                  </i>
-
-                  {label}
-                </span>
-              </button>
-
-            ))}
-          </div>
-
-
-          {/* RATING */}
-
-          <div className="concept-filter-section">
-            <h3>Rating</h3>
-
-            {[4, 3].map((value) => (
-              <button
-                type="button"
-                key={value}
-                className={
-                  rating === value
-                    ? 'active'
-                    : ''
-                }
-                onClick={() =>
-                  update(
-                    'rating',
-                    rating === value
-                      ? ''
-                      : String(value)
-                  )
-                }
-              >
-                <span>
-                  <i className="filter-check">
-                    {rating === value
-                      ? '✓'
-                      : ''}
-                  </i>
-
-                  {'★'.repeat(value)} & up
-                </span>
-              </button>
-            ))}
-          </div>
-
-
-          {/* STOCK */}
-
-          <div className="concept-filter-section compact-filter-section">
-            <h3>Availability</h3>
-
-            <button
-              type="button"
-              className={
-                inStockOnly
-                  ? 'active'
-                  : ''
-              }
-              onClick={() =>
-                update(
-                  'stock',
-                  inStockOnly
-                    ? ''
-                    : '1'
-                )
-              }
-            >
-              <span>
-                <i className="filter-check">
-                  {inStockOnly
-                    ? '✓'
-                    : ''}
-                </i>
-
-                In Stock
-              </span>
-            </button>
-          </div>
-
-
-          {/* OFFERS */}
-
-          <div className="concept-filter-section compact-filter-section">
-            <h3>Offers</h3>
-
-            <button
-              type="button"
-              className={
-                offerOnly
-                  ? 'active'
-                  : ''
-              }
-              onClick={() =>
-                update(
-                  'offer',
-                  offerOnly
-                    ? ''
-                    : '1'
-                )
-              }
-            >
-              <span>
-                <i className="filter-check">
-                  {offerOnly
-                    ? '✓'
-                    : ''}
-                </i>
-
-                On Sale
-              </span>
-            </button>
-          </div>
+          <FiltersContent />
 
         </aside>
 
 
-        {/* ==============================
-            RIGHT RESULT PANEL
-        ============================== */}
+        {/* BOOK RESULTS */}
 
         <div className="concept-shop-results">
 
-          {/* TOOLBAR */}
-
           <div className="shop-results-toolbar">
 
-            <span>
-              Showing{' '}
-              {filtered.length
-                ? (safePage - 1) *
+            <div className="shop-result-info">
+
+              {/* MOBILE FILTER BUTTON */}
+
+              <button
+                type="button"
+                className="shop-mobile-filter-btn"
+                onClick={() =>
+                  setMobileFiltersOpen(true)
+                }
+              >
+                <span>☷</span>
+
+                Filters
+
+                {activeFilterCount > 0 && (
+                  <b>{activeFilterCount}</b>
+                )}
+              </button>
+
+
+              <span className="shop-result-count">
+                Showing{' '}
+                {filtered.length
+                  ? (safePage - 1) *
                     PAGE_SIZE +
                   1
-                : 0}
-              –
-              {Math.min(
-                safePage * PAGE_SIZE,
-                filtered.length
-              )}{' '}
-              of {filtered.length} books
-            </span>
+                  : 0}
+                –
+                {Math.min(
+                  safePage * PAGE_SIZE,
+                  filtered.length
+                )}{' '}
+                of {filtered.length} books
+              </span>
+
+            </div>
+
 
             <div className="concept-sort-wrap">
-
               <span>Sort by</span>
 
               <PremiumSelect
                 value={sort}
                 options={sortOptions}
-                onChange={(value) =>
+                onChange={value =>
                   update('sort', value)
                 }
                 className="sort-premium-select"
               />
-
             </div>
 
           </div>
@@ -540,12 +537,8 @@ export default function ShopPage() {
 
               {category && (
                 <button
-                  type="button"
                   onClick={() =>
-                    update(
-                      'category',
-                      ''
-                    )
+                    update('category', '')
                   }
                 >
                   {category} ×
@@ -554,12 +547,8 @@ export default function ShopPage() {
 
               {language && (
                 <button
-                  type="button"
                   onClick={() =>
-                    update(
-                      'language',
-                      ''
-                    )
+                    update('language', '')
                   }
                 >
                   {language} ×
@@ -568,12 +557,8 @@ export default function ShopPage() {
 
               {price && (
                 <button
-                  type="button"
                   onClick={() =>
-                    update(
-                      'price',
-                      ''
-                    )
+                    update('price', '')
                   }
                 >
                   Price ×
@@ -582,12 +567,8 @@ export default function ShopPage() {
 
               {rating > 0 && (
                 <button
-                  type="button"
                   onClick={() =>
-                    update(
-                      'rating',
-                      ''
-                    )
+                    update('rating', '')
                   }
                 >
                   {rating}★ & up ×
@@ -596,12 +577,8 @@ export default function ShopPage() {
 
               {inStockOnly && (
                 <button
-                  type="button"
                   onClick={() =>
-                    update(
-                      'stock',
-                      ''
-                    )
+                    update('stock', '')
                   }
                 >
                   In Stock ×
@@ -610,12 +587,8 @@ export default function ShopPage() {
 
               {offerOnly && (
                 <button
-                  type="button"
                   onClick={() =>
-                    update(
-                      'offer',
-                      ''
-                    )
+                    update('offer', '')
                   }
                 >
                   Offers ×
@@ -626,18 +599,14 @@ export default function ShopPage() {
           )}
 
 
-          {/* =================================
-              IMPORTANT:
-              ONLY BOOK AREA SCROLLS
-          ================================= */}
+          {/* ONLY BOOK AREA SCROLL */}
 
           <div className="concept-shop-scroll-area">
 
             {visible.length ? (
-
               <div className="book-grid shop-grid">
 
-                {visible.map((book) => (
+                {visible.map(book => (
                   <BookCard
                     key={book.id}
                     book={book}
@@ -646,9 +615,7 @@ export default function ShopPage() {
                 ))}
 
               </div>
-
             ) : (
-
               <div className="empty-state">
 
                 <span className="empty-book-icon">
@@ -658,44 +625,36 @@ export default function ShopPage() {
                 <h3>No matching books</h3>
 
                 <p>
-                  Try a different title,
-                  author, category or language.
+                  Try a different title, author,
+                  category or language.
                 </p>
 
                 <button
                   type="button"
                   className="market-cart-button"
-                  onClick={viewAllBooks}
+                  onClick={() => setParams({})}
                 >
                   View all books
                 </button>
 
               </div>
-
             )}
 
 
-            {/* PAGINATION */}
-
             {pageCount > 1 && (
-
               <div className="shop-pagination">
 
                 <button
-                  type="button"
                   disabled={safePage === 1}
                   onClick={() =>
                     update(
                       'page',
-                      String(
-                        safePage - 1
-                      )
+                      String(safePage - 1)
                     )
                   }
                 >
                   ‹
                 </button>
-
 
                 {Array.from(
                   {
@@ -704,12 +663,9 @@ export default function ShopPage() {
                       5
                     )
                   },
-                  (_, index) =>
-                    index + 1
-                ).map((number) => (
-
+                  (_, index) => index + 1
+                ).map(number => (
                   <button
-                    type="button"
                     key={number}
                     className={
                       safePage === number
@@ -725,28 +681,20 @@ export default function ShopPage() {
                   >
                     {number}
                   </button>
-
                 ))}
 
-
                 {pageCount > 5 && (
-                  <span>
-                    … {pageCount}
-                  </span>
+                  <span>… {pageCount}</span>
                 )}
 
-
                 <button
-                  type="button"
                   disabled={
                     safePage === pageCount
                   }
                   onClick={() =>
                     update(
                       'page',
-                      String(
-                        safePage + 1
-                      )
+                      String(safePage + 1)
                     )
                   }
                 >
@@ -754,7 +702,6 @@ export default function ShopPage() {
                 </button>
 
               </div>
-
             )}
 
           </div>
@@ -762,6 +709,76 @@ export default function ShopPage() {
         </div>
 
       </div>
+
+
+      {/* =====================================
+          MOBILE FILTER DRAWER
+      ===================================== */}
+
+      <div
+        className={`mobile-filter-overlay ${
+          mobileFiltersOpen ? 'show' : ''
+        }`}
+        onClick={() =>
+          setMobileFiltersOpen(false)
+        }
+      />
+
+      <aside
+        className={`mobile-filter-drawer ${
+          mobileFiltersOpen ? 'open' : ''
+        }`}
+      >
+
+        <div className="mobile-filter-header">
+          <div>
+            <strong>Filters</strong>
+
+            <small>
+              Refine your book selection
+            </small>
+          </div>
+
+          <button
+            type="button"
+            className="mobile-filter-close"
+            onClick={() =>
+              setMobileFiltersOpen(false)
+            }
+          >
+            ×
+          </button>
+        </div>
+
+
+        <div className="mobile-filter-body">
+          <FiltersContent />
+        </div>
+
+
+        <div className="mobile-filter-footer">
+
+          <button
+            type="button"
+            className="mobile-clear-btn"
+            onClick={clearFilters}
+          >
+            Clear
+          </button>
+
+          <button
+            type="button"
+            className="mobile-show-btn"
+            onClick={() =>
+              setMobileFiltersOpen(false)
+            }
+          >
+            Show {filtered.length} Books
+          </button>
+
+        </div>
+
+      </aside>
 
     </section>
   )
