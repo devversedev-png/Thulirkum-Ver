@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useStore } from '../context/StoreContext'
 import BookCard from '../components/BookCard'
 import PremiumSelect from '../components/PremiumSelect'
@@ -10,6 +10,7 @@ export default function ShopPage() {
   const { books } = useStore()
   const [params, setParams] = useSearchParams()
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const [activeSlide, setActiveSlide] = useState(0)
 
   const q = params.get('q') || ''
   const category = params.get('category') || ''
@@ -49,13 +50,6 @@ export default function ShopPage() {
     { value: 'price-high', label: 'Price: High to Low' }
   ]
 
-  const promoMessages = [
-    '🔥 Up to 30% OFF on selected books',
-    '📚 Special prices on Tamil Literature',
-    '🎁 Bestselling Self Help books on offer',
-    '🚚 Free delivery on orders above ₹499',
-    '✨ New arrivals added every week'
-  ]
 
   useEffect(() => {
     if (!mobileFiltersOpen) return
@@ -67,6 +61,98 @@ export default function ShopPage() {
       document.body.style.overflow = previous
     }
   }, [mobileFiltersOpen])
+
+  const promoBooks = useMemo(() => {
+
+  const promotional = books.filter(book => {
+
+    const hasOffer =
+      Number(book.originalPrice || 0) >
+      Number(book.price || 0)
+
+    const isNew =
+      book.newArrival === true
+
+    return (
+      book.available !== false &&
+      Number(book.stock || 0) > 0 &&
+      (hasOffer || isNew)
+    )
+  })
+
+  if (promotional.length) {
+    return promotional.slice(0, 6)
+  }
+
+  return books
+    .filter(
+      book =>
+        book.available !== false &&
+        Number(book.stock || 0) > 0
+    )
+    .slice(0, 6)
+
+}, [books])
+
+useEffect(() => {
+
+  if (promoBooks.length <= 1) {
+    return
+  }
+
+  const timer = setInterval(() => {
+
+    setActiveSlide(current =>
+      (current + 1) %
+      promoBooks.length
+    )
+
+  }, 4500)
+
+  return () =>
+    clearInterval(timer)
+
+}, [promoBooks.length])
+
+function nextSlide() {
+
+  if (!promoBooks.length) return
+
+  setActiveSlide(current =>
+    (current + 1) %
+    promoBooks.length
+  )
+
+}
+
+
+function previousSlide() {
+
+  if (!promoBooks.length) return
+
+  setActiveSlide(current =>
+    (
+      current -
+      1 +
+      promoBooks.length
+    ) %
+    promoBooks.length
+  )
+
+}
+
+useEffect(() => {
+
+  if (
+    activeSlide >= promoBooks.length
+  ) {
+    setActiveSlide(0)
+  }
+
+}, [
+  activeSlide,
+  promoBooks.length
+])
 
   const filtered = useMemo(() => {
     const text = q.toLowerCase().trim()
@@ -399,48 +485,118 @@ export default function ShopPage() {
     <section className="shop-page">
 
       {/* =====================================
-          COMPACT HERO
+          COMPACT BOOK OFFER / NEW RELEASE SLIDER
       ===================================== */}
 
-      <div className="shop-title-band">
-        <div className="page-width market-shop-heading">
+      {promoBooks.length > 0 && (
+        <section className="shop-book-slider">
+          <div className="page-width">
+            <div className="shop-slider-shell">
 
-          <div className="shop-title-copy">
-            <span className="shop-small-label">
-              THULIRKUM VER BOOKSTORE
-            </span>
+              {promoBooks.map((book, index) => {
+                const discount =
+                  Number(book.originalPrice || 0) > Number(book.price || 0)
+                    ? Math.round(
+                        ((Number(book.originalPrice) - Number(book.price)) /
+                          Number(book.originalPrice)) *
+                          100
+                      )
+                    : 0
 
-            <h1>
-              {q
-                ? `Search results for “${q}”`
-                : category || 'All Books'}
-            </h1>
+                return (
+                  <article
+                    key={book.id}
+                    className={`shop-slider-slide ${
+                      index === activeSlide ? 'active' : ''
+                    }`}
+                    aria-hidden={index !== activeSlide}
+                  >
+                    <div className="shop-slider-content">
 
-            <p>
-              Discover Tamil and English books that
-              inform, inspire and uplift.
-            </p>
-          </div>
+                      <div className="shop-slider-text">
+                        <span className="shop-slider-badge">
+                          {book.newArrival
+                            ? '✨ NEW RELEASE'
+                            : discount > 0
+                              ? `🔥 ${discount}% OFF`
+                              : '📚 FEATURED BOOK'}
+                        </span>
 
+                        <h2>{book.title}</h2>
+                        <p>{book.author}</p>
 
-          {/* OFFER TICKER */}
+                        <div className="shop-slider-price">
+                          <strong>₹{book.price}</strong>
 
-          <div className="shop-promo-marquee">
-            <div className="shop-promo-track">
+                          {Number(book.originalPrice || 0) >
+                            Number(book.price || 0) && (
+                            <del>₹{book.originalPrice}</del>
+                          )}
+                        </div>
 
-              {[...promoMessages, ...promoMessages].map(
-                (message, index) => (
-                  <span key={`${message}-${index}`}>
-                    {message}
-                  </span>
+                        <Link
+                          to={`/book/${book.id}`}
+                          className="shop-slider-btn"
+                        >
+                          View Book <span>→</span>
+                        </Link>
+                      </div>
+
+                      <Link
+                        to={`/book/${book.id}`}
+                        className="shop-slider-image"
+                        aria-label={`View ${book.title}`}
+                      >
+                        <img
+                          src={book.image}
+                          alt={book.title}
+                          loading={index === 0 ? 'eager' : 'lazy'}
+                        />
+                      </Link>
+
+                    </div>
+                  </article>
                 )
+              })}
+
+              {promoBooks.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    className="shop-slider-arrow shop-slider-prev"
+                    onClick={previousSlide}
+                    aria-label="Previous featured book"
+                  >
+                    ‹
+                  </button>
+
+                  <button
+                    type="button"
+                    className="shop-slider-arrow shop-slider-next"
+                    onClick={nextSlide}
+                    aria-label="Next featured book"
+                  >
+                    ›
+                  </button>
+
+                  <div className="shop-slider-dots">
+                    {promoBooks.map((book, index) => (
+                      <button
+                        type="button"
+                        key={book.id}
+                        className={index === activeSlide ? 'active' : ''}
+                        onClick={() => setActiveSlide(index)}
+                        aria-label={`Go to slide ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                </>
               )}
 
             </div>
           </div>
-
-        </div>
-      </div>
+        </section>
+      )}
 
 
       {/* =====================================
