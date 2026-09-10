@@ -10644,3 +10644,217 @@ body,
     max-width: 132px !important;
   }
 }
+
+/* =========================================================
+   ADMIN LOGO — FINAL PERFECT FIX
+   KEEP THIS AT THE VERY END OF styles.css
+   ========================================================= */
+
+body .admin-sidebar-v6 .admin-brand-v6 {
+  width: 100% !important;
+
+  min-height: 112px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 14px 16px 18px !important;
+
+  margin: 0 !important;
+
+  background: transparent !important;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.14) !important;
+
+  overflow: visible !important;
+}
+
+
+body .admin-sidebar-v6
+.admin-brand-v6
+img.admin-brand-logo {
+
+  display: block !important;
+
+  width: 190px !important;
+  max-width: 100% !important;
+
+  height: 72px !important;
+  max-height: 72px !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+
+  object-fit: contain !important;
+  object-position: center center !important;
+
+  /* IMPORTANT */
+  transform: none !important;
+
+  filter: none !important;
+
+  mix-blend-mode: normal !important;
+
+  opacity: 1 !important;
+
+  background: transparent !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+
+  box-shadow: none !important;
+
+  image-rendering: auto !important;
+
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+
+/* =========================
+   TABLET ADMIN
+   ========================= */
+
+@media (max-width: 960px) {
+
+  body .admin-sidebar-v6
+  .admin-brand-v6
+  img.admin-brand-logo {
+
+    width: 155px !important;
+
+    height: 62px !important;
+    max-height: 62px !important;
+  }
+
+}
+
+
+/* =========================
+   MOBILE ADMIN
+   ========================= */
+
+@media (max-width: 720px) {
+
+  body .admin-sidebar-v6
+  .admin-brand-v6 {
+
+    min-height: 64px !important;
+
+    padding: 6px 12px 8px !important;
+  }
+
+
+  body .admin-sidebar-v6
+  .admin-brand-v6
+  img.admin-brand-logo {
+
+    width: 145px !important;
+
+    height: 50px !important;
+    max-height: 50px !important;
+  }
+
+}
+
+/* =========================================================
+   ADMIN LOGO — REMOVE WHITE HALO / MERGE WITH GREEN
+   KEEP THIS AS THE LAST CSS
+   ========================================================= */
+
+.admin-sidebar-v6 .admin-brand-v6 {
+  width: 100% !important;
+  min-height: 112px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 12px 14px 18px !important;
+  margin: 0 !important;
+
+  background: transparent !important;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.14) !important;
+
+  overflow: hidden !important;
+}
+
+
+.admin-sidebar-v6
+.admin-brand-v6
+img.admin-brand-logo {
+
+  display: block !important;
+
+  width: 205px !important;
+  height: 78px !important;
+
+  max-width: 100% !important;
+  max-height: 78px !important;
+
+  object-fit: contain !important;
+  object-position: center !important;
+
+  margin: 0 auto !important;
+  padding: 0 !important;
+
+  background: transparent !important;
+
+  border: 0 !important;
+  box-shadow: none !important;
+
+  /* IMPORTANT */
+  filter: contrast(1.05) saturate(1.06) !important;
+
+  /*
+    White pixels blend into the green sidebar.
+    This removes the white halo visible around
+    the Tamil letters and tree.
+  */
+  mix-blend-mode: multiply !important;
+
+  opacity: 1 !important;
+
+  transform: none !important;
+
+  image-rendering: auto !important;
+}
+
+
+/* TABLET */
+
+@media (max-width: 960px) {
+
+  .admin-sidebar-v6
+  .admin-brand-v6
+  img.admin-brand-logo {
+
+    width: 165px !important;
+    height: 64px !important;
+    max-height: 64px !important;
+  }
+}
+
+
+/* MOBILE */
+
+@media (max-width: 720px) {
+
+  .admin-sidebar-v6 .admin-brand-v6 {
+    min-height: 62px !important;
+    padding: 5px 10px 8px !important;
+  }
+
+  .admin-sidebar-v6
+  .admin-brand-v6
+  img.admin-brand-logo {
+
+    width: 145px !important;
+    height: 48px !important;
+    max-height: 48px !important;
+  }
+}
