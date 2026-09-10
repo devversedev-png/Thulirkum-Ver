@@ -8520,3 +8520,1567 @@ h1, h2, h3, h4, blockquote {
     transition: none !important;
   }
 }
+
+/* ADMIN LOGO - SAME AS USER WEBSITE LOGO */
+
+.admin-brand-v6 {
+  min-height: 115px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 16px 12px 20px !important;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.admin-brand-v6 img {
+  width: 205px !important;
+  height: auto !important;
+  max-height: 85px !important;
+
+  object-fit: contain !important;
+  object-position: center !important;
+
+  /* IMPORTANT - remove white/inverted effect */
+  filter: none !important;
+
+  opacity: 1 !important;
+
+  display: block;
+
+  background: transparent;
+}
+
+/* =========================================================
+   FINAL RESPONSIVE TYPOGRAPHY ONLY
+   ---------------------------------------------------------
+   User requirement:
+   - Keep every element in its existing position/layout.
+   - Do not change grids, spacing, widths, heights or alignment.
+   - Only reduce text font sizes progressively by device width.
+   ========================================================= */
+
+@media (max-width: 1440px) {
+
+  .big,
+  .c9-hero-book strong,
+  .remove-btn,
+  .confirmation-order-box strong,
+  .tv-hero-subtitle {
+    font-size: 14.7px !important;
+  }
+
+  .c9-home-copy h1 {
+    font-size: 65.8px !important;
+  }
+
+  .c9-hero-line,
+  .cart-item-info > a,
+  .cart-price-block strong,
+  .summary-total span,
+  .home-ref-book-card .price-line strong {
+    font-size: 15.7px !important;
+  }
+
+  .c9-hero-art blockquote,
+  .admin-nav-v6 button > span,
+  .author-editor-title-c8 h3,
+  .account-sidebar-title,
+  .account-sidebar-quote blockquote {
+    font-size: 17.6px !important;
+  }
+
+  .c9-section-heading h2, .section-heading h2,
+  .order-modal-head-v6 h2,
+  .category-showcase-header h2 {
+    font-size: 24px !important;
+  }
+
+  .c9-offer-banner h2,
+  .summary-card h3,
+  .checkout-section-head-v7 h2,
+  .wishlist-aside h2,
+  .catalogue-donut-c8 strong,
+  .admin-status-card-v6 strong,
+  .tv-offer-copy h3,
+  .mobile-filter-header strong {
+    font-size: 21.1px !important;
+  }
+
+  .market-wishlist-button,
+  .details-meta-grid > div > span,
+  .summary-total strong,
+  .checkout-summary-title h3,
+  .wishlist-heading-row h2,
+  .premium-confirm-copy-v73 h3 {
+    font-size: 19.2px !important;
+  }
+
+  .price-line strong,
+  .wishlist-price-v7 strong,
+  .account-sidebar h3,
+  .track-panel-head h3,
+  .login-art p, .admin-login-side p {
+    font-size: 13.7px !important;
+  }
+
+  .market-shop-heading h1, .page-title-row h1, .checkout-title-row h1 {
+    font-size: 39.5px !important;
+  }
+
+  .market-shop-heading blockquote, .page-title-row blockquote, .checkout-title-row blockquote,
+  .details-title-row blockquote,
+  .qty-box button,
+  .cart-recommend-note strong,
+  .wishlist-aside blockquote,
+  .account-overview-card > span {
+    font-size: 16.7px !important;
+  }
+
+  .concept-filter-head strong,
+  .account-overview-card strong,
+  .address-modal-head-v7 > button,
+  .promotion-card-v6 h3,
+  .promotion-card-v6 > strong,
+  .order-modal-head-v6 > button,
+  .home-ref-book-card .market-wishlist-button,
+  .shop-slider-price strong {
+    font-size: 18.6px !important;
+  }
+
+  .details-info h1 {
+    font-size: 40.4px !important;
+  }
+
+  .details-price > strong,
+  .account-welcome h1,
+  .login-card h2, .admin-login-card h1 {
+    font-size: 28.2px !important;
+  }
+
+  .details-trust-strip b,
+  .login-art blockquote, .admin-login-side blockquote,
+  .admin-panel-title-v6 h2 {
+    font-size: 20.2px !important;
+  }
+
+  .offers-hero h1 {
+    font-size: 43.2px !important;
+  }
+
+  .offer-card-premium h2 {
+    font-size: 23px !important;
+  }
+
+  .offer-value strong {
+    font-size: 32.9px !important;
+  }
+
+  .confirmation-card h1 {
+    font-size: 32px !important;
+  }
+
+  .address-modal-head-v7 h2,
+  .tv-section-head h2 {
+    font-size: 22.1px !important;
+  }
+
+  .login-art h1, .admin-login-side h1 {
+    font-size: 73.3px !important;
+  }
+
+  .admin-top-v6 h1 {
+    font-size: 31px !important;
+  }
+
+  .admin-hero-v6 h2 {
+    font-size: 26.9px !important;
+  }
+
+  .admin-kpi-v6 strong {
+    font-size: 25px !important;
+  }
+
+  .tv-hero-left h1 {
+    font-size: 56.9px !important;
+  }
+
+  .market-shop-heading h1 {
+    font-size: 40.6px !important;
+  }
+
+  .shop-slider-text h2 {
+    font-size: 25.9px !important;
+  }
+
+  .category-feature-copy h3 {
+    font-size: 32.5px !important;
+  }
+
+}
+
+@media (max-width: 1200px) {
+
+  .eyebrow,
+  .store-topbar,
+  .market-action-link,
+  .market-action-link strong,
+  .market-category-inner a,
+  .search-suggestion-head,
+  .search-all-row,
+  .market-footer h4,
+  .c9-trust-strip strong,
+  .book-title,
+  .concept-filter-section h3,
+  .shop-pagination span,
+  .premium-calendar-head strong,
+  .qty-box span,
+  .details-tab-panel,
+  .cart-item-info span,
+  .summary-card > div:not(.summary-total):not(.cart-coupon):not(.summary-trust):not(.checkout-summary-items):not(.checkout-summary-title):not(.checkout-savings),
+  .checkout-steps span,
+  .payment-options strong,
+  .wishlist-copy-v7 h3,
+  .order-card-bottom strong,
+  .status-chip,
+  .login-card > p, .admin-login-card > p,
+  .tv-section-head p,
+  .tv-inline-link,
+  .tv-category-copy strong,
+  .tv-offer-copy p,
+  .shop-result-count,
+  .shop-slider-text p,
+  .category-feature-copy p {
+    font-size: 10.7px !important;
+  }
+
+  .breadcrumbs, .market-breadcrumb,
+  .compact,
+  .market-search-button,
+  .search-suggestion-copy strong,
+  .search-suggestion-meta b,
+  .footer-socials span,
+  .c9-text-link,
+  .big-rating,
+  .confirmation-card > p,
+  .address-empty-v7 h3,
+  .tv-btn-primary, .tv-btn-secondary, .tv-offer-link,
+  .tv-benefits strong,
+  .home-ref-book-card .book-title {
+    font-size: 11.6px !important;
+  }
+
+  .backend-status-banner,
+  .form-error,
+  .market-search input,
+  .c9-hero-copy,
+  .market-shop-heading p, .page-title-row p, .checkout-title-row p,
+  .empty-state p,
+  .details-info .author,
+  .details-price del,
+  .offers-hero p,
+  .market-shop-heading p,
+  .shop-promo-track span,
+  .category-feature-eyebrow b {
+    font-size: 12.6px !important;
+  }
+
+  .big,
+  .c9-hero-book strong,
+  .remove-btn,
+  .confirmation-order-box strong,
+  .tv-hero-subtitle {
+    font-size: 14.2px !important;
+  }
+
+  .search-suggestion-copy small, .search-suggestion-meta small,
+  .footer-brand-block p,
+  .c9-eyebrow,
+  .c9-offer-banner p,
+  .c9-author-card strong,
+  .price-line del,
+  .concept-sort-wrap > span,
+  .details-thumbnails button,
+  .details-price > span,
+  .details-price .stock,
+  .details-message,
+  .details-tabs button,
+  .cart-price-block del,
+  .cart-coupon button,
+  .cart-recommend-note a,
+  .mini-order span b,
+  .wishlist-heading-row a,
+  .wishlist-message-v7,
+  .wishlist-aside > p,
+  .account-sidebar nav a, .account-sidebar nav button,
+  .account-welcome p,
+  .order-card-top strong,
+  .tracked-items h4,
+  .address-label-v7,
+  .address-card-v7 > strong,
+  .location-capture-panel-v7 strong,
+  .login-art-points,
+  .login-switch,
+  .admin-nav-v6 button strong,
+  .admin-top-v6 p,
+  .inventory-info-v6 h3,
+  .order-modal-items-v6 h3, .order-modal-actions-v6 h3, .order-modal-history-v6 h3,
+  .tv-hero-kicker,
+  .home-ref-book-card .market-rating-row,
+  .home-ref-book-card .price-line del,
+  .mobile-filter-header small,
+  .shop-slider-price del,
+  .category-showcase-header > a,
+  .category-feature-actions small strong {
+    font-size: 9.7px !important;
+  }
+
+  .market-footer a,
+  .c9-section-heading p, .section-heading p,
+  .c9-section-heading > a, .section-heading > a,
+  .c9-category-card strong,
+  .c9-offer-banner > a,
+  .shop-results-toolbar,
+  .premium-select-trigger, .premium-date-trigger,
+  .premium-select-option,
+  .buy-row > label,
+  .continue-link,
+  .form-grid input, .form-grid textarea, .address-form-grid-v7 input, .admin-form-grid-v6 input, .admin-form-grid-v6 textarea, .admin-filters-v6 input, .login-card input, .admin-login-card input, .author-search-row-c8 input, .customer-tools-v6 input, .admin-search-v6 input,
+  .offer-card-premium p,
+  .home-ref-book-card .market-cart-button,
+  .tv-author-chip strong {
+    font-size: 10.2px !important;
+  }
+
+  .c9-home-copy h1 {
+    font-size: 54px !important;
+  }
+
+  .c9-hero-line,
+  .cart-item-info > a,
+  .cart-price-block strong,
+  .summary-total span,
+  .home-ref-book-card .price-line strong {
+    font-size: 15.2px !important;
+  }
+
+  .c9-hero-art blockquote,
+  .admin-nav-v6 button > span,
+  .author-editor-title-c8 h3,
+  .account-sidebar-title,
+  .account-sidebar-quote blockquote {
+    font-size: 17.1px !important;
+  }
+
+  .c9-section-heading h2, .section-heading h2,
+  .order-modal-head-v6 h2,
+  .category-showcase-header h2 {
+    font-size: 23px !important;
+  }
+
+  .c9-offer-banner h2,
+  .summary-card h3,
+  .checkout-section-head-v7 h2,
+  .wishlist-aside h2,
+  .catalogue-donut-c8 strong,
+  .admin-status-card-v6 strong,
+  .tv-offer-copy h3,
+  .mobile-filter-header strong {
+    font-size: 20.2px !important;
+  }
+
+  .market-wishlist-button,
+  .details-meta-grid > div > span,
+  .summary-total strong,
+  .checkout-summary-title h3,
+  .wishlist-heading-row h2,
+  .premium-confirm-copy-v73 h3 {
+    font-size: 18.4px !important;
+  }
+
+  .price-line strong,
+  .wishlist-price-v7 strong,
+  .account-sidebar h3,
+  .track-panel-head h3,
+  .login-art p, .admin-login-side p {
+    font-size: 13.3px !important;
+  }
+
+  .market-shop-heading h1, .page-title-row h1, .checkout-title-row h1 {
+    font-size: 37.8px !important;
+  }
+
+  .market-shop-heading blockquote, .page-title-row blockquote, .checkout-title-row blockquote,
+  .details-title-row blockquote,
+  .qty-box button,
+  .cart-recommend-note strong,
+  .wishlist-aside blockquote,
+  .account-overview-card > span {
+    font-size: 16.1px !important;
+  }
+
+  .concept-filter-head strong,
+  .account-overview-card strong,
+  .address-modal-head-v7 > button,
+  .promotion-card-v6 h3,
+  .promotion-card-v6 > strong,
+  .order-modal-head-v6 > button,
+  .home-ref-book-card .market-wishlist-button,
+  .shop-slider-price strong {
+    font-size: 18.1px !important;
+  }
+
+  .details-info h1 {
+    font-size: 38.7px !important;
+  }
+
+  .details-lead {
+    font-size: 12.1px !important;
+  }
+
+  .details-price > strong,
+  .account-welcome h1,
+  .login-card h2, .admin-login-card h1 {
+    font-size: 27px !important;
+  }
+
+  .details-trust-strip b,
+  .login-art blockquote, .admin-login-side blockquote,
+  .admin-panel-title-v6 h2 {
+    font-size: 19.3px !important;
+  }
+
+  .offers-hero h1 {
+    font-size: 41.4px !important;
+  }
+
+  .offer-card-premium h2 {
+    font-size: 22.1px !important;
+  }
+
+  .offer-value strong {
+    font-size: 31.5px !important;
+  }
+
+  .confirmation-card h1 {
+    font-size: 30.6px !important;
+  }
+
+  .address-modal-head-v7 h2,
+  .tv-section-head h2 {
+    font-size: 21.2px !important;
+  }
+
+  .login-art h1, .admin-login-side h1 {
+    font-size: 64.8px !important;
+  }
+
+  .admin-top-v6 h1 {
+    font-size: 29.7px !important;
+  }
+
+  .admin-hero-v6 h2 {
+    font-size: 25.8px !important;
+  }
+
+  .admin-kpi-v6 strong {
+    font-size: 23.9px !important;
+  }
+
+  .tv-hero-left h1 {
+    font-size: 46.8px !important;
+  }
+
+  .market-shop-heading h1 {
+    font-size: 32.4px !important;
+  }
+
+  .shop-slider-text h2 {
+    font-size: 24.8px !important;
+  }
+
+  .category-feature-copy h3 {
+    font-size: 26.5px !important;
+  }
+
+}
+
+@media (max-width: 992px) {
+
+  .eyebrow,
+  .store-topbar,
+  .market-action-link,
+  .market-action-link strong,
+  .market-category-inner a,
+  .search-suggestion-head,
+  .search-all-row,
+  .market-footer h4,
+  .c9-trust-strip strong,
+  .book-title,
+  .concept-filter-section h3,
+  .shop-pagination span,
+  .premium-calendar-head strong,
+  .qty-box span,
+  .details-tab-panel,
+  .cart-item-info span,
+  .summary-card > div:not(.summary-total):not(.cart-coupon):not(.summary-trust):not(.checkout-summary-items):not(.checkout-summary-title):not(.checkout-savings),
+  .checkout-steps span,
+  .payment-options strong,
+  .wishlist-copy-v7 h3,
+  .order-card-bottom strong,
+  .status-chip,
+  .login-card > p, .admin-login-card > p,
+  .tv-section-head p,
+  .tv-inline-link,
+  .tv-category-copy strong,
+  .tv-offer-copy p,
+  .shop-result-count,
+  .shop-slider-text p,
+  .category-feature-copy p {
+    font-size: 10.4px !important;
+  }
+
+  .breadcrumbs, .market-breadcrumb,
+  .compact,
+  .market-search-button,
+  .search-suggestion-copy strong,
+  .search-suggestion-meta b,
+  .footer-socials span,
+  .c9-text-link,
+  .big-rating,
+  .confirmation-card > p,
+  .address-empty-v7 h3,
+  .tv-btn-primary, .tv-btn-secondary, .tv-offer-link,
+  .tv-benefits strong,
+  .home-ref-book-card .book-title {
+    font-size: 11.4px !important;
+  }
+
+  .backend-status-banner,
+  .form-error,
+  .market-search input,
+  .c9-hero-copy,
+  .market-shop-heading p, .page-title-row p, .checkout-title-row p,
+  .empty-state p,
+  .details-info .author,
+  .details-price del,
+  .offers-hero p,
+  .market-shop-heading p,
+  .shop-promo-track span,
+  .category-feature-eyebrow b {
+    font-size: 12.3px !important;
+  }
+
+  .big,
+  .c9-hero-book strong,
+  .remove-btn,
+  .confirmation-order-box strong,
+  .tv-hero-subtitle {
+    font-size: 13.8px !important;
+  }
+
+  .search-suggestion-copy small, .search-suggestion-meta small,
+  .footer-brand-block p,
+  .c9-eyebrow,
+  .c9-offer-banner p,
+  .c9-author-card strong,
+  .price-line del,
+  .concept-sort-wrap > span,
+  .details-thumbnails button,
+  .details-price > span,
+  .details-price .stock,
+  .details-message,
+  .details-tabs button,
+  .cart-price-block del,
+  .cart-coupon button,
+  .cart-recommend-note a,
+  .mini-order span b,
+  .wishlist-heading-row a,
+  .wishlist-message-v7,
+  .wishlist-aside > p,
+  .account-sidebar nav a, .account-sidebar nav button,
+  .account-welcome p,
+  .order-card-top strong,
+  .tracked-items h4,
+  .address-label-v7,
+  .address-card-v7 > strong,
+  .location-capture-panel-v7 strong,
+  .login-art-points,
+  .login-switch,
+  .admin-nav-v6 button strong,
+  .admin-top-v6 p,
+  .inventory-info-v6 h3,
+  .order-modal-items-v6 h3, .order-modal-actions-v6 h3, .order-modal-history-v6 h3,
+  .tv-hero-kicker,
+  .home-ref-book-card .market-rating-row,
+  .home-ref-book-card .price-line del,
+  .mobile-filter-header small,
+  .shop-slider-price del,
+  .category-showcase-header > a,
+  .category-feature-actions small strong {
+    font-size: 9.5px !important;
+  }
+
+  .market-footer a,
+  .c9-section-heading p, .section-heading p,
+  .c9-section-heading > a, .section-heading > a,
+  .c9-category-card strong,
+  .c9-offer-banner > a,
+  .shop-results-toolbar,
+  .premium-select-trigger, .premium-date-trigger,
+  .premium-select-option,
+  .buy-row > label,
+  .continue-link,
+  .form-grid input, .form-grid textarea, .address-form-grid-v7 input, .admin-form-grid-v6 input, .admin-form-grid-v6 textarea, .admin-filters-v6 input, .login-card input, .admin-login-card input, .author-search-row-c8 input, .customer-tools-v6 input, .admin-search-v6 input,
+  .offer-card-premium p,
+  .home-ref-book-card .market-cart-button,
+  .tv-author-chip strong {
+    font-size: 10px !important;
+  }
+
+  .c9-home-copy h1 {
+    font-size: 41.7px !important;
+  }
+
+  .c9-hero-line,
+  .cart-item-info > a,
+  .cart-price-block strong,
+  .summary-total span,
+  .home-ref-book-card .price-line strong {
+    font-size: 14.7px !important;
+  }
+
+  .c9-hero-art blockquote,
+  .admin-nav-v6 button > span,
+  .author-editor-title-c8 h3,
+  .account-sidebar-title,
+  .account-sidebar-quote blockquote {
+    font-size: 16.6px !important;
+  }
+
+  .c9-section-heading h2, .section-heading h2,
+  .order-modal-head-v6 h2,
+  .category-showcase-header h2 {
+    font-size: 22px !important;
+  }
+
+  .c9-offer-banner h2,
+  .summary-card h3,
+  .checkout-section-head-v7 h2,
+  .wishlist-aside h2,
+  .catalogue-donut-c8 strong,
+  .admin-status-card-v6 strong,
+  .tv-offer-copy h3,
+  .mobile-filter-header strong {
+    font-size: 19.4px !important;
+  }
+
+  .market-wishlist-button,
+  .details-meta-grid > div > span,
+  .summary-total strong,
+  .checkout-summary-title h3,
+  .wishlist-heading-row h2,
+  .premium-confirm-copy-v73 h3 {
+    font-size: 17.6px !important;
+  }
+
+  .price-line strong,
+  .wishlist-price-v7 strong,
+  .account-sidebar h3,
+  .track-panel-head h3,
+  .login-art p, .admin-login-side p {
+    font-size: 12.9px !important;
+  }
+
+  .market-shop-heading h1, .page-title-row h1, .checkout-title-row h1 {
+    font-size: 35.3px !important;
+  }
+
+  .market-shop-heading blockquote, .page-title-row blockquote, .checkout-title-row blockquote,
+  .details-title-row blockquote,
+  .qty-box button,
+  .cart-recommend-note strong,
+  .wishlist-aside blockquote,
+  .account-overview-card > span {
+    font-size: 15.6px !important;
+  }
+
+  .concept-filter-head strong,
+  .account-overview-card strong,
+  .address-modal-head-v7 > button,
+  .promotion-card-v6 h3,
+  .promotion-card-v6 > strong,
+  .order-modal-head-v6 > button,
+  .home-ref-book-card .market-wishlist-button,
+  .shop-slider-price strong {
+    font-size: 17.5px !important;
+  }
+
+  .details-info h1 {
+    font-size: 36.1px !important;
+  }
+
+  .details-lead {
+    font-size: 11.9px !important;
+  }
+
+  .details-price > strong,
+  .account-welcome h1,
+  .login-card h2, .admin-login-card h1 {
+    font-size: 25.2px !important;
+  }
+
+  .details-trust-strip b,
+  .login-art blockquote, .admin-login-side blockquote,
+  .admin-panel-title-v6 h2 {
+    font-size: 18.5px !important;
+  }
+
+  .offers-hero h1 {
+    font-size: 38.6px !important;
+  }
+
+  .offer-card-premium h2 {
+    font-size: 21.1px !important;
+  }
+
+  .offer-value strong {
+    font-size: 29.4px !important;
+  }
+
+  .confirmation-card h1,
+  .market-shop-heading h1 {
+    font-size: 28.6px !important;
+  }
+
+  .address-modal-head-v7 h2,
+  .tv-section-head h2 {
+    font-size: 20.2px !important;
+  }
+
+  .login-art h1, .admin-login-side h1 {
+    font-size: 50px !important;
+  }
+
+  .admin-top-v6 h1 {
+    font-size: 27.7px !important;
+  }
+
+  .admin-hero-v6 h2,
+  .category-feature-copy h3 {
+    font-size: 24.6px !important;
+  }
+
+  .admin-kpi-v6 strong {
+    font-size: 22.9px !important;
+  }
+
+  .tv-hero-left h1 {
+    font-size: 43.7px !important;
+  }
+
+  .shop-slider-text h2 {
+    font-size: 23.8px !important;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .eyebrow,
+  .store-topbar,
+  .market-action-link,
+  .market-action-link strong,
+  .market-category-inner a,
+  .search-suggestion-head,
+  .search-all-row,
+  .market-footer h4,
+  .c9-trust-strip strong,
+  .book-title,
+  .concept-filter-section h3,
+  .shop-pagination span,
+  .premium-calendar-head strong,
+  .qty-box span,
+  .details-tab-panel,
+  .cart-item-info span,
+  .summary-card > div:not(.summary-total):not(.cart-coupon):not(.summary-trust):not(.checkout-summary-items):not(.checkout-summary-title):not(.checkout-savings),
+  .checkout-steps span,
+  .payment-options strong,
+  .wishlist-copy-v7 h3,
+  .order-card-bottom strong,
+  .status-chip,
+  .login-card > p, .admin-login-card > p,
+  .tv-section-head p,
+  .tv-inline-link,
+  .tv-category-copy strong,
+  .tv-offer-copy p,
+  .market-shop-heading p,
+  .shop-result-count {
+    font-size: 10.1px !important;
+  }
+
+  .breadcrumbs, .market-breadcrumb,
+  .compact,
+  .market-search-button,
+  .search-suggestion-copy strong,
+  .search-suggestion-meta b,
+  .footer-socials span,
+  .c9-text-link,
+  .big-rating,
+  .confirmation-card > p,
+  .address-empty-v7 h3,
+  .tv-btn-primary, .tv-btn-secondary, .tv-offer-link,
+  .tv-benefits strong,
+  .home-ref-book-card .book-title {
+    font-size: 11px !important;
+  }
+
+  .backend-status-banner,
+  .form-error,
+  .market-search input,
+  .c9-hero-copy,
+  .market-shop-heading p, .page-title-row p, .checkout-title-row p,
+  .empty-state p,
+  .details-info .author,
+  .details-price del,
+  .offers-hero p {
+    font-size: 12px !important;
+  }
+
+  .big,
+  .c9-hero-book strong,
+  .remove-btn,
+  .confirmation-order-box strong,
+  .tv-hero-subtitle,
+  .shop-slider-price strong {
+    font-size: 13.2px !important;
+  }
+
+  .search-suggestion-copy small, .search-suggestion-meta small,
+  .footer-brand-block p,
+  .c9-eyebrow,
+  .c9-offer-banner p,
+  .c9-author-card strong,
+  .price-line del,
+  .concept-sort-wrap > span,
+  .details-thumbnails button,
+  .details-price > span,
+  .details-price .stock,
+  .details-message,
+  .details-tabs button,
+  .cart-price-block del,
+  .cart-coupon button,
+  .cart-recommend-note a,
+  .mini-order span b,
+  .wishlist-heading-row a,
+  .wishlist-message-v7,
+  .wishlist-aside > p,
+  .account-sidebar nav a, .account-sidebar nav button,
+  .account-welcome p,
+  .order-card-top strong,
+  .tracked-items h4,
+  .address-label-v7,
+  .address-card-v7 > strong,
+  .location-capture-panel-v7 strong,
+  .login-art-points,
+  .login-switch,
+  .admin-nav-v6 button strong,
+  .admin-top-v6 p,
+  .inventory-info-v6 h3,
+  .order-modal-items-v6 h3, .order-modal-actions-v6 h3, .order-modal-history-v6 h3,
+  .tv-hero-kicker,
+  .home-ref-book-card .market-rating-row,
+  .home-ref-book-card .price-line del,
+  .shop-promo-track span,
+  .mobile-filter-header small,
+  .category-feature-eyebrow b,
+  .category-feature-actions small strong {
+    font-size: 9.2px !important;
+  }
+
+  .market-footer a,
+  .c9-section-heading p, .section-heading p,
+  .c9-section-heading > a, .section-heading > a,
+  .c9-category-card strong,
+  .c9-offer-banner > a,
+  .shop-results-toolbar,
+  .premium-select-trigger, .premium-date-trigger,
+  .premium-select-option,
+  .buy-row > label,
+  .continue-link,
+  .form-grid input, .form-grid textarea, .address-form-grid-v7 input, .admin-form-grid-v6 input, .admin-form-grid-v6 textarea, .admin-filters-v6 input, .login-card input, .admin-login-card input, .author-search-row-c8 input, .customer-tools-v6 input, .admin-search-v6 input,
+  .offer-card-premium p,
+  .home-ref-book-card .market-cart-button,
+  .tv-author-chip strong {
+    font-size: 9.7px !important;
+  }
+
+  .c9-home-copy h1,
+  .offers-hero h1 {
+    font-size: 35.9px !important;
+  }
+
+  .c9-hero-line,
+  .cart-item-info > a,
+  .cart-price-block strong,
+  .summary-total span,
+  .home-ref-book-card .price-line strong {
+    font-size: 14.1px !important;
+  }
+
+  .c9-hero-art blockquote,
+  .admin-nav-v6 button > span,
+  .author-editor-title-c8 h3,
+  .account-sidebar-title,
+  .account-sidebar-quote blockquote,
+  .shop-slider-text h2 {
+    font-size: 15.8px !important;
+  }
+
+  .c9-section-heading h2, .section-heading h2,
+  .order-modal-head-v6 h2 {
+    font-size: 20.5px !important;
+  }
+
+  .c9-offer-banner h2,
+  .summary-card h3,
+  .checkout-section-head-v7 h2,
+  .wishlist-aside h2,
+  .catalogue-donut-c8 strong,
+  .admin-status-card-v6 strong,
+  .tv-offer-copy h3,
+  .mobile-filter-header strong {
+    font-size: 18px !important;
+  }
+
+  .market-wishlist-button,
+  .details-meta-grid > div > span,
+  .summary-total strong,
+  .checkout-summary-title h3,
+  .wishlist-heading-row h2,
+  .premium-confirm-copy-v73 h3,
+  .category-feature-copy h3 {
+    font-size: 16.4px !important;
+  }
+
+  .price-line strong,
+  .wishlist-price-v7 strong,
+  .account-sidebar h3,
+  .track-panel-head h3,
+  .login-art p, .admin-login-side p {
+    font-size: 12.3px !important;
+  }
+
+  .market-shop-heading h1, .page-title-row h1, .checkout-title-row h1 {
+    font-size: 32.8px !important;
+  }
+
+  .market-shop-heading blockquote, .page-title-row blockquote, .checkout-title-row blockquote,
+  .details-title-row blockquote,
+  .qty-box button,
+  .cart-recommend-note strong,
+  .wishlist-aside blockquote,
+  .account-overview-card > span {
+    font-size: 15px !important;
+  }
+
+  .concept-filter-head strong,
+  .account-overview-card strong,
+  .address-modal-head-v7 > button,
+  .promotion-card-v6 h3,
+  .promotion-card-v6 > strong,
+  .order-modal-head-v6 > button,
+  .home-ref-book-card .market-wishlist-button {
+    font-size: 16.7px !important;
+  }
+
+  .details-info h1 {
+    font-size: 33.5px !important;
+  }
+
+  .details-lead {
+    font-size: 11.5px !important;
+  }
+
+  .details-price > strong,
+  .account-welcome h1,
+  .login-card h2, .admin-login-card h1,
+  .market-shop-heading h1 {
+    font-size: 23.4px !important;
+  }
+
+  .details-trust-strip b,
+  .login-art blockquote, .admin-login-side blockquote,
+  .admin-panel-title-v6 h2,
+  .category-showcase-header h2 {
+    font-size: 17.2px !important;
+  }
+
+  .offer-card-premium h2 {
+    font-size: 19.7px !important;
+  }
+
+  .offer-value strong {
+    font-size: 27.3px !important;
+  }
+
+  .confirmation-card h1 {
+    font-size: 26.5px !important;
+  }
+
+  .address-modal-head-v7 h2,
+  .tv-section-head h2 {
+    font-size: 18.9px !important;
+  }
+
+  .login-art h1, .admin-login-side h1 {
+    font-size: 37.4px !important;
+  }
+
+  .admin-top-v6 h1 {
+    font-size: 25.7px !important;
+  }
+
+  .admin-hero-v6 h2 {
+    font-size: 23px !important;
+  }
+
+  .admin-kpi-v6 strong {
+    font-size: 21.3px !important;
+  }
+
+  .tv-hero-left h1 {
+    font-size: 40.6px !important;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .eyebrow,
+  .store-topbar,
+  .market-action-link,
+  .market-action-link strong,
+  .market-category-inner a,
+  .search-suggestion-head,
+  .search-all-row,
+  .market-footer h4,
+  .c9-trust-strip strong,
+  .book-title,
+  .concept-filter-section h3,
+  .shop-pagination span,
+  .premium-calendar-head strong,
+  .qty-box span,
+  .details-tab-panel,
+  .cart-item-info span,
+  .summary-card > div:not(.summary-total):not(.cart-coupon):not(.summary-trust):not(.checkout-summary-items):not(.checkout-summary-title):not(.checkout-savings),
+  .checkout-steps span,
+  .payment-options strong,
+  .wishlist-copy-v7 h3,
+  .order-card-bottom strong,
+  .status-chip,
+  .login-card > p, .admin-login-card > p,
+  .tv-section-head p,
+  .tv-inline-link,
+  .tv-category-copy strong,
+  .tv-offer-copy p,
+  .market-shop-heading p,
+  .shop-result-count {
+    font-size: 9.9px !important;
+  }
+
+  .breadcrumbs, .market-breadcrumb,
+  .compact,
+  .market-search-button,
+  .search-suggestion-copy strong,
+  .search-suggestion-meta b,
+  .footer-socials span,
+  .c9-text-link,
+  .big-rating,
+  .confirmation-card > p,
+  .address-empty-v7 h3,
+  .tv-btn-primary, .tv-btn-secondary, .tv-offer-link,
+  .tv-benefits strong,
+  .home-ref-book-card .book-title {
+    font-size: 10.8px !important;
+  }
+
+  .backend-status-banner,
+  .form-error,
+  .market-search input,
+  .c9-hero-copy,
+  .market-shop-heading p, .page-title-row p, .checkout-title-row p,
+  .empty-state p,
+  .details-info .author,
+  .details-price del,
+  .offers-hero p,
+  .tv-hero-subtitle {
+    font-size: 11.7px !important;
+  }
+
+  .big,
+  .c9-hero-book strong,
+  .remove-btn,
+  .confirmation-order-box strong,
+  .shop-slider-price strong {
+    font-size: 12.9px !important;
+  }
+
+  .search-suggestion-copy small, .search-suggestion-meta small,
+  .footer-brand-block p,
+  .c9-eyebrow,
+  .c9-offer-banner p,
+  .c9-author-card strong,
+  .price-line del,
+  .concept-sort-wrap > span,
+  .details-thumbnails button,
+  .details-price > span,
+  .details-price .stock,
+  .details-message,
+  .details-tabs button,
+  .cart-price-block del,
+  .cart-coupon button,
+  .cart-recommend-note a,
+  .mini-order span b,
+  .wishlist-heading-row a,
+  .wishlist-message-v7,
+  .wishlist-aside > p,
+  .account-sidebar nav a, .account-sidebar nav button,
+  .account-welcome p,
+  .order-card-top strong,
+  .tracked-items h4,
+  .address-label-v7,
+  .address-card-v7 > strong,
+  .location-capture-panel-v7 strong,
+  .login-art-points,
+  .login-switch,
+  .admin-nav-v6 button strong,
+  .admin-top-v6 p,
+  .inventory-info-v6 h3,
+  .order-modal-items-v6 h3, .order-modal-actions-v6 h3, .order-modal-history-v6 h3,
+  .tv-hero-kicker,
+  .home-ref-book-card .market-rating-row,
+  .home-ref-book-card .price-line del,
+  .shop-promo-track span,
+  .mobile-filter-header small,
+  .category-feature-eyebrow b,
+  .category-feature-actions small strong {
+    font-size: 9px !important;
+  }
+
+  .market-footer a,
+  .c9-section-heading p, .section-heading p,
+  .c9-section-heading > a, .section-heading > a,
+  .c9-category-card strong,
+  .c9-offer-banner > a,
+  .shop-results-toolbar,
+  .premium-select-trigger, .premium-date-trigger,
+  .premium-select-option,
+  .buy-row > label,
+  .continue-link,
+  .form-grid input, .form-grid textarea, .address-form-grid-v7 input, .admin-form-grid-v6 input, .admin-form-grid-v6 textarea, .admin-filters-v6 input, .login-card input, .admin-login-card input, .author-search-row-c8 input, .customer-tools-v6 input, .admin-search-v6 input,
+  .offer-card-premium p,
+  .home-ref-book-card .market-cart-button,
+  .tv-author-chip strong {
+    font-size: 9.5px !important;
+  }
+
+  .c9-home-copy h1,
+  .login-art h1, .admin-login-side h1 {
+    font-size: 35.5px !important;
+  }
+
+  .c9-hero-line,
+  .cart-item-info > a,
+  .cart-price-block strong,
+  .summary-total span,
+  .home-ref-book-card .price-line strong {
+    font-size: 13.8px !important;
+  }
+
+  .c9-hero-art blockquote,
+  .admin-nav-v6 button > span,
+  .author-editor-title-c8 h3,
+  .account-sidebar-title,
+  .account-sidebar-quote blockquote,
+  .shop-slider-text h2 {
+    font-size: 15.5px !important;
+  }
+
+  .c9-section-heading h2, .section-heading h2,
+  .order-modal-head-v6 h2 {
+    font-size: 20px !important;
+  }
+
+  .c9-offer-banner h2,
+  .summary-card h3,
+  .checkout-section-head-v7 h2,
+  .wishlist-aside h2,
+  .catalogue-donut-c8 strong,
+  .admin-status-card-v6 strong,
+  .tv-offer-copy h3,
+  .mobile-filter-header strong {
+    font-size: 17.6px !important;
+  }
+
+  .market-wishlist-button,
+  .details-meta-grid > div > span,
+  .summary-total strong,
+  .checkout-summary-title h3,
+  .wishlist-heading-row h2,
+  .admin-kpi-v6 strong,
+  .premium-confirm-copy-v73 h3,
+  .category-feature-copy h3 {
+    font-size: 16px !important;
+  }
+
+  .price-line strong,
+  .wishlist-price-v7 strong,
+  .account-sidebar h3,
+  .track-panel-head h3,
+  .login-art p, .admin-login-side p {
+    font-size: 12px !important;
+  }
+
+  .market-shop-heading h1, .page-title-row h1, .checkout-title-row h1 {
+    font-size: 23.7px !important;
+  }
+
+  .market-shop-heading blockquote, .page-title-row blockquote, .checkout-title-row blockquote,
+  .details-title-row blockquote,
+  .qty-box button,
+  .cart-recommend-note strong,
+  .wishlist-aside blockquote,
+  .account-overview-card > span {
+    font-size: 14.6px !important;
+  }
+
+  .concept-filter-head strong,
+  .account-overview-card strong,
+  .address-modal-head-v7 > button,
+  .promotion-card-v6 h3,
+  .promotion-card-v6 > strong,
+  .order-modal-head-v6 > button,
+  .home-ref-book-card .market-wishlist-button {
+    font-size: 16.3px !important;
+  }
+
+  .details-info h1,
+  .confirmation-card h1 {
+    font-size: 25.2px !important;
+  }
+
+  .details-lead {
+    font-size: 11.2px !important;
+  }
+
+  .details-price > strong,
+  .account-welcome h1,
+  .login-card h2, .admin-login-card h1,
+  .market-shop-heading h1 {
+    font-size: 22.2px !important;
+  }
+
+  .details-trust-strip b,
+  .login-art blockquote, .admin-login-side blockquote,
+  .admin-panel-title-v6 h2,
+  .category-showcase-header h2 {
+    font-size: 16.8px !important;
+  }
+
+  .offers-hero h1 {
+    font-size: 34px !important;
+  }
+
+  .offer-card-premium h2 {
+    font-size: 19.2px !important;
+  }
+
+  .offer-value strong {
+    font-size: 25.9px !important;
+  }
+
+  .address-modal-head-v7 h2,
+  .tv-section-head h2 {
+    font-size: 18.4px !important;
+  }
+
+  .admin-top-v6 h1 {
+    font-size: 21.6px !important;
+  }
+
+  .admin-hero-v6 h2 {
+    font-size: 22.4px !important;
+  }
+
+  .tv-hero-left h1 {
+    font-size: 33.3px !important;
+  }
+
+}
+
+@media (max-width: 390px) {
+
+  .eyebrow,
+  .store-topbar,
+  .market-action-link,
+  .market-action-link strong,
+  .market-category-inner a,
+  .search-suggestion-head,
+  .search-all-row,
+  .market-footer h4,
+  .c9-trust-strip strong,
+  .book-title,
+  .concept-filter-section h3,
+  .shop-pagination span,
+  .premium-calendar-head strong,
+  .qty-box span,
+  .details-tab-panel,
+  .cart-item-info span,
+  .summary-card > div:not(.summary-total):not(.cart-coupon):not(.summary-trust):not(.checkout-summary-items):not(.checkout-summary-title):not(.checkout-savings),
+  .payment-options strong,
+  .wishlist-copy-v7 h3,
+  .order-card-bottom strong,
+  .status-chip,
+  .login-card > p, .admin-login-card > p,
+  .tv-section-head p,
+  .tv-inline-link,
+  .tv-category-copy strong,
+  .tv-offer-copy p,
+  .market-shop-heading p,
+  .shop-result-count {
+    font-size: 9.7px !important;
+  }
+
+  .breadcrumbs, .market-breadcrumb,
+  .compact,
+  .market-search-button,
+  .search-suggestion-copy strong,
+  .search-suggestion-meta b,
+  .footer-socials span,
+  .c9-text-link,
+  .big-rating,
+  .confirmation-card > p,
+  .address-empty-v7 h3,
+  .tv-btn-primary, .tv-btn-secondary, .tv-offer-link,
+  .tv-benefits strong,
+  .home-ref-book-card .book-title {
+    font-size: 10.6px !important;
+  }
+
+  .backend-status-banner,
+  .form-error,
+  .market-search input,
+  .c9-hero-copy,
+  .market-shop-heading p, .page-title-row p, .checkout-title-row p,
+  .empty-state p,
+  .details-info .author,
+  .details-price del,
+  .offers-hero p,
+  .tv-hero-subtitle {
+    font-size: 11.4px !important;
+  }
+
+  .big,
+  .c9-hero-book strong,
+  .remove-btn,
+  .confirmation-order-box strong,
+  .shop-slider-price strong {
+    font-size: 12.3px !important;
+  }
+
+  .search-suggestion-copy small, .search-suggestion-meta small,
+  .footer-brand-block p,
+  .c9-eyebrow,
+  .c9-offer-banner p,
+  .c9-author-card strong,
+  .price-line del,
+  .concept-sort-wrap > span,
+  .details-thumbnails button,
+  .details-price > span,
+  .details-price .stock,
+  .details-message,
+  .details-tabs button,
+  .cart-price-block del,
+  .cart-coupon button,
+  .cart-recommend-note a,
+  .mini-order span b,
+  .wishlist-heading-row a,
+  .wishlist-message-v7,
+  .wishlist-aside > p,
+  .account-sidebar nav a, .account-sidebar nav button,
+  .account-welcome p,
+  .order-card-top strong,
+  .tracked-items h4,
+  .address-label-v7,
+  .address-card-v7 > strong,
+  .location-capture-panel-v7 strong,
+  .login-art-points,
+  .login-switch,
+  .admin-nav-v6 button strong,
+  .admin-top-v6 p,
+  .inventory-info-v6 h3,
+  .order-modal-items-v6 h3, .order-modal-actions-v6 h3, .order-modal-history-v6 h3,
+  .tv-hero-kicker,
+  .home-ref-book-card .market-rating-row,
+  .home-ref-book-card .price-line del,
+  .shop-promo-track span,
+  .mobile-filter-header small,
+  .category-feature-eyebrow b,
+  .category-feature-actions small strong {
+    font-size: 8.8px !important;
+  }
+
+  .market-footer a,
+  .c9-section-heading p, .section-heading p,
+  .c9-section-heading > a, .section-heading > a,
+  .c9-category-card strong,
+  .c9-offer-banner > a,
+  .shop-results-toolbar,
+  .premium-select-trigger, .premium-date-trigger,
+  .premium-select-option,
+  .buy-row > label,
+  .continue-link,
+  .form-grid input, .form-grid textarea, .address-form-grid-v7 input, .admin-form-grid-v6 input, .admin-form-grid-v6 textarea, .admin-filters-v6 input, .login-card input, .admin-login-card input, .author-search-row-c8 input, .customer-tools-v6 input, .admin-search-v6 input,
+  .offer-card-premium p,
+  .home-ref-book-card .market-cart-button,
+  .tv-author-chip strong,
+  .tv-btn-primary, .tv-btn-secondary {
+    font-size: 9.2px !important;
+  }
+
+  .c9-home-copy h1,
+  .login-art h1, .admin-login-side h1 {
+    font-size: 33.6px !important;
+  }
+
+  .c9-hero-line,
+  .cart-item-info > a,
+  .cart-price-block strong,
+  .summary-total span,
+  .home-ref-book-card .price-line strong {
+    font-size: 13.1px !important;
+  }
+
+  .c9-hero-art blockquote,
+  .admin-nav-v6 button > span,
+  .author-editor-title-c8 h3,
+  .account-sidebar-title,
+  .account-sidebar-quote blockquote,
+  .shop-slider-text h2 {
+    font-size: 14.8px !important;
+  }
+
+  .c9-section-heading h2, .section-heading h2,
+  .order-modal-head-v6 h2 {
+    font-size: 19px !important;
+  }
+
+  .c9-offer-banner h2,
+  .summary-card h3,
+  .checkout-section-head-v7 h2,
+  .wishlist-aside h2,
+  .catalogue-donut-c8 strong,
+  .admin-status-card-v6 strong,
+  .tv-offer-copy h3,
+  .mobile-filter-header strong {
+    font-size: 16.7px !important;
+  }
+
+  .market-wishlist-button,
+  .details-meta-grid > div > span,
+  .summary-total strong,
+  .checkout-summary-title h3,
+  .wishlist-heading-row h2,
+  .admin-kpi-v6 strong,
+  .premium-confirm-copy-v73 h3,
+  .category-feature-copy h3 {
+    font-size: 15.2px !important;
+  }
+
+  .price-line strong,
+  .wishlist-price-v7 strong,
+  .account-sidebar h3,
+  .track-panel-head h3,
+  .login-art p, .admin-login-side p {
+    font-size: 11.5px !important;
+  }
+
+  .market-shop-heading h1, .page-title-row h1, .checkout-title-row h1 {
+    font-size: 22.4px !important;
+  }
+
+  .market-shop-heading blockquote, .page-title-row blockquote, .checkout-title-row blockquote,
+  .details-title-row blockquote,
+  .qty-box button,
+  .cart-recommend-note strong,
+  .wishlist-aside blockquote,
+  .account-overview-card > span {
+    font-size: 13.9px !important;
+  }
+
+  .concept-filter-head strong,
+  .account-overview-card strong,
+  .address-modal-head-v7 > button,
+  .promotion-card-v6 h3,
+  .promotion-card-v6 > strong,
+  .order-modal-head-v6 > button,
+  .home-ref-book-card .market-wishlist-button {
+    font-size: 15.6px !important;
+  }
+
+  .details-info h1,
+  .confirmation-card h1 {
+    font-size: 23.8px !important;
+  }
+
+  .details-lead {
+    font-size: 11px !important;
+  }
+
+  .details-price > strong,
+  .account-welcome h1,
+  .login-card h2, .admin-login-card h1 {
+    font-size: 21px !important;
+  }
+
+  .details-trust-strip b,
+  .login-art blockquote, .admin-login-side blockquote,
+  .admin-panel-title-v6 h2,
+  .category-showcase-header h2 {
+    font-size: 16px !important;
+  }
+
+  .offers-hero h1 {
+    font-size: 32.2px !important;
+  }
+
+  .offer-card-premium h2 {
+    font-size: 18.2px !important;
+  }
+
+  .offer-value strong {
+    font-size: 24.5px !important;
+  }
+
+  .address-modal-head-v7 h2,
+  .tv-section-head h2 {
+    font-size: 17.5px !important;
+  }
+
+  .admin-top-v6 h1 {
+    font-size: 20.5px !important;
+  }
+
+  .admin-hero-v6 h2,
+  .market-shop-heading h1 {
+    font-size: 21.3px !important;
+  }
+
+  .tv-hero-left h1 {
+    font-size: 27.3px !important;
+  }
+
+}
