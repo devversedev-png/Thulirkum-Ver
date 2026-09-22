@@ -1,25 +1,8 @@
 import { Link } from 'react-router-dom'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useStore } from '../context/StoreContext'
 import BookCard from '../components/BookCard'
-import { decorateBooks, demoAuthors, demoBooks, demoOffers, slugKey } from '../data/siteCatalog'
-
-const FEATURED_ORDER = [
-  'atomic habits',
-  'ikigai',
-  'ponniyin selvan',
-  'siru maatrangal periya vazhkai',
-  'the alchemist'
-]
-
-const AUTHOR_ORDER = [
-  'kalki krishnamurthy',
-  'paulo coelho',
-  'james clear',
-  'hector garcia',
-  'jay shetty',
-  'r balakrishnan'
-]
+import { decorateBooks } from '../data/siteCatalog'
 
 const CATEGORY_CONFIG = [
   {
@@ -74,11 +57,6 @@ const CATEGORY_CONFIG = [
   }
 ]
 
-function orderedFeaturedBooks(catalogue) {
-  const byKey = new Map(catalogue.map(book => [slugKey(book.title), book]))
-  const ordered = FEATURED_ORDER.map(key => byKey.get(key)).filter(Boolean)
-  return ordered.length ? ordered : catalogue.slice(0, 5)
-}
 
 function normalizeCategory(value = '') {
   return String(value)
@@ -92,29 +70,39 @@ function normalizeCategory(value = '') {
 export default function HomePage() {
   const [activeCategorySlide, setActiveCategorySlide] = useState(0)
   const [categoryPaused, setCategoryPaused] = useState(false)
-  const { books, offers, authors, loading } = useStore()
-  const carouselRef = useRef(null)
+  const [activeOfferSlide, setActiveOfferSlide] = useState(0)
+  const { books, offers, authors, homeSections, homeSettings, loading } = useStore()
 
   const catalogue = useMemo(
-    () => decorateBooks(books?.length ? books : demoBooks),
+    () => decorateBooks(books || []),
     [books]
   )
 
-  const featuredBooks = useMemo(
-    () => orderedFeaturedBooks(catalogue),
-    [catalogue]
-  )
+  const homeBookSections = useMemo(() => {
+    return (homeSections || [])
+      .map(section => ({
+        ...section,
+        books: (section.bookIds || [])
+          .map(id => catalogue.find(book => book.id === id))
+          .filter(Boolean),
+      }))
+      .filter(section => section.active !== false && section.books.length)
+      .sort((a, b) => Number(a.displayOrder || 0) - Number(b.displayOrder || 0))
+  }, [homeSections, catalogue])
 
-  const topOffer = useMemo(
-    () => (offers?.length ? offers.find(offer => offer.active) || offers[0] : demoOffers[0]),
+  const offerRows = useMemo(
+    () => (offers || []).filter(offer => offer.active !== false),
     [offers]
   )
 
   const authorRows = useMemo(() => {
-    const source = authors?.length ? authors : demoAuthors
-    const byKey = new Map(source.map(author => [slugKey(author.name), author]))
-    return AUTHOR_ORDER.map(key => byKey.get(key)).filter(Boolean)
+    return [...(authors || [])]
+      .filter(author => author.active !== false && author.featured !== false)
+      .sort((a, b) => Number(a.displayOrder || 0) - Number(b.displayOrder || 0))
   }, [authors])
+
+  const activeOffer = offerRows[activeOfferSlide] || offerRows[0]
+  const activeHeroBanner = homeSettings?.bannerUrls?.[homeSettings?.activeBannerIndex] || ''
 
   const categorySlides = useMemo(() => {
     return CATEGORY_CONFIG.map(item => {
@@ -140,6 +128,22 @@ export default function HomePage() {
   }, [catalogue])
 
   useEffect(() => {
+    if (offerRows.length <= 1) return undefined
+
+    const timer = window.setInterval(() => {
+      setActiveOfferSlide(current => (current + 1) % offerRows.length)
+    }, 4500)
+
+    return () => window.clearInterval(timer)
+  }, [offerRows.length])
+
+  useEffect(() => {
+    if (activeOfferSlide >= offerRows.length) {
+      setActiveOfferSlide(0)
+    }
+  }, [activeOfferSlide, offerRows.length])
+
+  useEffect(() => {
     if (categoryPaused || categorySlides.length <= 1) return undefined
 
     const timer = window.setInterval(() => {
@@ -157,13 +161,6 @@ export default function HomePage() {
     }
   }, [activeCategorySlide, categorySlides.length])
 
-  function slide(direction) {
-    carouselRef.current?.scrollBy({
-      left: direction * 280,
-      behavior: 'smooth'
-    })
-  }
-
   function nextCategorySlide() {
     if (!categorySlides.length) return
     setActiveCategorySlide(current =>
@@ -180,7 +177,10 @@ export default function HomePage() {
 
   return (
     <main className="tv-homepage">
-      <section className="tv-hero-shell">
+      <section
+        className={`tv-hero-shell ${activeHeroBanner ? 'tv-hero-shell-has-banner' : ''}`}
+        style={activeHeroBanner ? { backgroundImage: `linear-gradient(90deg, rgba(247, 247, 239, .98) 0%, rgba(247, 247, 239, .84) 52%, rgba(247, 247, 239, .38) 100%), url("${activeHeroBanner}")` } : undefined}
+      >
         <div className="page-width tv-hero">
           <div className="tv-hero-left">
             <div className="tv-hero-kicker">THULIRKUM VER · ONLINE BOOKSTORE</div>
@@ -326,65 +326,74 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="page-width tv-section tv-featured-section">
-        <div className="tv-section-head">
-          <div>
-            <h2>Featured Books</h2>
-            <p>Curated picks for your next great read.</p>
+      {homeBookSections.map(section => (
+        <section className="page-width tv-section tv-home-book-section-v7" key={section.id || section.key}>
+          <div className="tv-section-head">
+            <div>
+              <h2>{section.title}</h2>
+              {section.description && <p>{section.description}</p>}
+            </div>
+            <Link to={`/shop?homeSection=${encodeURIComponent(section.key)}`} className="tv-inline-link">
+              View all <span>→</span>
+            </Link>
           </div>
-          <Link to="/shop" className="tv-inline-link">
-            View all books <span>→</span>
+
+          <div className="tv-home-book-row-v7">
+            {section.books.map(book => (
+              <BookCard key={`${section.key}-${book.id}`} book={book} variant="home-ref" />
+            ))}
+          </div>
+        </section>
+      ))}
+
+      {activeOffer && (
+        <section className="page-width tv-offer-banner tv-offer-slider-v7">
+          <div className="tv-offer-copy">
+            <small>🎁 SPECIAL OFFER</small>
+            <h3>{activeOffer.title}</h3>
+            <p>{activeOffer.description || 'Save on selected books.'}</p>
+            <div className="tv-offer-slide-value-v7">
+              <strong>
+                {activeOffer.discountType === 'FIXED'
+                  ? `₹${activeOffer.discountValue}`
+                  : `${activeOffer.discountValue}%`}
+              </strong>
+              <span>OFF</span>
+              {activeOffer.code && <b>Code: {activeOffer.code}</b>}
+            </div>
+          </div>
+
+          <Link to="/offers" className="tv-offer-link">
+            View Offers <span>→</span>
           </Link>
-        </div>
 
-        <div className="tv-carousel-shell">
-          <button
-            type="button"
-            className="tv-carousel-btn prev"
-            onClick={() => slide(-1)}
-            aria-label="Previous books"
-          >
-            ‹
-          </button>
-
-          <div className="tv-featured-grid" ref={carouselRef}>
-            {loading && !featuredBooks.length ? (
-              <p>Loading books...</p>
-            ) : (
-              featuredBooks.map(book => (
-                <BookCard key={book.id} book={book} variant="home-ref" />
-              ))
+          <div className="tv-offer-slider-controls-v7">
+            {offerRows.length > 1 && (
+              <>
+                <button type="button" onClick={() => setActiveOfferSlide(current => (current - 1 + offerRows.length) % offerRows.length)} aria-label="Previous offer">‹</button>
+                <div>
+                  {offerRows.map((offer, index) => (
+                    <button
+                      type="button"
+                      key={offer.id}
+                      className={index === activeOfferSlide ? 'active' : ''}
+                      onClick={() => setActiveOfferSlide(index)}
+                      aria-label={`Show offer ${index + 1}`}
+                    />
+                  ))}
+                </div>
+                <button type="button" onClick={() => setActiveOfferSlide(current => (current + 1) % offerRows.length)} aria-label="Next offer">›</button>
+              </>
             )}
           </div>
 
-          <button
-            type="button"
-            className="tv-carousel-btn next"
-            onClick={() => slide(1)}
-            aria-label="Next books"
-          >
-            ›
-          </button>
-        </div>
-      </section>
-
-      <section className="page-width tv-offer-banner">
-        <div className="tv-offer-copy">
-          <small>🎁 SPECIAL OFFER</small>
-          <h3>{topOffer?.title || 'Great Books. Greater Journeys.'}</h3>
-          <p>{topOffer?.description || 'Get up to 30% OFF on selected titles.'}</p>
-        </div>
-
-        <Link to="/offers" className="tv-offer-link">
-          View Offers <span>→</span>
-        </Link>
-
-        <img
-          className="tv-offer-photo"
-          src="/premium/offer-books-premium.png"
-          alt="Premium books with an up to 30 percent offer"
-        />
-      </section>
+          <img
+            className="tv-offer-photo"
+            src={activeOffer.bannerImage || '/premium/offer-books-premium.png'}
+            alt={activeOffer.title}
+          />
+        </section>
+      )}
 
       <section className="page-width tv-section tv-authors-section">
         <div className="tv-section-head">

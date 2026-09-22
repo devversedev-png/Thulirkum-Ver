@@ -10,9 +10,6 @@ import { api } from '../api/client'
 import { useAuth } from './AuthContext'
 
 import {
-  demoAuthors,
-  demoBooks,
-  demoOffers,
   decorateAuthors,
   decorateBooks,
 } from '../data/siteCatalog'
@@ -25,6 +22,8 @@ export function StoreProvider({ children }) {
   const [books, setBooks] = useState([])
   const [offers, setOffers] = useState([])
   const [authors, setAuthors] = useState([])
+  const [homeSections, setHomeSections] = useState([])
+  const [homeSettings, setHomeSettings] = useState({ bannerUrls: [], activeBannerIndex: 0 })
   const [account, setAccount] = useState(null)
 
   const [loading, setLoading] = useState(true)
@@ -34,6 +33,8 @@ export function StoreProvider({ children }) {
     loadBooks()
     loadOffers()
     loadAuthors()
+    loadHomeSections()
+    loadHomeSettings()
   }, [])
 
   useEffect(() => {
@@ -55,7 +56,7 @@ export function StoreProvider({ children }) {
       setBooks(decorateBooks(data))
       setBackendReady(true)
     } catch {
-      setBooks(demoBooks)
+      setBooks([])
       setBackendReady(false)
     } finally {
       if (!silent) {
@@ -70,7 +71,7 @@ export function StoreProvider({ children }) {
 
       setOffers(data)
     } catch {
-      setOffers(demoOffers)
+      setOffers([])
     }
   }
 
@@ -80,7 +81,28 @@ export function StoreProvider({ children }) {
 
       setAuthors(decorateAuthors(data))
     } catch {
-      setAuthors(demoAuthors)
+      setAuthors([])
+    }
+  }
+
+  async function loadHomeSections() {
+    try {
+      const data = await api('/home-sections')
+      setHomeSections(Array.isArray(data) ? data : [])
+    } catch {
+      setHomeSections([])
+    }
+  }
+
+  async function loadHomeSettings() {
+    try {
+      const data = await api('/home-settings')
+      setHomeSettings({
+        bannerUrls: Array.isArray(data?.bannerUrls) ? data.bannerUrls : [],
+        activeBannerIndex: Number(data?.activeBannerIndex || 0),
+      })
+    } catch {
+      setHomeSettings({ bannerUrls: [], activeBannerIndex: 0 })
     }
   }
 
@@ -267,6 +289,8 @@ export function StoreProvider({ children }) {
       books,
       offers,
       authors,
+      homeSections,
+      homeSettings,
       account,
       loading,
       backendReady,
@@ -274,6 +298,8 @@ export function StoreProvider({ children }) {
       loadBooks,
       loadOffers,
       loadAuthors,
+      loadHomeSections,
+      loadHomeSettings,
       loadAccount,
 
       getBook,
@@ -297,6 +323,8 @@ export function StoreProvider({ children }) {
       books,
       offers,
       authors,
+      homeSections,
+      homeSettings,
       account,
       loading,
       backendReady,
