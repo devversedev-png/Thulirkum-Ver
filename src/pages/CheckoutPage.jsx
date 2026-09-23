@@ -12,8 +12,12 @@ function blankAddress(user) {
     line1: '',
     line2: '',
     city: '',
+    district: '',
     state: '',
-    pincode: ''
+    pincode: '',
+    latitude: null,
+    longitude: null,
+    locationLabel: ''
   }
 }
 
@@ -64,6 +68,64 @@ export default function CheckoutPage() {
     setAddress(blankAddress(user))
   }
 
+  async function reverseGeocode(latitude, longitude) {
+    const baseUrl =
+      import.meta.env.VITE_REVERSE_GEOCODE_URL ||
+      'https://nominatim.openstreetmap.org/reverse'
+    const separator = baseUrl.includes('?') ? '&' : '?'
+    const response = await fetch(
+      `${baseUrl}${separator}format=jsonv2&addressdetails=1&lat=${encodeURIComponent(latitude)}&lon=${encodeURIComponent(longitude)}`,
+      { headers: { 'Accept-Language': 'en' } }
+    )
+    if (!response.ok) throw new Error('Unable to read the address from the map')
+    return response.json()
+  }
+
+  function useCurrentLocation() {
+    setError('')
+    if (!navigator.geolocation) {
+      setError('Location access is not supported by this browser.')
+      return
+    }
+
+    setBusy(true)
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const latitude = Number(position.coords.latitude.toFixed(6))
+          const longitude = Number(position.coords.longitude.toFixed(6))
+          const data = await reverseGeocode(latitude, longitude)
+          const geo = data?.address || {}
+          setAddress(current => ({
+            ...current,
+            latitude,
+            longitude,
+            locationLabel: data?.display_name || '',
+            line1: current.line1 || [geo.house_number, geo.road].filter(Boolean).join(' '),
+            city: current.city || geo.city || geo.town || geo.village || geo.municipality || '',
+            district: current.district || geo.state_district || geo.county || geo.district || '',
+            state: current.state || geo.state || '',
+            pincode: current.pincode || geo.postcode || '',
+          }))
+        } catch (err) {
+          setError(err.message || 'Unable to fetch the current address.')
+        } finally {
+          setBusy(false)
+        }
+      },
+      (error) => {
+        setBusy(false)
+        const messages = {
+          1: 'Location permission was denied. Please allow location access and try again.',
+          2: 'Your current location could not be determined.',
+          3: 'Location request timed out. Please try again.',
+        }
+        setError(messages[error.code] || 'Unable to get your current location.')
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    )
+  }
+
   async function submit(event) {
     event.preventDefault()
     setBusy(true)
@@ -89,14 +151,14 @@ export default function CheckoutPage() {
       <div className="page-width checkout-layout">
         <form className="checkout-form" onSubmit={submit}>
           <section className="checkout-card">
-            <div className="checkout-section-head-v7"><div><span className="checkout-section-icon">⌖</span><div><h2>Shipping Address</h2><p>Where should we deliver your books?</p></div></div>{addresses.length > 0 && <button type="button" className="text-btn" onClick={() => document.querySelector('.checkout-address-picker-v7')?.scrollIntoView({ behavior: 'smooth' })}>Select saved address →</button>}</div>
+            <div className="checkout-section-head-v7"><div><span className="checkout-section-icon">⌖</span><div><h2>Shipping Address</h2><p>Where should we deliver your books?</p></div></div><button type="button" className="location-button-v7" onClick={useCurrentLocation} disabled={busy}>{busy ? 'Locating...' : '⌖ Use current location'}</button>{addresses.length > 0 && <button type="button" className="text-btn" onClick={() => document.querySelector('.checkout-address-picker-v7')?.scrollIntoView({ behavior: 'smooth' })}>Select saved address →</button>}</div>
 
             {addresses.length > 0 && (
               <div className="checkout-address-picker-v7">
                 {addresses.map(item => (
                   <button type="button" key={item.id} className={`checkout-address-option-v7 ${selectedAddressId === item.id ? 'selected' : ''}`} onClick={() => chooseSavedAddress(item)}>
                     <span className="checkout-radio-v7">{selectedAddressId === item.id ? '●' : '○'}</span>
-                    <div><strong>{item.label || 'Address'} {item.defaultAddress && <small>Default</small>}</strong><p>{item.line1}{item.line2 ? `, ${item.line2}` : ''}, {item.city} - {item.pincode}</p></div>
+                    <div><strong>{item.label || 'Address'} {item.defaultAddress && <small>Default</small>}</strong><p> {item.line1}{item.line2 ? `, ${item.line2}` : ''}, {item.city}{item.district ? `, ${item.district}` : ''} - {item.pincode}</p></div>
                   </button>
                 ))}
                 <button type="button" className={`checkout-address-option-v7 new ${selectedAddressId === 'NEW' ? 'selected' : ''}`} onClick={chooseNewAddress}><span>＋</span><div><strong>Use a new address</strong><p>Enter a different delivery address.</p></div></button>
@@ -109,7 +171,7 @@ export default function CheckoutPage() {
               <div className="wide"><label>Email Address *</label><input type="email" value={user?.email || ''} readOnly /><small>We’ll send order updates to this email.</small></div>
               <div className="wide"><label>Address Line *</label><input name="line1" value={address.line1 || ''} onChange={change} required /></div>
               <div><label>City *</label><input name="city" value={address.city || ''} onChange={change} required /></div>
-              <div><label>State *</label><input name="state" value={address.state || ''} onChange={change} required /></div>
+              <div><label>District</label><input name="district" value={address.district || ''} onChange={change} /></div><div><label>State *</label><input name="state" value={address.state || ''} onChange={change} required /></div>
               <div><label>Pincode *</label><input name="pincode" value={address.pincode || ''} onChange={change} required /></div>
               <div className="wide"><label>Delivery Notes (Optional)</label><textarea name="line2" value={address.line2 || ''} onChange={change} placeholder="House name, nearby landmark, delivery instructions..." rows="3" /></div>
             </div>

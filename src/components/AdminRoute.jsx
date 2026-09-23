@@ -3,8 +3,9 @@ import { useAuth } from '../context/AuthContext'
 
 export default function AdminRoute({ children }) {
   const { user } = useAuth()
+  const token = localStorage.getItem('tvb_token')
 
-  if (user?.role !== 'ADMIN') {
+  if (user?.role !== 'ADMIN' || !token) {
     return <Navigate to="/admin/login" replace />
   }
 

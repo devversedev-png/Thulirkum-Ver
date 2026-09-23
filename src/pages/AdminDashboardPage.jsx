@@ -160,6 +160,12 @@ export default function AdminDashboardPage() {
   const [orderActions, setOrderActions] =
     useState([])
 
+  const [shipmentAction, setShipmentAction] =
+    useState(null)
+
+  const [shipmentForm, setShipmentForm] =
+    useState({ courierName: '', trackingNumber: '' })
+
   const [
     orderActionBusy,
     setOrderActionBusy,
@@ -194,48 +200,86 @@ export default function AdminDashboardPage() {
   }, [selectedHomeSectionKey, homeSections])
 
   async function loadEverything() {
-    try {
-      const [
-        bookData,
-        orderData,
-        customerData,
-        offerData,
-        authorData,
-        homeSectionData,
-        homeSettingsData,
-      ] = await Promise.all([
-        api('/admin/books'),
-        api('/admin/orders'),
-        api('/admin/customers'),
-        api('/admin/offers'),
-        api('/admin/authors'),
-        api('/admin/home-sections'),
-        api('/admin/home-settings'),
-      ])
+    // Load each admin area independently. One unavailable endpoint (for example
+    // Home Settings on an older Render deployment) must not hide the other tabs
+    // or prevent the Home Sections tab from rendering.
+    const requests = [
+      ['books', api('/admin/books')],
+      ['orders', api('/admin/orders')],
+      ['customers', api('/admin/customers')],
+      ['offers', api('/admin/offers')],
+      ['authors', api('/admin/authors')],
+      ['homeSections', api('/admin/home-sections')],
+      ['homeSettings', api('/admin/home-settings')],
+    ]
 
-      setBooks(bookData)
-      setOrders(orderData)
-      setCustomers(customerData)
-      setOffers(offerData)
-      setAuthors(authorData)
-      setHomeSections(homeSectionData)
-      setHomeSettingsForm({
-        bannerUrls: [0, 1, 2, 3].map(index => homeSettingsData?.bannerUrls?.[index] || ''),
-        activeBannerIndex: Number(homeSettingsData?.activeBannerIndex || 0),
-      })
+    const results = await Promise.allSettled(
+      requests.map(([, request]) => request)
+    )
 
-      setStatusOptions([
-        ...new Set(
-          orderData
-            .map(
-              (order) =>
-                order.status
-            )
-            .filter(Boolean)
-        ),
-      ])
-    } catch (err) {
-      setMessage(err.message)
+    const failed = []
+
+    results.forEach((result, index) => {
+      const key = requests[index][0]
+
+      if (result.status === 'fulfilled') {
+        const data = result.value
+
+        if (key === 'books') {
+          setBooks(Array.isArray(data) ? data : [])
+        } else if (key === 'orders') {
+          setOrders(Array.isArray(data) ? data : [])
+          setStatusOptions([
+            ...new Set(
+              (Array.isArray(data) ? data : [])
+                .map(order => order.status)
+                .filter(Boolean)
+            ),
+          ])
+        } else if (key === 'customers') {
+          setCustomers(Array.isArray(data) ? data : [])
+        } else if (key === 'offers') {
+          setOffers(Array.isArray(data) ? data : [])
+        } else if (key === 'authors') {
+          setAuthors(Array.isArray(data) ? data : [])
+        } else if (key === 'homeSections') {
+          setHomeSections(Array.isArray(data) ? data : [])
+        } else if (key === 'homeSettings') {
+          setHomeSettingsForm({
+            bannerUrls: [0, 1, 2, 3].map(index => data?.bannerUrls?.[index] || ''),
+            activeBannerIndex: Number(data?.activeBannerIndex || 0),
+          })
+        }
+      } else {
+        failed.push({
+          key,
+          message: result.reason?.message || 'Request failed',
+        })
+      }
+    })
+
+    if (failed.length) {
+      const homeFailed = failed.some(item =>
+        item.key === 'homeSections' || item.key === 'homeSettings'
+      )
+
+      // Keep the Home Sections UI usable even if the newly added backend
+      // endpoints have not been deployed yet. The selected section falls back
+      // to HOME_SECTION_DEFAULTS and can be saved once the backend is updated.
+      if (homeFailed) {
+        setHomeSections(current => current.length ? current : HOME_SECTION_OPTIONS.map(option => ({
+          key: option.key,
+          title: option.title,
+          bookIds: [],
+          config: { ...(HOME_SECTION_DEFAULTS[option.key] || {}) },
+        })))
+      }
+
+      // Do not show the useless generic “Something went wrong” toast.
+      // Tell the admin exactly which area needs the backend deployment.
+      setMessage(
+        failed.map(item => `${item.key}: ${item.message}`).join(' • ')
+      )
     }
   }
 
@@ -1017,6 +1061,22 @@ export default function AdminDashboardPage() {
     }
   }
 
+  function confirmShipment() {
+    if (!shipmentAction) return
+
+    const courierName = shipmentForm.courierName.trim()
+    const trackingNumber = shipmentForm.trackingNumber.trim()
+
+    if (!courierName || !trackingNumber) {
+      setMessage('Courier name and tracking number are required before shipping.')
+      return
+    }
+
+    const action = shipmentAction
+    setShipmentAction(null)
+    executeOrderAction(action)
+  }
+
   function performOrderAction(
     action
   ) {
@@ -1024,6 +1084,15 @@ export default function AdminDashboardPage() {
       !selectedOrder ||
       orderActionBusy
     ) {
+      return
+    }
+
+    if (action.status === 'SHIPPED') {
+      setShipmentAction(action)
+      setShipmentForm({
+        courierName: selectedOrder.courierName || '',
+        trackingNumber: selectedOrder.trackingNumber || '',
+      })
       return
     }
 
@@ -3734,6 +3803,15 @@ export default function AdminDashboardPage() {
                   )}
                 </strong>
               </div>
+
+              {(selectedOrder.courierName || selectedOrder.trackingNumber) && (
+                <div>
+                  <span>Shipment</span>
+                  <strong>
+                    {selectedOrder.courierName || 'Courier'} · {selectedOrder.trackingNumber || '—'}
+                  </strong>
+                </div>
+              )}
             </div>
 
             <div className="order-modal-items-v6">
@@ -3779,6 +3857,56 @@ export default function AdminDashboardPage() {
                 )
               )}
             </div>
+
+            {shipmentAction && (
+              <div className="order-modal-actions-v6">
+                <h3>Shipment details</h3>
+                <div className="admin-form-grid-v6">
+                  <div>
+                    <label>Courier / Postal Service *</label>
+                    <input
+                      value={shipmentForm.courierName}
+                      onChange={(event) =>
+                        setShipmentForm(current => ({
+                          ...current,
+                          courierName: event.target.value,
+                        }))
+                      }
+                      placeholder="e.g. India Post"
+                    />
+                  </div>
+                  <div>
+                    <label>Tracking / Consignment Number *</label>
+                    <input
+                      value={shipmentForm.trackingNumber}
+                      onChange={(event) =>
+                        setShipmentForm(current => ({
+                          ...current,
+                          trackingNumber: event.target.value,
+                        }))
+                      }
+                      placeholder="e.g. EM123456789IN"
+                    />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                  <button
+                    className="admin-primary-v6"
+                    onClick={confirmShipment}
+                    disabled={orderActionBusy}
+                  >
+                    Mark as Shipped
+                  </button>
+                  <button
+                    className="admin-secondary-v6"
+                    onClick={() => setShipmentAction(null)}
+                    disabled={orderActionBusy}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="order-modal-actions-v6">
               <h3>

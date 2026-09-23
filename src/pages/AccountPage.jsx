@@ -39,6 +39,7 @@ function blankAddress(user) {
     line1: '',
     line2: '',
     city: '',
+    district: '',
     state: '',
     pincode: '',
     latitude: null,
@@ -451,6 +452,11 @@ export default function AccountPage() {
               city:
                 city ||
                 current.city,
+              district:
+                data.state_district ||
+                data.county ||
+                data.district ||
+                current.district,
               state:
                 data.state ||
                 current.state,
@@ -1039,6 +1045,24 @@ export default function AccountPage() {
                     </div>
                   )}
 
+                  {(selected.courierName || selected.trackingNumber) && (
+                    <div className="tracking-shipment-v7">
+                      <strong>Shipment details</strong>
+                      <span>
+                        {selected.courierName || 'Courier'} · {selected.trackingNumber || '—'}
+                      </span>
+                      {selected.trackingNumber && (
+                        <a
+                          href="https://www.indiapost.gov.in/"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Track on India Post ↗
+                        </a>
+                      )}
+                    </div>
+                  )}
+
                   <div className="tracking-history-v6">
                     {(selected.statusHistory ||
                       []).length ? (
@@ -1240,7 +1264,8 @@ export default function AccountPage() {
 
                         <br />
 
-                        {address.city},{' '}
+                        {address.city}
+                        {address.district ? `, ${address.district}` : ''},{' '}
                         {address.state} -{' '}
                         {address.pincode}
                       </p>
@@ -1631,6 +1656,22 @@ export default function AccountPage() {
                         changeAddress
                       }
                       required
+                    />
+                  </div>
+
+                  <div>
+                    <label>
+                      District
+                    </label>
+
+                    <input
+                      name="district"
+                      value={
+                        addressForm.district
+                      }
+                      onChange={
+                        changeAddress
+                      }
                     />
                   </div>
 

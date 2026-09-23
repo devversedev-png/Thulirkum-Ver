@@ -2,6 +2,7 @@ import { useState } from 'react'
 import {
   Navigate,
   useNavigate,
+  useSearchParams,
 } from 'react-router-dom'
 
 import { useAuth } from '../context/AuthContext'
@@ -13,6 +14,7 @@ export default function AdminLoginPage() {
   } = useAuth()
 
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const [form, setForm] = useState({
     email: '',
@@ -22,7 +24,16 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
-  if (user?.role === 'ADMIN') {
+  const redirectReason = searchParams.get('reason')
+  const redirectMessage = redirectReason === 'session-expired'
+    ? 'Your admin session expired or the token is invalid. Please sign in again.'
+    : redirectReason === 'admin-access'
+      ? 'This session is no longer authorized as an administrator. Please sign in again with an administrator account.'
+      : ''
+
+  const token = localStorage.getItem('tvb_token')
+
+  if (user?.role === 'ADMIN' && token) {
     return (
       <Navigate
         to="/admin"
@@ -127,9 +138,9 @@ export default function AdminLoginPage() {
             required
           />
 
-          {error && (
+          {(error || redirectMessage) && (
             <div className="form-error">
-              {error}
+              {error || redirectMessage}
             </div>
           )}
 

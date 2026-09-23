@@ -11237,3 +11237,20 @@ img.admin-brand-logo {
   }
 }
 
+
+/* Order shipment details */
+.tracking-shipment-v7 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid #dce5dc;
+  border-radius: 10px;
+  background: #f5f8f5;
+  font-size: 9px;
+}
+.tracking-shipment-v7 strong { color: var(--green-900); }
+.tracking-shipment-v7 span { color: #5c6b62; }
+.tracking-shipment-v7 a { color: var(--green-700); font-weight: 700; text-decoration: none; }
