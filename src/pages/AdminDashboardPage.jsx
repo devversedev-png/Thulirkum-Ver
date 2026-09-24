@@ -92,6 +92,31 @@ function statusLabel(value) {
     .join(' ')
 }
 
+function paymentAmountPaid(order) {
+  const total = Number(order?.total || 0)
+  const raw = Number(order?.amountPaid)
+  if (Number.isFinite(raw) && raw > 0) return Math.min(raw, total)
+  // Existing orders created before amountPaid was introduced can still have
+  // paymentStatus=PAID. Preserve that real backend state in the UI.
+  return String(order?.paymentStatus || '').toUpperCase() === 'PAID' ? total : 0
+}
+
+function paymentStatusValue(order) {
+  const total = Number(order?.total || 0)
+  const paid = paymentAmountPaid(order)
+  if (total > 0 && paid >= total) return 'PAID'
+  if (paid > 0) return 'PARTIALLY_PAID'
+  return 'UNPAID'
+}
+
+function paymentStatusLabel(order) {
+  return statusLabel(paymentStatusValue(order))
+}
+
+function money(value) {
+  return `₹${Number(value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+
 export default function AdminDashboardPage() {
   const { user, logout } = useAuth()
 
@@ -156,6 +181,12 @@ export default function AdminDashboardPage() {
 
   const [selectedOrder, setSelectedOrder] =
     useState(null)
+
+  const [paymentDraft, setPaymentDraft] =
+    useState('0')
+
+  const [paymentBusy, setPaymentBusy] =
+    useState(false)
 
   const [orderActions, setOrderActions] =
     useState([])
@@ -872,6 +903,7 @@ export default function AdminDashboardPage() {
     order
   ) {
     setSelectedOrder(order)
+    setPaymentDraft(String(paymentAmountPaid(order)))
     setOrderActions([])
 
     try {
@@ -882,6 +914,41 @@ export default function AdminDashboardPage() {
       )
     } catch (err) {
       setMessage(err.message)
+    }
+  }
+
+  async function saveOrderPayment() {
+    if (!selectedOrder || paymentBusy) return
+
+    const amount = Number(paymentDraft)
+    const total = Number(selectedOrder.total || 0)
+
+    if (!Number.isFinite(amount) || amount < 0) {
+      setMessage('Enter a valid paid amount.')
+      return
+    }
+    if (amount > total) {
+      setMessage(`Amount paid cannot be greater than ${money(total)}.`)
+      return
+    }
+
+    setPaymentBusy(true)
+    try {
+      const updated = await api(`/admin/orders/${selectedOrder.id}/payment`, {
+        method: 'PUT',
+        body: JSON.stringify({ amountPaid: amount }),
+      })
+
+      setOrders(current =>
+        current.map(item => item.id === updated.id ? updated : item)
+      )
+      setSelectedOrder(updated)
+      setPaymentDraft(String(paymentAmountPaid(updated)))
+      setMessage(`Payment updated for order #${updated.orderNumber}.`)
+    } catch (err) {
+      setMessage(err.message)
+    } finally {
+      setPaymentBusy(false)
     }
   }
 
@@ -3779,17 +3846,23 @@ export default function AdminDashboardPage() {
               </div>
 
               <div>
-                <span>
-                  Payment
-                </span>
+                <span>Payment method</span>
+                <strong>{selectedOrder.paymentMethod || '—'}</strong>
+              </div>
 
-                <strong>
-                  {selectedOrder.paymentMethod ||
-                    '—'}{' '}
-                  ·{' '}
-                  {selectedOrder.paymentStatus ||
-                    '—'}
+              <div className="order-payment-summary-v7">
+                <span>Payment status</span>
+                <strong className={`payment-chip payment-${paymentStatusValue(selectedOrder).toLowerCase()}`}>
+                  {paymentStatusLabel(selectedOrder)}
                 </strong>
+                <div className="payment-summary-line-v7">
+                  <span>Paid</span>
+                  <strong>{money(paymentAmountPaid(selectedOrder))}</strong>
+                </div>
+                <div className="payment-summary-line-v7">
+                  <span>Remaining</span>
+                  <strong>{money(Math.max(0, Number(selectedOrder.total || 0) - paymentAmountPaid(selectedOrder)))}</strong>
+                </div>
               </div>
 
               <div>
@@ -3812,6 +3885,38 @@ export default function AdminDashboardPage() {
                   </strong>
                 </div>
               )}
+            </div>
+
+            <div className="order-payment-editor-v7">
+              <div>
+                <span className="order-payment-editor-eyebrow-v7">PAYMENT COLLECTION</span>
+                <h3>Record amount paid</h3>
+                <p>Update the real amount received. The payment status is calculated automatically.</p>
+              </div>
+              <div className="order-payment-editor-controls-v7">
+                <label>
+                  <span>Amount paid</span>
+                  <div className="payment-input-wrap-v7">
+                    <span>₹</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max={Number(selectedOrder.total || 0)}
+                      step="0.01"
+                      value={paymentDraft}
+                      onChange={(event) => setPaymentDraft(event.target.value)}
+                    />
+                  </div>
+                </label>
+                <button
+                  type="button"
+                  className="admin-primary-v6"
+                  onClick={saveOrderPayment}
+                  disabled={paymentBusy}
+                >
+                  {paymentBusy ? 'Saving…' : 'Save payment'}
+                </button>
+              </div>
             </div>
 
             <div className="order-modal-items-v6">
@@ -4430,128 +4535,81 @@ function OrderTable({
   detailed = false,
 }) {
   return (
-    <div className="admin-table-wrap-v6">
-      <table className="admin-table-v6 order-table-v6">
-        <thead>
-          <tr>
-            <th>
-              Order
-            </th>
+    <div className="admin-order-cards-v7">
+      {orders.map((order) => {
+        const total = Number(order.total || 0)
+        const paid = paymentAmountPaid(order)
+        const remaining = Math.max(0, total - paid)
+        const paymentStatus = paymentStatusValue(order)
 
-            <th>
-              Customer
-            </th>
+        return (
+          <article className="admin-order-card-v7" key={order.id}>
+            <div className="admin-order-card-head-v7">
+              <div>
+                <span className="admin-order-eyebrow-v7">ORDER</span>
+                <strong>#{order.orderNumber || order.id}</strong>
+              </div>
+              <span className={`status-chip status-${String(order.status || '').toLowerCase()}`}>
+                {statusLabel(order.status)}
+              </span>
+            </div>
 
-            {detailed && (
-              <th>
-                Items
-              </th>
-            )}
+            <div className="admin-order-customer-v7">
+              <div className="admin-order-avatar-v7">
+                {(order.customerName || 'C').trim().charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <strong>{order.customerName || 'Customer'}</strong>
+                <span>{order.customerEmail || order.userId || '—'}</span>
+              </div>
+            </div>
 
-            <th>
-              Date
-            </th>
+            <div className="admin-order-meta-grid-v7">
+              <div>
+                <span>Date</span>
+                <strong>{formatDateTime(order.createdAt)}</strong>
+              </div>
+              <div>
+                <span>Items</span>
+                <strong>{order.items?.length || 0} item types</strong>
+              </div>
+              <div>
+                <span>Payment</span>
+                <strong>{order.paymentMethod || '—'}</strong>
+              </div>
+              <div>
+                <span>Order total</span>
+                <strong>{money(total)}</strong>
+              </div>
+            </div>
 
-            <th>
-              Total
-            </th>
+            <div className="admin-order-payment-v7">
+              <div>
+                <span>Amount paid</span>
+                <strong>{money(paid)}</strong>
+              </div>
+              <div>
+                <span>Remaining</span>
+                <strong>{money(remaining)}</strong>
+              </div>
+              <span className={`payment-chip payment-${paymentStatus.toLowerCase()}`}>
+                {statusLabel(paymentStatus)}
+              </span>
+            </div>
 
-            <th>
-              Status
-            </th>
-
-            <th />
-          </tr>
-        </thead>
-
-        <tbody>
-          {orders.map(
-            (order) => (
-              <tr
-                key={
-                  order.id
-                }
+            <div className="admin-order-card-foot-v7">
+              <span>{detailed ? 'Open order to manage fulfilment and payment' : 'Latest order'}</span>
+              <button
+                type="button"
+                className="manage-order-btn-v6"
+                onClick={() => onOpen(order)}
               >
-                <td>
-                  <strong>
-                    #
-                    {
-                      order.orderNumber
-                    }
-                  </strong>
-
-                  <span>
-                    {order.paymentMethod ||
-                      '—'}
-                  </span>
-                </td>
-
-                <td>
-                  <strong>
-                    {order.customerName ||
-                      'Customer'}
-                  </strong>
-
-                  <span>
-                    {order.customerEmail ||
-                      order.userId}
-                  </span>
-                </td>
-
-                {detailed && (
-                  <td>
-                    <span>
-                      {order.items?.length ||
-                        0}{' '}
-                      item types
-                    </span>
-                  </td>
-                )}
-
-                <td>
-                  {formatDateTime(
-                    order.createdAt
-                  )}
-                </td>
-
-                <td>
-                  <strong>
-                    ₹
-                    {
-                      order.total
-                    }
-                  </strong>
-                </td>
-
-                <td>
-                  <span
-                    className={`status-chip status-${String(
-                      order.status
-                    ).toLowerCase()}`}
-                  >
-                    {statusLabel(
-                      order.status
-                    )}
-                  </span>
-                </td>
-
-                <td>
-                  <button
-                    className="manage-order-btn-v6"
-                    onClick={() =>
-                      onOpen(
-                        order
-                      )
-                    }
-                  >
-                    Manage
-                  </button>
-                </td>
-              </tr>
-            )
-          )}
-        </tbody>
-      </table>
+                Manage order
+              </button>
+            </div>
+          </article>
+        )
+      })}
 
       {!orders.length && (
         <div className="admin-empty-v6">

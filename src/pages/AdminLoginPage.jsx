@@ -80,13 +80,12 @@ export default function AdminLoginPage() {
         />
 
         <h1>
-          Commerce Console
+          Thulirkum Ver Admin
         </h1>
 
         <p>
-          Manage catalogue, customers, orders
-          and promotions from one focused
-          workspace.
+          Manage your bookstore, catalogue, customers
+          and orders from one focused workspace.
         </p>
 
         <blockquote>

@@ -417,8 +417,8 @@ export default function AccountPage() {
           const road = [
             data.house_number,
             data.road ||
-              data.pedestrian ||
-              data.residential,
+            data.pedestrian ||
+            data.residential,
           ]
             .filter(Boolean)
             .join(' ')
@@ -547,8 +547,7 @@ export default function AccountPage() {
         'Remove this address?',
 
       message:
-        `${
-          address.label || 'This'
+        `${address.label || 'This'
         } address will be removed from your saved delivery addresses.`,
 
       confirmLabel:
@@ -585,9 +584,8 @@ export default function AccountPage() {
       )
 
       setAccountNotice(
-        `${
-          address.label ||
-          'Address'
+        `${address.label ||
+        'Address'
         } set as default`
       )
     } catch (error) {
@@ -683,13 +681,10 @@ export default function AccountPage() {
               Addresses
             </a>
 
-            <a href="#overview">
-              <span>
-                ♙
-              </span>
-
+            <Link to="/account/profile">
+              <span>♙</span>
               Profile Settings
-            </a>
+            </Link>
 
             <button
               onClick={logout}
@@ -888,11 +883,11 @@ export default function AccountPage() {
                   {item === 'ALL'
                     ? 'All orders'
                     : item ===
-                        'ACTIVE'
+                      'ACTIVE'
                       ? 'Active'
                       : statusLabel(
-                          item
-                        )}
+                        item
+                      )}
                 </button>
               ))}
             </div>
@@ -903,12 +898,11 @@ export default function AccountPage() {
                   visibleOrders.map(
                     (order) => (
                       <button
-                        className={`customer-order-card glass-card ${
-                          selected?.id ===
+                        className={`customer-order-card glass-card ${selected?.id ===
                           order.id
-                            ? 'selected'
-                            : ''
-                        }`}
+                          ? 'selected'
+                          : ''
+                          }`}
                         key={
                           order.id
                         }
@@ -940,8 +934,8 @@ export default function AccountPage() {
                         <span className="order-date">
                           {order.createdAt
                             ? new Date(
-                                order.createdAt
-                              ).toLocaleString()
+                              order.createdAt
+                            ).toLocaleString()
                             : 'Date unavailable'}
                         </span>
 
@@ -955,7 +949,7 @@ export default function AccountPage() {
                                 sum +
                                 Number(
                                   item.quantity ||
-                                    0
+                                  0
                                 ),
                               0
                             ) || 0}{' '}
@@ -1012,8 +1006,8 @@ export default function AccountPage() {
                       <small>
                         {selected.createdAt
                           ? new Date(
-                              selected.createdAt
-                            ).toLocaleString()
+                            selected.createdAt
+                          ).toLocaleString()
                           : ''}
                       </small>
                     </div>
@@ -1031,19 +1025,19 @@ export default function AccountPage() {
 
                   {selected.status ===
                     'CANCELLED' && (
-                    <div className="cancelled-order-banner">
-                      <b>
-                        Order cancelled
-                      </b>
+                      <div className="cancelled-order-banner">
+                        <b>
+                          Order cancelled
+                        </b>
 
-                      <span>
-                        If the store reopens this
-                        order, the next tracking
-                        event will appear here
-                        automatically.
-                      </span>
-                    </div>
-                  )}
+                        <span>
+                          If the store reopens this
+                          order, the next tracking
+                          event will appear here
+                          automatically.
+                        </span>
+                      </div>
+                    )}
 
                   {(selected.courierName || selected.trackingNumber) && (
                     <div className="tracking-shipment-v7">
@@ -1075,12 +1069,10 @@ export default function AccountPage() {
                         ) => (
                           <div
                             className="history-step-v6"
-                            key={`${
-                              event.status
-                            }-${
-                              event.at ||
+                            key={`${event.status
+                              }-${event.at ||
                               index
-                            }`}
+                              }`}
                           >
                             <span className="history-dot-v6">
                               {index +
@@ -1097,8 +1089,8 @@ export default function AccountPage() {
                               <small>
                                 {event.at
                                   ? new Date(
-                                      event.at
-                                    ).toLocaleString()
+                                    event.at
+                                  ).toLocaleString()
                                   : 'Time unavailable'}
                               </small>
 
@@ -1220,11 +1212,10 @@ export default function AccountPage() {
                 {addresses.map(
                   (address) => (
                     <article
-                      className={`address-card-v7 glass-card ${
-                        address.defaultAddress
-                          ? 'is-default'
-                          : ''
-                      }`}
+                      className={`address-card-v7 glass-card ${address.defaultAddress
+                        ? 'is-default'
+                        : ''
+                        }`}
                       key={address.id}
                     >
                       <div className="address-card-head-v7">
@@ -1244,7 +1235,7 @@ export default function AccountPage() {
                         {address.latitude !=
                           null &&
                           address.longitude !=
-                            null && (
+                          null && (
                             <span className="location-saved-chip">
                               ⌖ Location saved
                             </span>
@@ -1308,7 +1299,7 @@ export default function AccountPage() {
                         {address.latitude !=
                           null &&
                           address.longitude !=
-                            null && (
+                          null && (
                             <a
                               href={mapOpenUrl(
                                 address.latitude,
@@ -1388,7 +1379,7 @@ export default function AccountPage() {
             className="address-modal-backdrop-v7"
             onMouseDown={(event) =>
               event.target ===
-                event.currentTarget &&
+              event.currentTarget &&
               closeAddressEditor()
             }
           >
@@ -1465,7 +1456,7 @@ export default function AccountPage() {
                   {locationBusy
                     ? 'Locating...'
                     : addressForm.latitude !=
-                        null
+                      null
                       ? '↻ Refresh location'
                       : '⌖ Use current location'}
                 </button>
@@ -1474,7 +1465,7 @@ export default function AccountPage() {
               {addressForm.latitude !=
                 null &&
                 addressForm.longitude !=
-                  null && (
+                null && (
                   <div className="address-map-wrap-v7">
                     <iframe
                       title="Saved delivery location"

@@ -14,6 +14,7 @@ import CheckoutPage from './pages/CheckoutPage'
 import OrderConfirmationPage from './pages/OrderConfirmationPage'
 import AccountPage from './pages/AccountPage'
 import OffersPage from './pages/OffersPage'
+import ProfileSettings from './pages/ProfileSettings'
 
 function PrivatePage({ children }) {
   return (
@@ -40,6 +41,14 @@ export default function App() {
       <Route path="/order-confirmation" element={<PrivatePage><OrderConfirmationPage /></PrivatePage>} />
       <Route path="/account" element={<PrivatePage><AccountPage /></PrivatePage>} />
       <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route
+        path="/account/profile"
+        element={
+          <PrivatePage>
+            <ProfileSettings />
+          </PrivatePage>
+        }
+      />
     </Routes>
   )
 }

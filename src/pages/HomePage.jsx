@@ -72,6 +72,7 @@ export default function HomePage() {
   const [categoryPaused, setCategoryPaused] = useState(false)
   const [activeOfferSlide, setActiveOfferSlide] = useState(0)
   const { books, offers, authors, homeSections, homeSettings, loading } = useStore()
+  console.log('HOME SECTIONS FROM BACKEND:', homeSections)
 
   const catalogue = useMemo(
     () => decorateBooks(books || []),
@@ -79,16 +80,44 @@ export default function HomePage() {
   )
 
   const homeBookSections = useMemo(() => {
-    return (homeSections || [])
-      .map(section => ({
-        ...section,
-        books: (section.bookIds || [])
-          .map(id => catalogue.find(book => book.id === id))
-          .filter(Boolean),
-      }))
-      .filter(section => section.active !== false && section.books.length)
-      .sort((a, b) => Number(a.displayOrder || 0) - Number(b.displayOrder || 0))
-  }, [homeSections, catalogue])
+  const seen = new Set()
+
+  return (homeSections || [])
+    .map(section => ({
+      ...section,
+      books: (section.bookIds || [])
+        .map(id => catalogue.find(book => book.id === id))
+        .filter(Boolean),
+    }))
+    .filter(section => {
+      if (section.active === false || !section.books.length) {
+        return false
+      }
+
+      // Use the actual section key/title to prevent duplicate sections
+      const uniqueKey = String(
+        section.key ||
+        section.name ||
+        section.title ||
+        section.id ||
+        ''
+      )
+        .trim()
+        .toLowerCase()
+
+      if (!uniqueKey || seen.has(uniqueKey)) {
+        return false
+      }
+
+      seen.add(uniqueKey)
+      return true
+    })
+    .sort(
+      (a, b) =>
+        Number(a.displayOrder || 0) -
+        Number(b.displayOrder || 0)
+    )
+}, [homeSections, catalogue])
 
   const offerRows = useMemo(
     () => (offers || []).filter(offer => offer.active !== false),
