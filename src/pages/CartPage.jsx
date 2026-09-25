@@ -77,12 +77,12 @@ export default function CartPage() {
 
                 <div className="cart-coupon"><label>Have a coupon code?</label><div><input value={couponCode} onChange={event => setCouponCode(event.target.value.toUpperCase())} placeholder="Enter coupon" /><button type="button" onClick={applyCoupon}>Apply</button></div>{discount > 0 && <small>✓ Coupon applied! You saved ₹{Math.round(discount)}.</small>}</div>
 
-                <Link className="primary-btn full big" to={`/checkout${appliedCode ? `?coupon=${encodeURIComponent(appliedCode)}` : ''}`}>🔒 Proceed to Checkout →</Link>
+                <Link className="primary-btn full big" to={`/checkout${appliedCode ? `?coupon=${encodeURIComponent(appliedCode)}` : ''}`}>🔒 Proceed to Checkout »</Link>
                 <div className="summary-trust"><span>◆ Secure Checkout</span><span>🚚 Fast Delivery</span><span>♧ Dedicated Support</span></div>
               </aside>
             </div>
 
-            <div className="cart-recommend-note"><span>🌿</span><div><strong>More books, more journeys.</strong><p>Explore the catalogue and add another great read.</p></div><Link to="/shop">View all books →</Link></div>
+            <div className="cart-recommend-note"><span>🌿</span><div><strong>More books, more journeys.</strong><p>Explore the catalogue and add another great read.</p></div><Link to="/shop">View all books »</Link></div>
           </>
         ) : (
           <div className="empty-state"><h3>Your cart is empty</h3><p>Add a few books and they will appear here.</p><Link className="primary-btn inline-btn" to="/shop">Shop Books</Link></div>

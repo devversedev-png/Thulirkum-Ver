@@ -38,7 +38,7 @@ export default function WishlistPage() {
       </div>
 
       <div className="page-width wishlist-content">
-        <div className="wishlist-heading-row"><h2>{list.length} saved {list.length === 1 ? 'book' : 'books'}</h2><Link to="/shop">Browse more books →</Link></div>
+        <div className="wishlist-heading-row"><h2>{list.length} saved {list.length === 1 ? 'book' : 'books'}</h2><Link to="/shop">Browse more books »</Link></div>
         {message && <div className="wishlist-message-v7">{message}</div>}
 
         {list.length ? (

@@ -115,7 +115,7 @@ export default function BookDetailsPage() {
 
       {related.length > 0 && (
         <div className="page-width section related-section">
-          <div className="section-heading"><div><h2>You May Also Like</h2><p>More books selected from this category.</p></div><Link to="/shop">View all books →</Link></div>
+          <div className="section-heading"><div><h2>You May Also Like</h2><p>More books selected from this category.</p></div><Link to="/shop">View all books »</Link></div>
           <div className="book-grid related-grid">{related.map(item => <BookCard key={item.id} book={item} />)}</div>
         </div>
       )}

@@ -59,7 +59,7 @@ export default function LoginPage() {
           </form>
 
           <button className="text-btn login-switch" onClick={() => setMode(mode === 'login' ? 'register' : 'login')}>{mode === 'login' ? 'New to Thulirkum Ver? Create an account' : 'Already have an account? Login'}</button>
-          <button className="text-btn admin-login-link" onClick={() => navigate('/admin/login')}>Store administrator? Admin login →</button>
+          <button className="text-btn admin-login-link" onClick={() => navigate('/admin/login')}>Store administrator? Admin login »</button>
         </div>
       </div>
     </div>

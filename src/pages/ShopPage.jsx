@@ -543,7 +543,7 @@ export default function ShopPage() {
                           to={`/book/${book.id}`}
                           className="shop-slider-btn"
                         >
-                          View Book <span>→</span>
+                          View Book <span>»</span>
                         </Link>
                       </div>
 

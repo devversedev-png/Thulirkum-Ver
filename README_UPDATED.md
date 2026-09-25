@@ -4,7 +4,7 @@ This update keeps the existing CSS/classes intact and adds an isolated `v7` styl
 
 ## Added
 
-- Admin → **Home Sections** manager with one common page and a section dropdown.
+- Admin » **Home Sections** manager with one common page and a section dropdown.
 - The eight sections:
   - Discounted Books
   - Top Selling Books
@@ -17,7 +17,7 @@ This update keeps the existing CSS/classes intact and adds an isolated `v7` styl
 - Admin can select any number of existing books for each section and save them to MongoDB.
 - A book can belong to multiple home sections.
 - Customer Home renders only the books assigned to active sections; empty sections stay hidden.
-- Admin → Home Sections → **Background Banners** supports up to four image URLs and an active-banner selector for the home hero background.
+- Admin » Home Sections » **Background Banners** supports up to four image URLs and an active-banner selector for the home hero background.
 - Offers now support an optional `bannerImage` and the Home offer banner automatically rotates through active offers.
 
 ## New backend API

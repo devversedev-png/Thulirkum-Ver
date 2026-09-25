@@ -3387,7 +3387,7 @@ export default function AdminDashboardPage() {
 
               {selectedHomeSectionKey !== 'cashback' && (
                 <p className="admin-home-rule-note-v7">
-                  {selectedHomeSectionKey === 'discounted' && 'The storefront calculates the discount from original price → current price. No manual book selection is required.'}
+                  {selectedHomeSectionKey === 'discounted' && 'The storefront calculates the discount from original price » current price. No manual book selection is required.'}
                   {selectedHomeSectionKey === 'top-selling' && 'The storefront calculates sales from order items; cancelled orders are excluded.'}
                   {selectedHomeSectionKey === 'highly-featured' && homeConfigForm.mode === 'FEATURED_FLAG' && 'Only books marked Featured in the catalogue are used.'}
                   {selectedHomeSectionKey === 'new-arrivals' && homeConfigForm.mode === 'NEW_ARRIVAL_FLAG' && 'Only books marked New Arrival in the catalogue are used.'}
@@ -3720,7 +3720,7 @@ export default function AdminDashboardPage() {
                     <small>
                       {offer.startDate ||
                         'No start date'}{' '}
-                      →{' '}
+                      »{' '}
                       {offer.endDate ||
                         'No end date'}
                     </small>

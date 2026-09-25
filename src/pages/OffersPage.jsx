@@ -6,7 +6,7 @@ export default function OffersPage() {
   return (
     <section className="offers-page min-page">
       <div className="offers-hero">
-        <div className="page-width"><span className="eyebrow">SPECIAL OFFERS</span><h1>Great Books. Greater Journeys.</h1><p>Save on selected titles and make your next reading journey even better.</p><Link to="/shop?offer=1" className="primary-btn inline-btn">Shop discounted books →</Link></div>
+        <div className="page-width"><span className="eyebrow">SPECIAL OFFERS</span><h1>Great Books. Greater Journeys.</h1><p>Save on selected titles and make your next reading journey even better.</p><Link to="/shop?offer=1" className="primary-btn inline-btn">Shop discounted books »</Link></div>
       </div>
       <div className="page-width">
         {offers.length ? (
@@ -18,7 +18,7 @@ export default function OffersPage() {
                 <div className="offer-value"><strong>{offer.discountType === 'FIXED' ? `₹${offer.discountValue}` : `${offer.discountValue}%`}</strong><span>OFF</span></div>
                 <div className="offer-rule">Minimum order ₹{offer.minOrderAmount || 0}</div>
                 {offer.endDate && <small>Valid until {new Date(`${offer.endDate}T00:00:00`).toLocaleDateString()}</small>}
-                <Link to="/shop?offer=1" className="primary-btn full">Browse Books →</Link>
+                <Link to="/shop?offer=1" className="primary-btn full">Browse Books »</Link>
               </article>
             ))}
           </div>

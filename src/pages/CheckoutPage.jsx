@@ -2,6 +2,10 @@ import { Navigate, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
+import {
+  createRazorpayOrder,
+  verifyRazorpayPayment
+} from '../api/payment'
 
 function blankAddress(user) {
   return {
@@ -31,7 +35,6 @@ export default function CheckoutPage() {
   const preferredAddress = addresses.find(item => item.defaultAddress) || addresses[0]
   const [selectedAddressId, setSelectedAddressId] = useState(preferredAddress?.id || 'NEW')
   const [address, setAddress] = useState(preferredAddress ? { ...preferredAddress } : blankAddress(user))
-  const [paymentMethod, setPaymentMethod] = useState('COD')
   const [couponCode, setCouponCode] = useState(searchParams.get('coupon') || '')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -130,13 +133,98 @@ export default function CheckoutPage() {
     event.preventDefault()
     setBusy(true)
     setError('')
+
     try {
-      const order = await placeOrder({ address, paymentMethod, couponCode: couponCode.trim() || null })
-      navigate('/order-confirmation', { state: { order } })
+      // The backend calculates the amount from the authenticated user's cart.
+      // The browser never sends a trusted payment amount.
+      const razorpayOrder = await createRazorpayOrder({
+        address,
+        couponCode: couponCode.trim() || null,
+      })
+
+      if (!razorpayOrder?.orderId || !razorpayOrder?.keyId) {
+        throw new Error('Unable to create Razorpay payment order.')
+      }
+
+      if (!window.Razorpay) {
+        throw new Error('Razorpay Checkout could not be loaded. Please refresh the page.')
+      }
+
+      const options = {
+        key: razorpayOrder.keyId,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency || 'INR',
+        name: 'Thulirkum Ver Bookstore',
+        description: 'Book Order',
+        order_id: razorpayOrder.orderId,
+        prefill: {
+          name: address.fullName || user?.name || '',
+          email: user?.email || '',
+          contact: address.mobile || user?.mobile || '',
+        },
+        notes: {
+          customer_email: user?.email || '',
+        },
+        theme: {
+          color: '#087f5b',
+        },
+        handler: async function (response) {
+          try {
+            setBusy(true)
+
+            const verification = await verifyRazorpayPayment({
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+              address,
+              couponCode: couponCode.trim() || null,
+            })
+
+            if (!verification?.success || !verification?.order) {
+              throw new Error(
+                verification?.message ||
+                'Payment verification failed.'
+              )
+            }
+
+            navigate('/order-confirmation', {
+              state: {
+                order: verification.order,
+              },
+            })
+          } catch (err) {
+            setError(
+              err.message ||
+              'Payment verification failed. Please contact support.'
+            )
+          } finally {
+            setBusy(false)
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setBusy(false)
+          },
+        },
+      }
+
+      const razorpay = new window.Razorpay(options)
+
+      razorpay.on('payment.failed', function (response) {
+        setBusy(false)
+        setError(
+          response?.error?.description ||
+          'Payment failed. Please try again.'
+        )
+      })
+
+      razorpay.open()
     } catch (err) {
-      setError(err.message)
-    } finally {
       setBusy(false)
+      setError(
+        err.message ||
+        'Unable to start online payment.'
+      )
     }
   }
 
@@ -151,7 +239,7 @@ export default function CheckoutPage() {
       <div className="page-width checkout-layout">
         <form className="checkout-form" onSubmit={submit}>
           <section className="checkout-card">
-            <div className="checkout-section-head-v7"><div><span className="checkout-section-icon">⌖</span><div><h2>Shipping Address</h2><p>Where should we deliver your books?</p></div></div><button type="button" className="location-button-v7" onClick={useCurrentLocation} disabled={busy}>{busy ? 'Locating...' : '⌖ Use current location'}</button>{addresses.length > 0 && <button type="button" className="text-btn" onClick={() => document.querySelector('.checkout-address-picker-v7')?.scrollIntoView({ behavior: 'smooth' })}>Select saved address →</button>}</div>
+            <div className="checkout-section-head-v7"><div><span className="checkout-section-icon">⌖</span><div><h2>Shipping Address</h2><p>Where should we deliver your books?</p></div></div><button type="button" className="location-button-v7" onClick={useCurrentLocation} disabled={busy}>{busy ? 'Locating...' : '⌖ Use current location'}</button>{addresses.length > 0 && <button type="button" className="text-btn" onClick={() => document.querySelector('.checkout-address-picker-v7')?.scrollIntoView({ behavior: 'smooth' })}>Select saved address »</button>}</div>
 
             {addresses.length > 0 && (
               <div className="checkout-address-picker-v7">
@@ -180,10 +268,24 @@ export default function CheckoutPage() {
           <section className="checkout-card payment-card">
             <div className="checkout-section-head-v7"><div><span className="checkout-section-icon">▣</span><div><h2>Payment Method</h2><p>🔒 Your payment information is secure and encrypted.</p></div></div></div>
             <div className="payment-options">
-              <label className={paymentMethod === 'UPI' ? 'selected' : ''}><input type="radio" name="payment" checked={paymentMethod === 'UPI'} onChange={() => setPaymentMethod('UPI')} /><span className="payment-icon">◉</span><strong>UPI</strong><small>GPay, PhonePe, Paytm</small></label>
-              <label className={paymentMethod === 'COD' ? 'selected' : ''}><input type="radio" name="payment" checked={paymentMethod === 'COD'} onChange={() => setPaymentMethod('COD')} /><span className="payment-icon">₹</span><strong>Cash on Delivery</strong><small>Pay when you receive</small></label>
+              <label className="selected online-payment-option">
+                <span className="payment-icon">🔒</span>
+
+                <div>
+                  <strong>Online Payment</strong>
+                  <small>UPI, Credit Card, Debit Card, Net Banking & more</small>
+                </div>
+
+                <span className="payment-selected">
+                  ✓
+                </span>
+              </label>
             </div>
-            {paymentMethod === 'UPI' && <div className="payment-note">Online payment will be enabled when the production payment gateway is connected.</div>}
+
+            <div className="payment-note">
+              🔒 Secure payment powered by Razorpay.
+              You will be redirected to Razorpay Checkout to complete your payment.
+            </div>
 
             <div className="checkout-coupon-box">
               <label>Offer Code</label>
@@ -206,7 +308,7 @@ export default function CheckoutPage() {
           <div><span>Shipping</span><strong className="free-text">{shipping ? `₹${shipping}` : 'Free'}</strong></div>
           <div className="summary-total"><span>Total Amount</span><strong>₹{Math.round(total)}</strong></div>
           {estimateDiscount > 0 && <div className="checkout-savings">🏷 You’re saving ₹{Math.round(estimateDiscount)} on this order!</div>}
-          <button className="primary-btn full big" type="button" onClick={() => document.querySelector('.checkout-form')?.requestSubmit()} disabled={busy}>{busy ? 'Placing order...' : '🔒 Place Order →'}</button>
+          <button className="primary-btn full big" type="button" onClick={() => document.querySelector('.checkout-form')?.requestSubmit()} disabled={busy}>{busy ? 'Placing order...' : '🔒 Place Order »'}</button>
           <small className="checkout-terms">By placing this order, you agree to our Terms & Conditions and Privacy Policy.</small>
           <div className="summary-trust checkout-trust"><span>◆ <b>Secure Payment</b><small>Protected checkout</small></span><span>🚚 <b>Fast Delivery</b><small>Across India</small></span><span>♧ <b>Dedicated Support</b><small>We’re here to help</small></span></div>
           <Link className="continue-link" to="/cart">← Back to cart</Link>

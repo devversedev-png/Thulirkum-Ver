@@ -219,7 +219,7 @@ export default function HomePage() {
             </p>
             <div className="tv-hero-actions">
               <Link to="/shop" className="tv-btn-primary">
-                Explore all books <span>→</span>
+                Explore all books <span>»</span>
               </Link>
               <Link to="/offers" className="tv-btn-secondary">
                 <span>🎁</span> View Offers
@@ -244,7 +244,7 @@ export default function HomePage() {
             <h2>Explore by Category</h2>
           </div>
 
-          <Link to="/shop">View all categories →</Link>
+          <Link to="/shop">View all categories »</Link>
         </div>
 
         <div
@@ -277,7 +277,7 @@ export default function HomePage() {
                     className="category-explore-btn"
                   >
                     Explore {slideItem.name}
-                    <span>→</span>
+                    <span>»</span>
                   </Link>
 
                   <small>
@@ -363,7 +363,7 @@ export default function HomePage() {
               {section.description && <p>{section.description}</p>}
             </div>
             <Link to={`/shop?homeSection=${encodeURIComponent(section.key)}`} className="tv-inline-link">
-              View all <span>→</span>
+              View all <span>»</span>
             </Link>
           </div>
 
@@ -393,7 +393,7 @@ export default function HomePage() {
           </div>
 
           <Link to="/offers" className="tv-offer-link">
-            View Offers <span>→</span>
+            View Offers <span>»</span>
           </Link>
 
           <div className="tv-offer-slider-controls-v7">
@@ -428,7 +428,7 @@ export default function HomePage() {
         <div className="tv-section-head">
           <h2>Featured Authors</h2>
           <Link to="/shop" className="tv-inline-link">
-            View all authors <span>→</span>
+            View all authors <span>»</span>
           </Link>
         </div>
 

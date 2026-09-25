@@ -783,7 +783,7 @@ export default function AccountPage() {
               </div>
 
               <b>
-                →
+                »
               </b>
             </a>
 
@@ -806,7 +806,7 @@ export default function AccountPage() {
               </div>
 
               <b>
-                →
+                »
               </b>
             </Link>
 
@@ -829,7 +829,7 @@ export default function AccountPage() {
               </div>
 
               <b>
-                →
+                »
               </b>
             </a>
           </div>
