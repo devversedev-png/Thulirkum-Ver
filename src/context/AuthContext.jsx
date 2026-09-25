@@ -1,6 +1,7 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from 'react'
@@ -9,14 +10,33 @@ import { api } from '../api/client'
 
 const AuthContext = createContext(null)
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
+function readStoredUser() {
+  try {
     const saved = localStorage.getItem('tvb_user')
+    if (!saved) return null
+    return JSON.parse(saved)
+  } catch {
+    localStorage.removeItem('tvb_user')
+    localStorage.removeItem('tvb_token')
+    return null
+  }
+}
 
-    return saved
-      ? JSON.parse(saved)
-      : null
-  })
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(readStoredUser)
+
+  useEffect(() => {
+    function handleSessionExpired() {
+      localStorage.removeItem('tvb_token')
+      localStorage.removeItem('tvb_user')
+      setUser(null)
+    }
+
+    window.addEventListener('tvb:session-expired', handleSessionExpired)
+    return () => {
+      window.removeEventListener('tvb:session-expired', handleSessionExpired)
+    }
+  }, [])
 
   async function login(email, password) {
     const data = await api('/auth/login', {
@@ -27,7 +47,7 @@ export function AuthProvider({ children }) {
       }),
     })
 
-    saveSession(data)
+    updateSession(data)
 
     return data
   }
@@ -41,7 +61,7 @@ export function AuthProvider({ children }) {
       }),
     })
 
-    saveSession(data)
+    updateSession(data)
 
     return data
   }
@@ -52,12 +72,12 @@ export function AuthProvider({ children }) {
       body: JSON.stringify(form),
     })
 
-    saveSession(data)
+    updateSession(data)
 
     return data
   }
 
-  function saveSession(data) {
+  function updateSession(data) {
     const account = {
       id: data.id,
       name: data.name,
@@ -65,23 +85,14 @@ export function AuthProvider({ children }) {
       role: data.role || 'CUSTOMER',
     }
 
-    localStorage.setItem(
-      'tvb_token',
-      data.token
-    )
-
-    localStorage.setItem(
-      'tvb_user',
-      JSON.stringify(account)
-    )
-
+    localStorage.setItem('tvb_token', data.token)
+    localStorage.setItem('tvb_user', JSON.stringify(account))
     setUser(account)
   }
 
   function logout() {
     localStorage.removeItem('tvb_token')
     localStorage.removeItem('tvb_user')
-
     setUser(null)
   }
 
@@ -91,6 +102,7 @@ export function AuthProvider({ children }) {
       login,
       adminLogin,
       register,
+      updateSession,
       logout,
     }),
     [user]
@@ -106,4 +118,3 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext)
 }
-

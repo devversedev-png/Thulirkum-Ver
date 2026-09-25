@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom'
 
 import { useAuth } from '../context/AuthContext'
+import '../styles.css'
 
 export default function AdminLoginPage() {
   const {
@@ -25,11 +26,13 @@ export default function AdminLoginPage() {
   const [busy, setBusy] = useState(false)
 
   const redirectReason = searchParams.get('reason')
-  const redirectMessage = redirectReason === 'session-expired'
-    ? 'Your admin session expired or the token is invalid. Please sign in again.'
-    : redirectReason === 'admin-access'
-      ? 'This session is no longer authorized as an administrator. Please sign in again with an administrator account.'
-      : ''
+
+  const redirectMessage =
+    redirectReason === 'session-expired'
+      ? 'Your admin session expired or the token is invalid. Please sign in again.'
+      : redirectReason === 'admin-access'
+        ? 'This session is no longer authorized as an administrator. Please sign in again with an administrator account.'
+        : ''
 
   const token = localStorage.getItem('tvb_token')
 
@@ -45,8 +48,7 @@ export default function AdminLoginPage() {
   function change(event) {
     setForm({
       ...form,
-      [event.target.name]:
-        event.target.value,
+      [event.target.name]: event.target.value,
     })
   }
 
@@ -64,7 +66,10 @@ export default function AdminLoginPage() {
 
       navigate('/admin')
     } catch (err) {
-      setError(err.message)
+      setError(
+        err?.message ||
+        'Unable to sign in. Please check your credentials.'
+      )
     } finally {
       setBusy(false)
     }
@@ -72,33 +77,29 @@ export default function AdminLoginPage() {
 
   return (
     <div className="admin-login-page">
-      {/* Left Side */}
-      <div className="admin-login-side">
-        <img
-          src="/logo.png"
-          alt="Thulirkum Ver"
-        />
 
-        <h1>
-          Thulirkum Ver Admin
-        </h1>
+      {/* Background image already contains:
+          Logo + Thulirkum Ver Admin + bookstore scene */}
+     <img
+  src="/admin-login-bg.png"
+  alt=""
+  className="admin-login-background"
+/>
 
-        <p>
-          Manage your bookstore, catalogue, customers
-          and orders from one focused workspace.
-        </p>
-
-        <blockquote>
-          Read · Learn · Grow
-        </blockquote>
-      </div>
+      {/* Dark/soft overlay for better login-card contrast */}
+      <div className="admin-login-overlay" />
 
       {/* Login Card */}
       <div className="admin-login-card">
-        <img
-          src="/logo.png"
-          alt="Thulirkum Ver Book Store"
-        />
+
+        {/* Small logo inside login card */}
+        <div className="admin-login-logo-wrap">
+          <img
+            src="/logo.png"
+            alt="Thulirkum Ver Book Store"
+            className="admin-login-logo"
+          />
+        </div>
 
         <span className="admin-badge">
           STORE ADMINISTRATION
@@ -108,32 +109,39 @@ export default function AdminLoginPage() {
           Admin Login
         </h1>
 
-        <p>
+        <p className="admin-login-description">
           Sign in with your administrator account.
         </p>
 
         <form onSubmit={submit}>
-          <label>
+
+          <label htmlFor="admin-email">
             Email
           </label>
 
           <input
+            id="admin-email"
             name="email"
             type="email"
             value={form.email}
             onChange={change}
+            placeholder="Enter your admin email"
+            autoComplete="username"
             required
           />
 
-          <label>
+          <label htmlFor="admin-password">
             Password
           </label>
 
           <input
+            id="admin-password"
             name="password"
             type="password"
             value={form.password}
             onChange={change}
+            placeholder="Enter your password"
+            autoComplete="current-password"
             required
           />
 
@@ -144,26 +152,26 @@ export default function AdminLoginPage() {
           )}
 
           <button
-            className="primary-btn full big"
+            type="submit"
+            className="primary-btn full big admin-login-submit"
             disabled={busy}
           >
             {busy
               ? 'Signing in...'
               : 'Login as Admin'}
           </button>
+
         </form>
 
         <button
-          className="text-btn"
+          className="text-btn admin-back-btn"
           type="button"
-          onClick={() =>
-            navigate('/login')
-          }
+          onClick={() => navigate('/login')}
         >
           ← Back to customer login
         </button>
+
       </div>
     </div>
   )
 }
-

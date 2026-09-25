@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { api } from "../api/client";
 import "./ProfileSettings.css";
 
 const ProfileSettings = () => {
-  const { user } = useAuth();
+  const { user, updateSession } = useAuth();
 
   const [profile, setProfile] = useState({
     firstName:
@@ -103,6 +104,11 @@ const ProfileSettings = () => {
      * function, use it here.
      */
     if (response) {
+      // The backend returns a fresh JWT when the email/profile changes.
+      // Save that session immediately so the next /account request still
+      // points to the same customer and the cart survives refresh.
+      updateSession(response);
+
       setProfile({
         firstName:
           response.name?.split(" ")[0] ||

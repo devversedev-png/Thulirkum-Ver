@@ -3,11 +3,26 @@ import { useMemo, useState } from 'react'
 import { useStore } from '../context/StoreContext'
 
 export default function CartPage() {
-  const { cartRows, updateCart, removeFromCart, offers } = useStore()
+  const {
+    cartRows,
+    updateCart,
+    removeFromCart,
+    offers,
+    account,
+    accountReady,
+    accountLoading,
+    accountError,
+    catalogueReady,
+    loadAccount,
+  } = useStore()
   const [error, setError] = useState('')
   const [couponCode, setCouponCode] = useState('')
   const [appliedCode, setAppliedCode] = useState('')
   const rows = cartRows()
+  const hasSavedCartItems = Boolean(account?.cart?.length)
+  const cartDataStillLoading = !accountReady || !catalogueReady || accountLoading
+  const cartBooksNotResolved = hasSavedCartItems && rows.length === 0
+  const hydratingCart = cartDataStillLoading || cartBooksNotResolved
   const subtotal = rows.reduce((sum, row) => sum + Number(row.book.price || 0) * Number(row.quantity || 0), 0)
   const shipping = subtotal >= 499 || subtotal === 0 ? 0 : 60
 
@@ -47,7 +62,29 @@ export default function CartPage() {
 
       <div className="page-width">
         {error && <div className="form-error cart-error">{error}</div>}
-        {rows.length ? (
+        {hydratingCart ? (
+          <div className="empty-state cart-loading-state">
+            <h3>Restoring your cart…</h3>
+            <p>
+              {cartBooksNotResolved
+                ? 'Your saved cart was found. Loading the book details now.'
+                : 'Your saved cart is being restored.'}
+            </p>
+            <span className="cart-loading-spinner" aria-hidden="true" />
+          </div>
+        ) : accountError && rows.length === 0 ? (
+          <div className="empty-state cart-loading-state">
+            <h3>We could not restore your cart</h3>
+            <p>{accountError}</p>
+            <button
+              type="button"
+              className="primary-btn inline-btn"
+              onClick={() => loadAccount(true)}
+            >
+              Try Again
+            </button>
+          </div>
+        ) : rows.length ? (
           <>
             <div className="cart-layout">
               <div className="cart-list">
