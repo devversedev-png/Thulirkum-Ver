@@ -12,6 +12,7 @@ export default function BookCard({ book, variant = 'default' }) {
 
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [added, setAdded] = useState(false)
 
   const inWishlist = account?.wishlist?.includes(book.id)
 
@@ -39,14 +40,27 @@ export default function BookCard({ book, variant = 'default' }) {
 
     setBusy(true)
     setError('')
+    setAdded(false)
 
-    try {
-      await addToCart(book.id, 1)
-    } catch (err) {
+    /*
+     * addToCart is optimistic: StoreContext updates the local cart
+     * before the backend request starts. Do not keep the button locked
+     * for the full network round-trip (especially when the backend is
+     * waking up on Render). The request continues in the background.
+     */
+    const request = addToCart(book.id, 1)
+
+    setBusy(false)
+    setAdded(true)
+
+    window.setTimeout(() => {
+      setAdded(false)
+    }, 700)
+
+    request.catch(err => {
+      setAdded(false)
       setError(err.message)
-    } finally {
-      setBusy(false)
-    }
+    })
   }
 
   async function wishClick() {
@@ -166,9 +180,11 @@ export default function BookCard({ book, variant = 'default' }) {
         >
           {!available
             ? 'Out of Stock'
-            : busy
-              ? 'Adding...'
-              : 'Add to Cart'}
+            : added
+              ? 'Added ✓'
+              : busy
+                ? 'Adding...'
+                : 'Add to Cart'}
         </button>
 
         {error && (

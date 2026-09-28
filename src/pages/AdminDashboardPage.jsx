@@ -66,14 +66,58 @@ const HOME_SECTION_OPTIONS = [
 ]
 
 const HOME_SECTION_DEFAULTS = {
-  discounted: { mode: 'AUTO', minDiscountPercent: 10, limit: 8 },
-  'top-selling': { mode: 'AUTO', periodDays: 30, basis: 'QUANTITY', limit: 8 },
-  'highly-featured': { mode: 'FEATURED_FLAG', limit: 8 },
-  cashback: { mode: 'MANUAL', cashbackType: 'PERCENT', cashbackValue: 5, maxCashback: 0, limit: 8 },
-  'new-arrivals': { mode: 'NEW_ARRIVAL_FLAG', limit: 8 },
-  'best-rated': { mode: 'AUTO', minRating: 4, minReviews: 5, limit: 8 },
-  trending: { mode: 'AUTO', periodDays: 7, basis: 'SALES', limit: 8 },
-  recommended: { mode: 'MANUAL', category: '', author: '', sourceBookId: '', limit: 8 },
+  discounted: {
+    mode: 'AUTO',
+    minDiscountPercent: 10,
+    limit: 8,
+  },
+
+  'top-selling': {
+    mode: 'AUTO',
+    periodDays: 30,
+    basis: 'QUANTITY',
+    limit: 8,
+  },
+
+  'highly-featured': {
+    mode: 'FEATURED_FLAG',
+    limit: 8,
+  },
+
+  cashback: {
+    mode: 'MANUAL',
+    cashbackType: 'PERCENT',
+    cashbackValue: 5,
+    maxCashback: 0,
+    limit: 8,
+  },
+
+  'new-arrivals': {
+    mode: 'NEW_ARRIVAL_FLAG',
+    limit: 8,
+  },
+
+  'best-rated': {
+    mode: 'AUTO',
+    minRating: 4,
+    minReviews: 5,
+    limit: 8,
+  },
+
+  trending: {
+    mode: 'AUTO',
+    periodDays: 7,
+    basis: 'SALES',
+    limit: 8,
+  },
+
+  recommended: {
+    mode: 'MANUAL',
+    category: '',
+    author: '',
+    sourceBookId: '',
+    limit: 8,
+  },
 }
 
 function statusLabel(value) {
@@ -3109,50 +3153,128 @@ export default function AdminDashboardPage() {
                   />
                 </label>
 
-                {selectedHomeSectionKey === 'discounted' && (
-                  <label>
-                    Minimum discount
-                    <div className="admin-home-input-with-suffix-v7">
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={homeConfigForm.minDiscountPercent ?? 10}
-                        onChange={event => setHomeConfigForm(current => ({ ...current, minDiscountPercent: Number(event.target.value || 0) }))}
-                      />
-                      <span>%</span>
-                    </div>
-                  </label>
-                )}
+            {selectedHomeSectionKey === 'discounted' && (
+  <>
+    <label>
+      Selection mode
+      <PremiumSelect
+        value={homeConfigForm.mode || 'AUTO'}
+        options={[
+          {
+            value: 'AUTO',
+            label: 'Automatically selected books',
+          },
+          {
+            value: 'MANUAL',
+            label: 'Manually selected books',
+          },
+        ]}
+        onChange={value =>
+          setHomeConfigForm(current => ({
+            ...current,
+            mode: value,
+          }))
+        }
+      />
+    </label>
 
-                {selectedHomeSectionKey === 'top-selling' && (
-                  <>
-                    <label>
-                      Sales period
-                      <PremiumSelect
-                        value={String(homeConfigForm.periodDays ?? 30)}
-                        options={[
-                          { value: '7', label: 'Last 7 days' },
-                          { value: '30', label: 'Last 30 days' },
-                          { value: '90', label: 'Last 90 days' },
-                          { value: '365', label: 'Last 12 months' },
-                        ]}
-                        onChange={value => setHomeConfigForm(current => ({ ...current, periodDays: Number(value) }))}
-                      />
-                    </label>
-                    <label>
-                      Rank by
-                      <PremiumSelect
-                        value={homeConfigForm.basis || 'QUANTITY'}
-                        options={[
-                          { value: 'QUANTITY', label: 'Units sold' },
-                          { value: 'REVENUE', label: 'Sales revenue' },
-                        ]}
-                        onChange={value => setHomeConfigForm(current => ({ ...current, basis: value }))}
-                      />
-                    </label>
-                  </>
-                )}
+    {homeConfigForm.mode === 'AUTO' && (
+      <label>
+        Minimum discount
+        <div className="admin-home-input-with-suffix-v7">
+          <input
+            type="number"
+            min="0"
+            max="100"
+            value={homeConfigForm.minDiscountPercent ?? 10}
+            onChange={event =>
+              setHomeConfigForm(current => ({
+                ...current,
+                minDiscountPercent: Number(
+                  event.target.value || 0
+                ),
+              }))
+            }
+          />
+          <span>%</span>
+        </div>
+      </label>
+    )}
+  </>
+)}
+
+               {selectedHomeSectionKey === 'top-selling' && (
+  <>
+    <label>
+      Selection mode
+      <PremiumSelect
+        value={homeConfigForm.mode || 'AUTO'}
+        options={[
+          {
+            value: 'AUTO',
+            label: 'Automatically selected books',
+          },
+          {
+            value: 'MANUAL',
+            label: 'Manually selected books',
+          },
+        ]}
+        onChange={value =>
+          setHomeConfigForm(current => ({
+            ...current,
+            mode: value,
+          }))
+        }
+      />
+    </label>
+
+    {homeConfigForm.mode === 'AUTO' && (
+      <>
+        <label>
+          Sales period
+          <PremiumSelect
+            value={String(homeConfigForm.periodDays ?? 30)}
+            options={[
+              { value: '7', label: 'Last 7 days' },
+              { value: '30', label: 'Last 30 days' },
+              { value: '90', label: 'Last 90 days' },
+              { value: '365', label: 'Last 12 months' },
+            ]}
+            onChange={value =>
+              setHomeConfigForm(current => ({
+                ...current,
+                periodDays: Number(value),
+              }))
+            }
+          />
+        </label>
+
+        <label>
+          Rank by
+          <PremiumSelect
+            value={homeConfigForm.basis || 'QUANTITY'}
+            options={[
+              {
+                value: 'QUANTITY',
+                label: 'Units sold',
+              },
+              {
+                value: 'REVENUE',
+                label: 'Sales revenue',
+              },
+            ]}
+            onChange={value =>
+              setHomeConfigForm(current => ({
+                ...current,
+                basis: value,
+              }))
+            }
+          />
+        </label>
+      </>
+    )}
+  </>
+)}
 
                 {selectedHomeSectionKey === 'highly-featured' && (
                   <label>
@@ -3216,61 +3338,165 @@ export default function AdminDashboardPage() {
                   </label>
                 )}
 
-                {selectedHomeSectionKey === 'best-rated' && (
-                  <>
-                    <label>
-                      Minimum rating
-                      <PremiumSelect
-                        value={String(homeConfigForm.minRating ?? 4)}
-                        options={[
-                          { value: '3', label: '3.0 ★ and above' },
-                          { value: '3.5', label: '3.5 ★ and above' },
-                          { value: '4', label: '4.0 ★ and above' },
-                          { value: '4.5', label: '4.5 ★ and above' },
-                        ]}
-                        onChange={value => setHomeConfigForm(current => ({ ...current, minRating: Number(value) }))}
-                      />
-                    </label>
-                    <label>
-                      Minimum reviews
-                      <input
-                        type="number"
-                        min="0"
-                        value={homeConfigForm.minReviews ?? 5}
-                        onChange={event => setHomeConfigForm(current => ({ ...current, minReviews: Number(event.target.value || 0) }))}
-                      />
-                    </label>
-                  </>
-                )}
+               {selectedHomeSectionKey === 'best-rated' && (
+  <>
+    <label>
+      Selection mode
+      <PremiumSelect
+        value={homeConfigForm.mode || 'AUTO'}
+        options={[
+          {
+            value: 'AUTO',
+            label: 'Automatically selected books',
+          },
+          {
+            value: 'MANUAL',
+            label: 'Manually selected books',
+          },
+        ]}
+        onChange={value =>
+          setHomeConfigForm(current => ({
+            ...current,
+            mode: value,
+          }))
+        }
+      />
+    </label>
 
-                {selectedHomeSectionKey === 'trending' && (
-                  <>
-                    <label>
-                      Trending period
-                      <PremiumSelect
-                        value={String(homeConfigForm.periodDays ?? 7)}
-                        options={[
-                          { value: '7', label: 'Last 7 days' },
-                          { value: '30', label: 'Last 30 days' },
-                          { value: '90', label: 'Last 90 days' },
-                        ]}
-                        onChange={value => setHomeConfigForm(current => ({ ...current, periodDays: Number(value) }))}
-                      />
-                    </label>
-                    <label>
-                      Trending signal
-                      <PremiumSelect
-                        value={homeConfigForm.basis || 'SALES'}
-                        options={[
-                          { value: 'SALES', label: 'Recent sales' },
-                          { value: 'RATING', label: 'Rating + reviews' },
-                        ]}
-                        onChange={value => setHomeConfigForm(current => ({ ...current, basis: value }))}
-                      />
-                    </label>
-                  </>
-                )}
+    {homeConfigForm.mode === 'AUTO' && (
+      <>
+        <label>
+          Minimum rating
+          <PremiumSelect
+            value={String(homeConfigForm.minRating ?? 4)}
+            options={[
+              {
+                value: '3',
+                label: '3.0 ★ and above',
+              },
+              {
+                value: '3.5',
+                label: '3.5 ★ and above',
+              },
+              {
+                value: '4',
+                label: '4.0 ★ and above',
+              },
+              {
+                value: '4.5',
+                label: '4.5 ★ and above',
+              },
+            ]}
+            onChange={value =>
+              setHomeConfigForm(current => ({
+                ...current,
+                minRating: Number(value),
+              }))
+            }
+          />
+        </label>
 
+        <label>
+          Minimum reviews
+          <input
+            type="number"
+            min="0"
+            value={homeConfigForm.minReviews ?? 5}
+            onChange={event =>
+              setHomeConfigForm(current => ({
+                ...current,
+                minReviews: Number(
+                  event.target.value || 0
+                ),
+              }))
+            }
+          />
+        </label>
+      </>
+    )}
+  </>
+)}
+
+              {selectedHomeSectionKey === 'trending' && (
+  <>
+    <label>
+      Selection mode
+      <PremiumSelect
+        value={homeConfigForm.mode || 'AUTO'}
+        options={[
+          {
+            value: 'AUTO',
+            label: 'Automatically selected books',
+          },
+          {
+            value: 'MANUAL',
+            label: 'Manually selected books',
+          },
+        ]}
+        onChange={value =>
+          setHomeConfigForm(current => ({
+            ...current,
+            mode: value,
+          }))
+        }
+      />
+    </label>
+
+    {homeConfigForm.mode === 'AUTO' && (
+      <>
+        <label>
+          Trending period
+          <PremiumSelect
+            value={String(homeConfigForm.periodDays ?? 7)}
+            options={[
+              {
+                value: '7',
+                label: 'Last 7 days',
+              },
+              {
+                value: '30',
+                label: 'Last 30 days',
+              },
+              {
+                value: '90',
+                label: 'Last 90 days',
+              },
+            ]}
+            onChange={value =>
+              setHomeConfigForm(current => ({
+                ...current,
+                periodDays: Number(value),
+              }))
+            }
+          />
+        </label>
+
+        <label>
+          Trending signal
+          <PremiumSelect
+            value={homeConfigForm.basis || 'SALES'}
+            options={[
+              {
+                value: 'SALES',
+                label: 'Recent sales',
+              },
+              {
+                value: 'RATING',
+                label: 'Rating + reviews',
+              },
+            ]}
+            onChange={value =>
+              setHomeConfigForm(current => ({
+                ...current,
+                basis: value,
+              }))
+            }
+          />
+        </label>
+      </>
+    )}
+  </>
+)}
                 {selectedHomeSectionKey === 'recommended' && (
                   <label>
                     Recommendation source
@@ -3336,58 +3562,64 @@ export default function AdminDashboardPage() {
                 </div>
               )}
 
-              {(['cashback', 'recommended'].includes(selectedHomeSectionKey) && homeConfigForm.mode === 'MANUAL') ||
-               (selectedHomeSectionKey === 'highly-featured' && homeConfigForm.mode === 'MANUAL') ||
-               (selectedHomeSectionKey === 'new-arrivals' && homeConfigForm.mode === 'MANUAL') ? (
-                <>
-                  <div className="admin-home-section-meta-v7">
-                    <strong>Manual book selection</strong>
-                    <span>{selectedHomeBookIds.length} selected</span>
+              <div className="admin-home-manual-picker-v7">
+                <div className="admin-home-section-meta-v7">
+                  <div>
+                    <strong>Select books manually</strong>
+                    <small>Choose specific books for this section. Selecting any book automatically switches this section to manual mode.</small>
                   </div>
+                  <span>{selectedHomeBookIds.length} selected</span>
+                </div>
 
-                  <label className="admin-home-search-v7 admin-home-search-block-v7">
-                    Find books
-                    <input
-                      value={homeBookSearch}
-                      onChange={event => setHomeBookSearch(event.target.value)}
-                      placeholder="Search title, author or category..."
-                    />
-                  </label>
+                <label className="admin-home-search-v7 admin-home-search-block-v7">
+                  Find books
+                  <input
+                    value={homeBookSearch}
+                    onChange={event => setHomeBookSearch(event.target.value)}
+                    placeholder="Search title, author or category..."
+                  />
+                </label>
 
-                  <div className="admin-home-book-grid-v7">
-                    {filteredHomeBooks.map(book => {
-                      const checked = selectedHomeBookIds.includes(book.id)
-                      return (
-                        <label className={`admin-home-book-option-v7 ${checked ? 'selected' : ''}`} key={book.id}>
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onChange={() => setSelectedHomeBookIds(current =>
-                              checked ? current.filter(id => id !== book.id) : [...current, book.id]
-                            )}
-                          />
-                          <span className="admin-home-book-thumb-v7">
-                            <img src={book.image || '/covers/atomic-habits.svg'} alt="" />
-                          </span>
-                          <span>
-                            <strong>{book.title}</strong>
-                            <small>{book.author || 'Unknown author'}</small>
-                            <em>{book.category || 'Uncategorised'}</em>
-                          </span>
-                        </label>
-                      )
-                    })}
-                  </div>
+                <div className="admin-home-book-grid-v7">
+                  {filteredHomeBooks.map(book => {
+                    const checked = selectedHomeBookIds.includes(book.id)
+                    return (
+                      <label className={`admin-home-book-option-v7 ${checked ? 'selected' : ''}`} key={book.id}>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => {
+                            setSelectedHomeBookIds(current =>
+                              checked
+                                ? current.filter(id => id !== book.id)
+                                : [...current, book.id]
+                            )
+                            if (!checked && homeConfigForm.mode !== 'MANUAL') {
+                              setHomeConfigForm(current => ({ ...current, mode: 'MANUAL' }))
+                            }
+                          }}
+                        />
+                        <span className="admin-home-book-thumb-v7">
+                          <img src={book.image || '/covers/atomic-habits.svg'} alt="" />
+                        </span>
+                        <span>
+                          <strong>{book.title}</strong>
+                          <small>{book.author || 'Unknown author'}</small>
+                          <em>{book.category || 'Uncategorised'}</em>
+                        </span>
+                      </label>
+                    )
+                  })}
+                </div>
 
-                  {!filteredHomeBooks.length && (
-                    <div className="admin-empty-v6 glass-card">No books match your search.</div>
-                  )}
-                </>
-              ) : null}
+                {!filteredHomeBooks.length && (
+                  <div className="admin-empty-v6 glass-card">No books match your search.</div>
+                )}
+              </div>
 
               {selectedHomeSectionKey !== 'cashback' && (
                 <p className="admin-home-rule-note-v7">
-                  {selectedHomeSectionKey === 'discounted' && 'The storefront calculates the discount from original price » current price. No manual book selection is required.'}
+                  {selectedHomeSectionKey === 'discounted' && 'The storefront can calculate discounted books automatically, or you can select specific books manually above.'}
                   {selectedHomeSectionKey === 'top-selling' && 'The storefront calculates sales from order items; cancelled orders are excluded.'}
                   {selectedHomeSectionKey === 'highly-featured' && homeConfigForm.mode === 'FEATURED_FLAG' && 'Only books marked Featured in the catalogue are used.'}
                   {selectedHomeSectionKey === 'new-arrivals' && homeConfigForm.mode === 'NEW_ARRIVAL_FLAG' && 'Only books marked New Arrival in the catalogue are used.'}

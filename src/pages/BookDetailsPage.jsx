@@ -9,6 +9,7 @@ export default function BookDetailsPage() {
   const { books, getBook, addToCart, toggleWishlist, account, backendReady } = useStore()
   const [qty, setQty] = useState(1)
   const [busy, setBusy] = useState(false)
+  const [added, setAdded] = useState(false)
   const [message, setMessage] = useState('')
   const [tab, setTab] = useState('description')
   const book = getBook(id)
@@ -32,11 +33,36 @@ export default function BookDetailsPage() {
     }
     setBusy(true)
     setMessage('')
+    setAdded(false)
+
+    /*
+     * Normal Add to Cart is optimistic. Update the UI immediately and
+     * let the StoreContext mutation queue persist it in the background.
+     * Buy Now still waits for the server because checkout must only open
+     * after the cart has been persisted.
+     */
+    if (!goCheckout) {
+      const request = addToCart(book.id, qty)
+      setQty(1)
+      setBusy(false)
+      setAdded(true)
+      setMessage('Added to cart successfully.')
+
+      window.setTimeout(() => {
+        setAdded(false)
+      }, 700)
+
+      request.catch(err => {
+        setAdded(false)
+        setMessage(err.message)
+      })
+      return
+    }
+
     try {
       await addToCart(book.id, qty)
       setQty(1)
-      if (goCheckout) navigate('/checkout')
-      else setMessage('Added to cart successfully.')
+      navigate('/checkout')
     } catch (err) {
       setMessage(err.message)
     } finally {
@@ -86,7 +112,7 @@ export default function BookDetailsPage() {
           </div>
 
           <div className="details-action-row">
-            <button className="primary-btn big" onClick={() => cart(false)} disabled={!available || busy}>🛒 {!available ? 'Out of Stock' : busy ? 'Adding...' : 'Add to Cart'}</button>
+            <button className="primary-btn big" onClick={() => cart(false)} disabled={!available || busy}>🛒 {!available ? 'Out of Stock' : added ? 'Added ✓' : busy ? 'Adding...' : 'Add to Cart'}</button>
             <button className={wish ? 'outline-btn selected-outline' : 'outline-btn'} onClick={() => backendReady && toggleWishlist(book.id)}>{wish ? '♥' : '♡'} {wish ? 'Wishlisted' : 'Add to Wishlist'}</button>
             <button className="buy-now-btn" onClick={() => cart(true)} disabled={!available || busy}>⚡ Buy Now</button>
           </div>
