@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { Eye, EyeOff } from 'lucide-react'
+
 
 export default function LoginPage() {
   const { user, login, register } = useAuth()
@@ -9,6 +11,7 @@ export default function LoginPage() {
   const [form, setForm] = useState({ name: '', email: '', mobile: '', password: '' })
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   if (user?.role === 'ADMIN') return <Navigate to="/admin" replace />
   if (user) return <Navigate to="/home" replace />
@@ -53,7 +56,31 @@ export default function LoginPage() {
           <form onSubmit={submit}>
             {mode === 'register' && <><label>Name</label><input name="name" value={form.name} onChange={change} required /><label>Mobile Number</label><input name="mobile" value={form.mobile} onChange={change} /></>}
             <label>Email</label><input name="email" type="email" value={form.email} onChange={change} required />
-            <label>Password</label><input name="password" type="password" value={form.password} onChange={change} minLength="6" required />
+            <label>Password</label><label>Password</label>
+
+<div className="password-input-wrap">
+  <input
+    name="password"
+    type={showPassword ? 'text' : 'password'}
+    value={form.password}
+    onChange={change}
+    minLength="6"
+    required
+  />
+
+  <button
+    type="button"
+    className="password-eye-btn"
+    onClick={() => setShowPassword(prev => !prev)}
+    aria-label={showPassword ? 'Hide password' : 'Show password'}
+  >
+    {showPassword ? (
+      <EyeOff size={20} />
+    ) : (
+      <Eye size={20} />
+    )}
+  </button>
+</div>
             {error && <div className="form-error">{error}</div>}
             <button className="primary-btn full big" disabled={busy}>{busy ? 'Please wait...' : mode === 'login' ? 'Login' : 'Create Account'}</button>
           </form>

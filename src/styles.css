@@ -1598,9 +1598,9 @@ main {
 
 .premium-select-trigger, .premium-date-trigger {
   width: 100%;
-  min-height: 36px;
+  min-height: 48px;
   border: 1px solid #d8dfd9;
-  border-radius: 6px;
+  border-radius: 12px;
   background: white;
   display: flex;
   align-items: center;
@@ -10944,6 +10944,20 @@ img.admin-brand-logo {
   transform: translateY(-50%);
   opacity: .55;
   font-size: 12px;
+}
+
+.admin-home-field-help-v7 {
+  margin-top: -2px;
+  color: rgba(15, 55, 44, .58);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.45;
+  text-transform: none;
+}
+
+.admin-home-config-grid-v7 label {
+  min-width: 0;
 }
 
 .admin-home-extra-grid-v7 {
@@ -21774,4 +21788,807 @@ body:has(.admin-login-page),
   .admin-sidebar-v6 {
     box-shadow: 0 6px 22px rgba(45, 38, 27, 0.08) !important;
   }
+}
+
+/* =========================================================
+   ADMIN LAYOUT — FIXED LEFT SIDEBAR / RESPONSIVE CONTENT
+   Sidebar stays on the left. Main content always starts beside it.
+   No public assets are modified by these rules.
+   ========================================================= */
+
+.admin-shell-v6 {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 100dvh !important;
+  display: grid !important;
+  grid-template-columns: 250px minmax(0, 1fr) !important;
+  align-items: stretch !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.admin-sidebar-v6 {
+  position: sticky !important;
+  inset: 0 auto auto 0 !important;
+  width: 250px !important;
+  min-width: 250px !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  box-sizing: border-box !important;
+  align-self: start !important;
+  overflow: hidden !important;
+  z-index: 30 !important;
+  margin: 0 !important;
+}
+
+.admin-main-v6 {
+  grid-column: 2 !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  padding: 0 25px 32px !important;
+  overflow-x: hidden !important;
+}
+
+.admin-top-v6 {
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Tablet: keep the sidebar vertical and on the left. */
+@media (max-width: 1100px) and (min-width: 721px) {
+  .admin-shell-v6 {
+    grid-template-columns: 210px minmax(0, 1fr) !important;
+  }
+
+  .admin-sidebar-v6 {
+    width: 210px !important;
+    min-width: 210px !important;
+    padding-inline: 10px !important;
+  }
+
+  .admin-brand-v6 .admin-brand-logo,
+  .admin-brand-v6 > img {
+    width: 170px !important;
+    max-width: 170px !important;
+  }
+
+  .admin-main-v6 {
+    padding-inline: 18px !important;
+  }
+
+  .admin-top-v6 {
+    margin-inline: -18px !important;
+    padding-inline: 18px !important;
+  }
+}
+
+/* Mobile: compact vertical rail remains on the LEFT instead of
+   becoming a horizontal bar across the top. */
+@media (max-width: 720px) {
+  .admin-shell-v6 {
+    display: grid !important;
+    grid-template-columns: 76px minmax(0, 1fr) !important;
+    width: 100% !important;
+    min-height: 100dvh !important;
+    overflow-x: hidden !important;
+  }
+
+  .admin-sidebar-v6 {
+    position: sticky !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 76px !important;
+    min-width: 76px !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    padding: 10px 7px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    z-index: 50 !important;
+  }
+
+  .admin-brand-v6 {
+    display: flex !important;
+    width: 100% !important;
+    min-height: 64px !important;
+    height: 64px !important;
+    padding: 0 0 9px !important;
+    margin: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  /* The existing full logo is preserved; only its visible area is
+     cropped to the emblem so the small rail stays clean. */
+  .admin-brand-v6 .admin-brand-logo,
+  .admin-brand-v6 > img {
+    display: block !important;
+    width: 58px !important;
+    min-width: 58px !important;
+    max-width: 58px !important;
+    height: 54px !important;
+    max-height: 54px !important;
+    object-fit: cover !important;
+    object-position: left center !important;
+    border-radius: 8px !important;
+  }
+
+  .admin-nav-v6 {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    gap: 5px !important;
+    padding: 10px 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .admin-nav-v6 button {
+    flex: 0 0 45px !important;
+    width: 62px !important;
+    min-width: 62px !important;
+    min-height: 45px !important;
+    height: 45px !important;
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
+    gap: 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+    border-radius: 9px !important;
+  }
+
+  .admin-nav-v6 button > span {
+    font-size: 19px !important;
+    line-height: 1 !important;
+  }
+
+  .admin-nav-v6 button strong {
+    display: none !important;
+  }
+
+  .admin-nav-v6 button b {
+    position: absolute !important;
+    top: 4px !important;
+    right: 4px !important;
+    min-width: 15px !important;
+    width: 15px !important;
+    height: 15px !important;
+    font-size: 7px !important;
+  }
+
+  .admin-profile-v6 {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 10px 0 0 !important;
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .admin-profile-v6 > div:nth-child(2) {
+    display: none !important;
+  }
+
+  .admin-avatar-v6 {
+    width: 34px !important;
+    height: 34px !important;
+    flex: 0 0 34px !important;
+  }
+
+  .admin-profile-v6 button {
+    width: 62px !important;
+    min-height: 32px !important;
+    font-size: 8px !important;
+    padding: 0 !important;
+  }
+
+  .admin-main-v6 {
+    grid-column: 2 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 0 10px 24px !important;
+    overflow-x: hidden !important;
+  }
+
+  .admin-top-v6 {
+    width: calc(100% + 20px) !important;
+    margin: 0 -10px 12px !important;
+    padding: 12px 10px !important;
+  }
+
+  .admin-top-v6 h1 {
+    font-size: 27px !important;
+  }
+
+  .admin-top-actions-v6 {
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+  }
+}
+
+
+/* -------------------------
+   CUSTOMER CARDS V9 — COMPACT / RESPONSIVE
+   ------------------------- */
+.customer-panel-v8 {
+  min-width: 0;
+}
+
+.customer-tools-v8 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
+}
+
+.customer-tools-v8 input {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  height: 42px;
+  padding: 0 13px;
+  border: 1px solid rgba(31, 92, 70, .16);
+  border-radius: 11px;
+  background: rgba(255,255,255,.88);
+  color: #244f42;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+}
+
+.customer-tools-v8 input:focus {
+  outline: none;
+  border-color: rgba(13, 104, 75, .42);
+  box-shadow: 0 0 0 3px rgba(13,104,75,.08);
+}
+
+.customer-order-check-v8 {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 0 13px;
+  border: 1px solid rgba(25, 96, 72, .15);
+  border-radius: 11px;
+  background: linear-gradient(135deg, rgba(248,247,239,.96), rgba(239,245,236,.92));
+  color: #31584b;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: border-color .16s ease, background .16s ease, box-shadow .16s ease;
+}
+
+.customer-order-check-v8:hover {
+  border-color: rgba(13, 104, 75, .30);
+  box-shadow: 0 4px 12px rgba(25,61,46,.06);
+}
+
+.customer-order-check-v8 input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 17px;
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  border: 1.5px solid rgba(13,104,75,.35);
+  border-radius: 5px;
+  background: #fff;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+
+.customer-order-check-v8 input[type="checkbox"]::before {
+  content: "";
+  width: 8px;
+  height: 4px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg) scale(0);
+  transform-origin: center;
+  transition: transform .12s ease;
+}
+
+.customer-order-check-v8 input[type="checkbox"]:checked {
+  background: #0d684b;
+  border-color: #0d684b;
+}
+
+.customer-order-check-v8 input[type="checkbox"]:checked::before {
+  transform: rotate(-45deg) scale(1);
+}
+
+.customer-card-grid-v8 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 11px;
+  min-width: 0;
+}
+
+.customer-card-v8 {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid rgba(32, 91, 69, .13);
+  border-radius: 15px;
+  background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(247,245,236,.94));
+  box-shadow: 0 6px 18px rgba(25,61,46,.055);
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+
+.customer-card-v8:hover {
+  transform: translateY(-1px);
+  border-color: rgba(32,91,69,.22);
+  box-shadow: 0 9px 22px rgba(25,61,46,.08);
+}
+
+.customer-card-head-v8 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(32,91,69,.09);
+}
+
+.customer-avatar-v8 {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #0d684b, #145d45);
+  color: #f8f1df;
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.customer-identity-v8 {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.customer-identity-v8 strong {
+  color: #164b3b;
+  font-size: 13px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.customer-identity-v8 span {
+  color: #718078;
+  font-size: 10px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.customer-card-details-v8 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  padding-top: 10px;
+}
+
+.customer-detail-v8 {
+  min-width: 0;
+  min-height: 47px;
+  padding: 7px 9px;
+  border-radius: 9px;
+  background: rgba(239,243,237,.66);
+}
+
+.customer-detail-v8 span {
+  display: block;
+  margin-bottom: 2px;
+  color: #7a877f;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+
+.customer-detail-v8 strong {
+  display: block;
+  color: #31584b;
+  font-size: 10px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.customer-detail-highlight-v8 {
+  background: rgba(235,243,231,.88);
+}
+
+.customer-detail-highlight-v8 strong {
+  color: #0b6248;
+  font-size: 12px;
+}
+
+.customer-empty-v8 {
+  grid-column: 1 / -1;
+  padding: 28px 16px;
+  text-align: center;
+  border: 1px dashed rgba(32,91,69,.22);
+  border-radius: 14px;
+  color: #718078;
+  background: rgba(247,245,236,.55);
+}
+
+@media (min-width: 900px) {
+  .customer-card-details-v8 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .customer-tools-v8 {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .customer-order-check-v8 {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .customer-card-grid-v8 {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .customer-card-v8 {
+    padding: 11px;
+    border-radius: 13px;
+  }
+}
+
+@media (max-width: 430px) {
+  /* Keep two detail cells per row on phones so the cards stay short. */
+  .customer-card-details-v8 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .customer-detail-v8 {
+    min-height: 43px;
+    padding: 6px 8px;
+  }
+
+  .customer-detail-v8 strong {
+    font-size: 9.5px;
+  }
+
+  .customer-detail-highlight-v8 strong {
+    font-size: 11px;
+  }
+
+  .customer-avatar-v8 {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    font-size: 14px;
+  }
+}
+
+/* Home Sections — final alignment polish */
+.admin-home-content-v7 .admin-panel-v6 {
+  overflow: visible;
+}
+
+.admin-home-section-toolbar-v7 {
+  grid-template-columns: minmax(300px, 1.05fr) minmax(360px, 1.35fr) auto;
+  gap: 18px;
+  align-items: stretch;
+  margin-top: 24px;
+}
+
+.admin-home-section-toolbar-v7 > label,
+.admin-home-section-toolbar-v7 > .admin-home-section-explainer-v7,
+.admin-home-section-toolbar-v7 > button {
+  min-height: 48px;
+}
+
+.admin-home-section-toolbar-v7 > label {
+  display: grid;
+  grid-template-rows: auto 48px;
+  align-content: space-between;
+  gap: 8px;
+}
+
+.admin-home-section-toolbar-v7 .admin-home-section-explainer-v7 {
+  min-height: 48px;
+  padding: 10px 16px;
+  line-height: 1.45;
+}
+
+.admin-home-section-toolbar-v7 > button {
+  align-self: end;
+  min-width: 178px;
+  white-space: nowrap;
+}
+
+.admin-home-config-grid-v7 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+  margin-top: 24px;
+}
+
+.admin-home-config-grid-v7 > label,
+.admin-home-extra-grid-v7 > label {
+  min-width: 0;
+}
+
+.admin-home-config-grid-v7 .admin-home-input-with-suffix-v7,
+.admin-home-config-grid-v7 .premium-select,
+.admin-home-config-grid-v7 input,
+.admin-home-extra-grid-v7 .premium-select,
+.admin-home-extra-grid-v7 input {
+  width: 100%;
+}
+
+.admin-home-config-grid-v7 input,
+.admin-home-config-grid-v7 .premium-select,
+.admin-home-extra-grid-v7 input,
+.admin-home-extra-grid-v7 .premium-select {
+  min-height: 48px;
+}
+
+.admin-home-config-grid-v7 .admin-home-field-help-v7 {
+  max-width: 100%;
+}
+
+.admin-home-rule-note-v7 {
+  margin-top: 20px;
+}
+
+@media (max-width: 1180px) and (min-width: 901px) {
+  .admin-home-section-toolbar-v7 {
+    grid-template-columns: minmax(240px, 1fr) minmax(260px, 1fr);
+  }
+
+  .admin-home-section-toolbar-v7 > button {
+    grid-column: 2;
+    justify-self: end;
+    margin-top: -2px;
+  }
+
+  .admin-home-config-grid-v7 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-home-section-toolbar-v7,
+  .admin-home-config-grid-v7,
+  .admin-home-extra-grid-v7 {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-home-section-toolbar-v7 > button {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* FINAL HOME SECTIONS ALIGNMENT — deterministic override */
+.admin-home-content-v7 .admin-home-section-toolbar-v7 {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.35fr) 180px !important;
+  column-gap: 18px !important;
+  row-gap: 12px !important;
+  align-items: end !important;
+  width: 100% !important;
+  margin-top: 24px !important;
+}
+
+.admin-home-content-v7 .admin-home-section-toolbar-v7 > label {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-rows: auto 48px !important;
+  gap: 8px !important;
+  align-items: stretch !important;
+}
+
+.admin-home-content-v7 .admin-home-section-toolbar-v7 > .admin-home-section-explainer-v7 {
+  min-width: 0 !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  box-sizing: border-box !important;
+  padding: 0 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  overflow: hidden !important;
+}
+
+.admin-home-content-v7 .admin-home-section-toolbar-v7 > button {
+  width: 180px !important;
+  min-width: 180px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  padding: 0 18px !important;
+  align-self: end !important;
+  justify-self: end !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+}
+
+.admin-home-content-v7 .admin-home-config-grid-v7 {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+  align-items: start !important;
+  width: 100% !important;
+  margin-top: 24px !important;
+}
+
+.admin-home-content-v7 .admin-home-config-grid-v7 > label {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.admin-home-content-v7 .admin-home-config-grid-v7 input,
+.admin-home-content-v7 .admin-home-config-grid-v7 .premium-select,
+.admin-home-content-v7 .admin-home-config-grid-v7 .admin-home-input-with-suffix-v7 {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.admin-home-content-v7 .admin-home-config-grid-v7 input,
+.admin-home-content-v7 .admin-home-config-grid-v7 .premium-select {
+  min-height: 48px !important;
+  height: 48px !important;
+}
+
+@media (max-width: 1180px) and (min-width: 901px) {
+  .admin-home-content-v7 .admin-home-section-toolbar-v7 {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  }
+
+  .admin-home-content-v7 .admin-home-section-toolbar-v7 > button {
+    grid-column: 2 !important;
+    width: 180px !important;
+    justify-self: end !important;
+  }
+
+  .admin-home-content-v7 .admin-home-config-grid-v7 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-home-content-v7 .admin-home-section-toolbar-v7,
+  .admin-home-content-v7 .admin-home-config-grid-v7 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-home-content-v7 .admin-home-section-toolbar-v7 > button {
+    grid-column: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    justify-self: stretch !important;
+  }
+}
+
+
+.admin-home-field-help-v7 {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #668078;
+}
+
+.admin-home-book-copy-v7 {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.admin-home-price-preview-v7 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 6px;
+}
+
+.admin-home-price-preview-v7 del {
+  color: #8b9993;
+  font-size: 0.78rem;
+}
+
+.admin-home-price-preview-v7 b {
+  color: #006b52;
+  font-size: 0.9rem;
+}
+
+.admin-home-price-preview-v7 mark {
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #e8f5e9;
+  color: #087452;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.admin-home-book-option-v7.selected
+  .admin-home-price-preview-v7 mark {
+  background: #d7f0df;
+}
+
+.password-input-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-wrap input {
+  width: 100%;
+  padding-right: 52px;
+}
+
+.password-eye-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+
+  background: transparent;
+  color: #176b57;
+
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.password-eye-btn:hover {
+  background: rgba(23, 107, 87, 0.09);
+  color: #0b5b48;
+}
+
+.password-eye-btn:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.password-eye-btn:focus-visible {
+  outline: 2px solid #176b57;
+  outline-offset: 2px;
+}
+
+.password-eye-btn svg {
+  pointer-events: none;
 }

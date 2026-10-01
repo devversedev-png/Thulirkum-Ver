@@ -67,7 +67,8 @@ const HOME_SECTION_OPTIONS = [
 
 const HOME_SECTION_DEFAULTS = {
   discounted: {
-    mode: 'AUTO',
+    mode: 'MANUAL',
+    discountPercent: 10,
     minDiscountPercent: 10,
     limit: 8,
   },
@@ -1546,28 +1547,123 @@ export default function AdminDashboardPage() {
     })
   }
 
-  async function saveHomeSection() {
-    const updated = homeSections.map(section =>
-      section.key === selectedHomeSectionKey
-        ? {
-            ...section,
-            bookIds: selectedHomeBookIds,
-            config: homeConfigForm,
-          }
-        : section
+async function saveHomeSection() {
+  const selectedSection =
+    homeSections.find(
+      section =>
+        section.key === selectedHomeSectionKey
     )
 
-    try {
-      const saved = await api('/admin/home-sections', {
+  const updated = homeSections.map(section =>
+    section.key === selectedHomeSectionKey
+      ? {
+          ...section,
+          bookIds: selectedHomeBookIds,
+          config: homeConfigForm,
+        }
+      : section
+  )
+
+  try {
+    /*
+     * Apply the actual catalogue discount when
+     * Discounted Books is in manual mode.
+     */
+    if (
+      selectedHomeSectionKey === 'discounted' &&
+      homeConfigForm.mode === 'MANUAL'
+    ) {
+      const discountPercent = Math.min(
+        100,
+        Math.max(
+          0,
+          Number(
+            homeConfigForm.discountPercent || 0
+          )
+        )
+      )
+
+      if (selectedHomeBookIds.length === 0) {
+        throw new Error(
+          'Please select at least one book.'
+        )
+      }
+
+      if (discountPercent <= 0) {
+        throw new Error(
+          'Enter a discount percentage greater than 0.'
+        )
+      }
+
+      const selectedBooks = books.filter(book =>
+        selectedHomeBookIds.includes(book.id)
+      )
+
+      await Promise.all(
+        selectedBooks.map(async book => {
+          const originalPrice = Number(
+            book.originalPrice ||
+            book.price ||
+            0
+          )
+
+          if (originalPrice <= 0) {
+            return
+          }
+
+          const newPrice =
+            Math.round(
+              originalPrice *
+              (1 - discountPercent / 100) *
+              100
+            ) / 100
+
+          await api(
+            `/admin/books/${book.id}`,
+            {
+              method: 'PUT',
+              body: JSON.stringify({
+                ...book,
+
+                originalPrice,
+
+                price: newPrice,
+              }),
+            }
+          )
+        })
+      )
+    }
+
+    const saved = await api(
+      '/admin/home-sections',
+      {
         method: 'PUT',
         body: JSON.stringify(updated),
-      })
-      setHomeSections(saved)
-      setMessage('Home section settings saved successfully')
-    } catch (err) {
-      setMessage(err.message)
-    }
+      }
+    )
+
+    setHomeSections(saved)
+
+    /*
+     * Refresh books so the new prices immediately
+     * appear in the admin UI.
+     */
+    const refreshedBooks =
+      await api('/admin/books')
+
+    setBooks(refreshedBooks)
+
+    setMessage(
+      'Home section and discount saved successfully'
+    )
+  } catch (err) {
+    setMessage(
+      err.message ||
+      'Unable to save home section'
+    )
   }
+}
 
   async function saveHomeSettings() {
     try {
@@ -2592,149 +2688,77 @@ export default function AdminDashboardPage() {
 
         {/* Customers */}
         {tab === 'customers' && (
-          <section className="admin-panel-v6 glass-panel">
+          <section className="admin-panel-v6 glass-panel customer-panel-v8">
             <PanelTitle
               eyebrow="CUSTOMER CRM"
               title="Customers"
               copy="Registered customers and order activity from your database."
             />
 
-            <div className="customer-tools-v6">
+            <div className="customer-tools-v8">
               <input
-                value={
-                  customerSearch
-                }
-                onChange={(
-                  event
-                ) =>
-                  setCustomerSearch(
-                    event.target.value
-                  )
-                }
+                value={customerSearch}
+                onChange={(event) => setCustomerSearch(event.target.value)}
                 placeholder="Search name, email or mobile..."
               />
 
-              <label className="premium-check-v73 customer-order-check-v73">
+              <label className="premium-check-v73 customer-order-check-v8">
                 <input
                   type="checkbox"
-                  checked={
-                    orderedOnly
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    setOrderedOnly(
-                      event.target
-                        .checked
-                    )
-                  }
+                  checked={orderedOnly}
+                  onChange={(event) => setOrderedOnly(event.target.checked)}
                 />
-
                 Customers with orders only
               </label>
             </div>
 
-            <div className="admin-table-wrap-v6">
-              <table className="admin-table-v6">
-                <thead>
-                  <tr>
-                    <th>
-                      Customer
-                    </th>
+            <div className="customer-card-grid-v8">
+              {filteredCustomers.length === 0 ? (
+                <div className="customer-empty-v8">
+                  No customers match your current search.
+                </div>
+              ) : (
+                filteredCustomers.map((customer) => (
+                  <article className="customer-card-v8" key={customer.id}>
+                    <div className="customer-card-head-v8">
+                      <div className="customer-avatar-v8">
+                        {(customer.name || 'C').trim().charAt(0).toUpperCase()}
+                      </div>
+                      <div className="customer-identity-v8">
+                        <strong>{customer.name || 'Customer'}</strong>
+                        <span>{customer.email || '—'}</span>
+                      </div>
+                    </div>
 
-                    <th>
-                      Mobile
-                    </th>
-
-                    <th>
-                      Registered
-                    </th>
-
-                    <th>
-                      Last login
-                    </th>
-
-                    <th>
-                      Orders
-                    </th>
-
-                    <th>
-                      Total spent
-                    </th>
-
-                    <th>
-                      Last order
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {filteredCustomers.map(
-                    (
-                      customer
-                    ) => (
-                      <tr
-                        key={
-                          customer.id
-                        }
-                      >
-                        <td>
-                          <strong>
-                            {
-                              customer.name
-                            }
-                          </strong>
-
-                          <span>
-                            {
-                              customer.email
-                            }
-                          </span>
-                        </td>
-
-                        <td>
-                          {customer.mobile ||
-                            '—'}
-                        </td>
-
-                        <td>
-                          {formatDate(
-                            customer.createdAt
-                          )}
-                        </td>
-
-                        <td>
-                          {formatDateTime(
-                            customer.lastLoginAt
-                          )}
-                        </td>
-
-                        <td>
-                          <b>
-                            {
-                              customer.orderCount
-                            }
-                          </b>
-                        </td>
-
-                        <td>
-                          ₹
-                          {Math.round(
-                            customer.totalSpent ||
-                              0
-                          ).toLocaleString()}
-                        </td>
-
-                        <td>
-                          {formatDateTime(
-                            customer.lastOrderAt
-                          )}
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
+                    <div className="customer-card-details-v8">
+                      <div className="customer-detail-v8">
+                        <span>Mobile</span>
+                        <strong>{customer.mobile || '—'}</strong>
+                      </div>
+                      <div className="customer-detail-v8">
+                        <span>Registered</span>
+                        <strong>{formatDate(customer.createdAt)}</strong>
+                      </div>
+                      <div className="customer-detail-v8">
+                        <span>Last login</span>
+                        <strong>{formatDateTime(customer.lastLoginAt)}</strong>
+                      </div>
+                      <div className="customer-detail-v8 customer-detail-highlight-v8">
+                        <span>Orders</span>
+                        <strong>{customer.orderCount || 0}</strong>
+                      </div>
+                      <div className="customer-detail-v8 customer-detail-highlight-v8">
+                        <span>Total spent</span>
+                        <strong>₹{Math.round(customer.totalSpent || 0).toLocaleString()}</strong>
+                      </div>
+                      <div className="customer-detail-v8">
+                        <span>Last order</span>
+                        <strong>{formatDateTime(customer.lastOrderAt)}</strong>
+                      </div>
+                    </div>
+                  </article>
+                ))
+              )}
             </div>
           </section>
         )}
@@ -3153,20 +3177,21 @@ export default function AdminDashboardPage() {
                   />
                 </label>
 
-            {selectedHomeSectionKey === 'discounted' && (
+{selectedHomeSectionKey === 'discounted' && (
   <>
     <label>
       Selection mode
+
       <PremiumSelect
-        value={homeConfigForm.mode || 'AUTO'}
+        value={homeConfigForm.mode || 'MANUAL'}
         options={[
-          {
-            value: 'AUTO',
-            label: 'Automatically selected books',
-          },
           {
             value: 'MANUAL',
             label: 'Manually selected books',
+          },
+          {
+            value: 'AUTO',
+            label: 'Automatically selected books',
           },
         ]}
         onChange={value =>
@@ -3178,26 +3203,70 @@ export default function AdminDashboardPage() {
       />
     </label>
 
-    {homeConfigForm.mode === 'AUTO' && (
+    {homeConfigForm.mode === 'MANUAL' ? (
       <label>
-        Minimum discount
+        Discount to apply
+
         <div className="admin-home-input-with-suffix-v7">
           <input
             type="number"
             min="0"
             max="100"
-            value={homeConfigForm.minDiscountPercent ?? 10}
+            step="0.01"
+            value={homeConfigForm.discountPercent ?? 10}
             onChange={event =>
               setHomeConfigForm(current => ({
                 ...current,
-                minDiscountPercent: Number(
-                  event.target.value || 0
+                discountPercent: Math.min(
+                  100,
+                  Math.max(
+                    0,
+                    Number(event.target.value || 0)
+                  )
                 ),
               }))
             }
           />
+
           <span>%</span>
         </div>
+
+        <small className="admin-home-field-help-v7">
+          This discount will be applied to the selected books.
+        </small>
+      </label>
+    ) : (
+      <label>
+        Minimum discount required
+
+        <div className="admin-home-input-with-suffix-v7">
+          <input
+            type="number"
+            min="0"
+            max="100"
+            step="0.01"
+            value={homeConfigForm.minDiscountPercent ?? 10}
+            onChange={event =>
+              setHomeConfigForm(current => ({
+                ...current,
+                minDiscountPercent: Math.min(
+                  100,
+                  Math.max(
+                    0,
+                    Number(event.target.value || 0)
+                  )
+                ),
+              }))
+            }
+          />
+
+          <span>%</span>
+        </div>
+
+        <small className="admin-home-field-help-v7">
+          Only books already discounted by this percentage or more
+          are included.
+        </small>
       </label>
     )}
   </>
@@ -3562,8 +3631,16 @@ export default function AdminDashboardPage() {
                 </div>
               )}
 
-              <div className="admin-home-manual-picker-v7">
-                <div className="admin-home-section-meta-v7">
+              {((selectedHomeSectionKey === 'discounted' && homeConfigForm.mode === 'MANUAL') ||
+                (selectedHomeSectionKey === 'top-selling' && homeConfigForm.mode === 'MANUAL') ||
+                (selectedHomeSectionKey === 'highly-featured' && homeConfigForm.mode === 'MANUAL') ||
+                (selectedHomeSectionKey === 'cashback') ||
+                (selectedHomeSectionKey === 'new-arrivals' && homeConfigForm.mode === 'MANUAL') ||
+                (selectedHomeSectionKey === 'best-rated' && homeConfigForm.mode === 'MANUAL') ||
+                (selectedHomeSectionKey === 'trending' && homeConfigForm.mode === 'MANUAL') ||
+                (selectedHomeSectionKey === 'recommended' && homeConfigForm.mode === 'MANUAL')) && (
+                <div className="admin-home-manual-picker-v7">
+                  <div className="admin-home-section-meta-v7">
                   <div>
                     <strong>Select books manually</strong>
                     <small>Choose specific books for this section. Selecting any book automatically switches this section to manual mode.</small>
@@ -3581,51 +3658,117 @@ export default function AdminDashboardPage() {
                 </label>
 
                 <div className="admin-home-book-grid-v7">
-                  {filteredHomeBooks.map(book => {
-                    const checked = selectedHomeBookIds.includes(book.id)
-                    return (
-                      <label className={`admin-home-book-option-v7 ${checked ? 'selected' : ''}`} key={book.id}>
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={() => {
-                            setSelectedHomeBookIds(current =>
-                              checked
-                                ? current.filter(id => id !== book.id)
-                                : [...current, book.id]
-                            )
-                            if (!checked && homeConfigForm.mode !== 'MANUAL') {
-                              setHomeConfigForm(current => ({ ...current, mode: 'MANUAL' }))
-                            }
-                          }}
-                        />
-                        <span className="admin-home-book-thumb-v7">
-                          <img src={book.image || '/covers/atomic-habits.svg'} alt="" />
-                        </span>
-                        <span>
-                          <strong>{book.title}</strong>
-                          <small>{book.author || 'Unknown author'}</small>
-                          <em>{book.category || 'Uncategorised'}</em>
-                        </span>
-                      </label>
-                    )
-                  })}
+                 {filteredHomeBooks.map(book => {
+  const checked = selectedHomeBookIds.includes(book.id)
+
+  const originalPrice = Number(
+    book.originalPrice || book.price || 0
+  )
+
+  const discountPercent =
+    selectedHomeSectionKey === 'discounted' &&
+    homeConfigForm.mode === 'MANUAL'
+      ? Number(homeConfigForm.discountPercent || 0)
+      : 0
+
+  const discountedPrice =
+    discountPercent > 0
+      ? originalPrice * (1 - discountPercent / 100)
+      : Number(book.price || 0)
+
+  return (
+    <label
+      className={`admin-home-book-option-v7 ${
+        checked ? 'selected' : ''
+      }`}
+      key={book.id}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={() =>
+          setSelectedHomeBookIds(current =>
+            checked
+              ? current.filter(id => id !== book.id)
+              : [...current, book.id]
+          )
+        }
+      />
+
+      <span className="admin-home-book-thumb-v7">
+        <img
+          src={
+            book.image ||
+            '/covers/atomic-habits.svg'
+          }
+          alt=""
+        />
+      </span>
+
+      <span className="admin-home-book-copy-v7">
+        <strong>
+          {book.title}
+        </strong>
+
+        <small>
+          {book.author || 'Unknown author'}
+        </small>
+
+        <em>
+          {book.category || 'Uncategorised'}
+        </em>
+
+        {selectedHomeSectionKey === 'discounted' &&
+          homeConfigForm.mode === 'MANUAL' && (
+            <span className="admin-home-price-preview-v7">
+              <del>
+                ₹{originalPrice.toFixed(2)}
+              </del>
+
+              <b>
+                ₹{discountedPrice.toFixed(2)}
+              </b>
+
+              <mark>
+                {discountPercent}% OFF
+              </mark>
+            </span>
+        )}
+      </span>
+    </label>
+  )
+})}
                 </div>
 
-                {!filteredHomeBooks.length && (
-                  <div className="admin-empty-v6 glass-card">No books match your search.</div>
-                )}
-              </div>
+                  {!filteredHomeBooks.length && (
+                    <div className="admin-empty-v6 glass-card">No books match your search.</div>
+                  )}
+                </div>
+              )}
 
               {selectedHomeSectionKey !== 'cashback' && (
                 <p className="admin-home-rule-note-v7">
-                  {selectedHomeSectionKey === 'discounted' && 'The storefront can calculate discounted books automatically, or you can select specific books manually above.'}
-                  {selectedHomeSectionKey === 'top-selling' && 'The storefront calculates sales from order items; cancelled orders are excluded.'}
-                  {selectedHomeSectionKey === 'highly-featured' && homeConfigForm.mode === 'FEATURED_FLAG' && 'Only books marked Featured in the catalogue are used.'}
-                  {selectedHomeSectionKey === 'new-arrivals' && homeConfigForm.mode === 'NEW_ARRIVAL_FLAG' && 'Only books marked New Arrival in the catalogue are used.'}
-                  {selectedHomeSectionKey === 'best-rated' && 'Rating and review thresholds are applied automatically from book data.'}
-                  {selectedHomeSectionKey === 'trending' && 'The selected signal is calculated from current catalogue/order data.'}
-                  {selectedHomeSectionKey === 'recommended' && homeConfigForm.mode !== 'MANUAL' && 'The storefront resolves recommendations from the selected rule.'}
+                  {selectedHomeSectionKey === 'discounted' && (homeConfigForm.mode === 'AUTO'
+                    ? 'The percentage here is a minimum eligibility threshold. It does not change a book price; the book must already have a lower current price than its original price.'
+                    : 'Manual mode lets you choose exactly which books appear in this section.')}
+                  {selectedHomeSectionKey === 'top-selling' && (homeConfigForm.mode === 'AUTO'
+                    ? 'Ranks books using order history for the selected period and ranking signal. Cancelled orders are excluded.'
+                    : 'Manual mode lets you choose exactly which books appear in this section.')}
+                  {selectedHomeSectionKey === 'highly-featured' && (homeConfigForm.mode === 'FEATURED_FLAG'
+                    ? 'Only books marked Featured in the catalogue are used.'
+                    : 'Manual mode lets you choose exactly which books appear in this section.')}
+                  {selectedHomeSectionKey === 'new-arrivals' && (homeConfigForm.mode === 'NEW_ARRIVAL_FLAG'
+                    ? 'Only books marked New Arrival in the catalogue are used.'
+                    : 'Manual mode lets you choose exactly which books appear in this section.')}
+                  {selectedHomeSectionKey === 'best-rated' && (homeConfigForm.mode === 'AUTO'
+                    ? 'Books must meet both the minimum rating and minimum review count.'
+                    : 'Manual mode lets you choose exactly which books appear in this section.')}
+                  {selectedHomeSectionKey === 'trending' && (homeConfigForm.mode === 'AUTO'
+                    ? 'Trending is calculated from the selected period and signal.'
+                    : 'Manual mode lets you choose exactly which books appear in this section.')}
+                  {selectedHomeSectionKey === 'recommended' && (homeConfigForm.mode !== 'MANUAL'
+                    ? 'Recommendations are resolved from the selected category, author, or similar-book rule.'
+                    : 'Manual mode lets you choose exactly which books appear in this section.')}
                 </p>
               )}
             </section>

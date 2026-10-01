@@ -7,6 +7,7 @@ import {
 
 import { useAuth } from '../context/AuthContext'
 import '../styles.css'
+import { Eye, EyeOff } from "lucide-react";
 
 export default function AdminLoginPage() {
   const {
@@ -24,6 +25,7 @@ export default function AdminLoginPage() {
 
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const redirectReason = searchParams.get('reason')
 
@@ -134,16 +136,31 @@ export default function AdminLoginPage() {
             Password
           </label>
 
-          <input
-            id="admin-password"
-            name="password"
-            type="password"
-            value={form.password}
-            onChange={change}
-            placeholder="Enter your password"
-            autoComplete="current-password"
-            required
-          />
+         <div className="password-input-wrap">
+  <input
+    id="admin-password"
+    name="password"
+    type={showPassword ? 'text' : 'password'}
+    value={form.password}
+    onChange={change}
+    placeholder="Enter your password"
+    autoComplete="current-password"
+    required
+  />
+
+  <button
+    type="button"
+    className="password-eye-btn"
+    onClick={() => setShowPassword(prev => !prev)}
+    aria-label={showPassword ? 'Hide password' : 'Show password'}
+  >
+    {showPassword ? (
+      <EyeOff size={20} />
+    ) : (
+      <Eye size={20} />
+    )}
+  </button>
+</div>
 
           {(error || redirectMessage) && (
             <div className="form-error">
