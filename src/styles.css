@@ -10566,10 +10566,10 @@ body,
     gap: 8px !important;
   }
 
-  .admin-top-actions-v6 {
+  /* .admin-top-actions-v6 {
     flex-wrap: wrap !important;
     justify-content: flex-end !important;
-  }
+  } */
 
   .admin-hero-v6,
   .admin-panel-v6 {
@@ -10753,10 +10753,10 @@ img.admin-brand-logo {
   .admin-brand-v6
   img.admin-brand-logo {
 
-    width: 145px !important;
+    width: 270px !important;
 
-    height: 50px !important;
-    max-height: 50px !important;
+    height: 120px !important;
+    max-height: 120px !important;
   }
 
 }
@@ -22015,10 +22015,10 @@ body:has(.admin-login-page),
     font-size: 27px !important;
   }
 
-  .admin-top-actions-v6 {
+  /* .admin-top-actions-v6 {
     flex-wrap: wrap !important;
     justify-content: flex-end !important;
-  }
+  } */
 }
 
 
@@ -23177,4 +23177,1823 @@ body:has(.admin-login-page),
     width: min(520px, calc(100vw - 32px)) !important;
     margin: 0 auto !important;
   }
+}
+
+/* =========================================================
+   MOBILE ADMIN SIDEBAR
+   Logo -> opens sidebar
+   Outside click -> closes sidebar
+   Navigation click -> closes sidebar
+   ========================================================= */
+
+.admin-mobile-logo-trigger,
+.admin-mobile-sidebar-overlay {
+  display: none;
+}
+
+
+/* =========================================================
+   MOBILE ONLY
+   ========================================================= */
+
+@media (max-width: 720px) {
+
+  /* -----------------------------------------
+     Main page becomes full width
+     ----------------------------------------- */
+
+  .admin-shell-v6 {
+    display: block !important;
+    width: 100% !important;
+    min-height: 100dvh !important;
+    overflow-x: hidden !important;
+  }
+
+
+  /* -----------------------------------------
+     Sidebar is completely hidden by default
+     ----------------------------------------- */
+
+  .admin-sidebar-v6 {
+    position: fixed !important;
+
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+
+    width: min(310px, 82vw) !important;
+    min-width: min(310px, 82vw) !important;
+    height: 100dvh !important;
+
+    z-index: 1001 !important;
+
+    transform: translateX(-105%) !important;
+
+    transition:
+      transform 0.28s ease,
+      box-shadow 0.28s ease !important;
+
+    box-shadow: none !important;
+
+    overflow: hidden !important;
+  }
+
+
+  /* -----------------------------------------
+     Sidebar OPEN
+     ----------------------------------------- */
+
+  .admin-sidebar-v6.mobile-sidebar-open {
+    transform: translateX(0) !important;
+
+    box-shadow:
+      12px 0 35px rgba(35, 45, 35, 0.20) !important;
+  }
+
+
+  /* -----------------------------------------
+     Mobile logo button
+     ----------------------------------------- */
+
+  .admin-mobile-logo-trigger {
+    display: flex !important;
+
+    position: fixed !important;
+
+    top: 14px !important;
+    left: 14px !important;
+
+    width: 58px !important;
+    height: 58px !important;
+
+    padding: 7px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: #f7f2e7 !important;
+
+    border: 1px solid rgba(92, 58, 29, 0.16) !important;
+
+    border-radius: 16px !important;
+
+    box-shadow:
+      0 6px 20px rgba(45, 38, 27, 0.15) !important;
+
+    cursor: pointer !important;
+
+    z-index: 1000 !important;
+  }
+
+
+  .admin-mobile-logo-trigger img {
+    display: block !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: contain !important;
+
+    background: transparent !important;
+
+    border: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    filter: none !important;
+    mix-blend-mode: normal !important;
+  }
+
+
+  .admin-mobile-logo-trigger:active {
+    transform: scale(0.96);
+  }
+
+
+  /* -----------------------------------------
+     Dark transparent background behind sidebar
+     ----------------------------------------- */
+
+  .admin-mobile-sidebar-overlay {
+    display: block !important;
+
+    position: fixed !important;
+
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    border: 0 !important;
+
+    background: rgba(20, 35, 28, 0.28) !important;
+
+    backdrop-filter: blur(2px) !important;
+    -webkit-backdrop-filter: blur(2px) !important;
+
+    z-index: 1000 !important;
+
+    cursor: pointer !important;
+  }
+
+
+  /* -----------------------------------------
+     Sidebar logo becomes BIG
+     ----------------------------------------- */
+
+  .admin-sidebar-v6 .admin-brand-v6 {
+    min-height: 125px !important;
+
+    height: 125px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 14px 18px !important;
+
+    background: transparent !important;
+  }
+
+
+  .admin-sidebar-v6
+  .admin-brand-v6
+  img.admin-brand-logo {
+    width: 220px !important;
+
+    max-width: 90% !important;
+
+    height: 88px !important;
+
+    max-height: 88px !important;
+
+    object-fit: contain !important;
+
+    margin: 0 auto !important;
+
+    transform: none !important;
+
+    filter: none !important;
+
+    mix-blend-mode: normal !important;
+
+    opacity: 1 !important;
+  }
+
+
+  /* -----------------------------------------
+     Navigation
+     ----------------------------------------- */
+
+  .admin-sidebar-v6 .admin-nav-v6 {
+    flex: 1 1 auto !important;
+
+    min-height: 0 !important;
+
+    width: 100% !important;
+
+    padding: 12px 14px 20px !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+
+  /* -----------------------------------------
+     ICON + PAGE NAME
+     ----------------------------------------- */
+
+  .admin-sidebar-v6 .admin-nav-v6 button {
+    width: 100% !important;
+
+    min-height: 54px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    gap: 14px !important;
+
+    padding: 10px 14px !important;
+
+    margin: 4px 0 !important;
+
+    border-radius: 14px !important;
+
+    white-space: nowrap !important;
+
+    text-align: left !important;
+
+    font-size: 15px !important;
+  }
+
+
+  .admin-sidebar-v6 .admin-nav-v6 button > span {
+    flex: 0 0 30px !important;
+
+    width: 30px !important;
+    height: 30px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    font-size: 22px !important;
+  }
+
+
+  .admin-sidebar-v6 .admin-nav-v6 button strong {
+    display: block !important;
+
+    flex: 1 !important;
+
+    font-size: 15px !important;
+
+    font-weight: 700 !important;
+  }
+
+
+  /* -----------------------------------------
+     Notification count
+     ----------------------------------------- */
+
+  .admin-sidebar-v6 .admin-nav-v6 button b {
+    flex: 0 0 auto !important;
+
+    min-width: 22px !important;
+    height: 22px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 50% !important;
+
+    font-size: 11px !important;
+  }
+
+
+  /* -----------------------------------------
+     Profile / Logout
+     ----------------------------------------- */
+
+  .admin-sidebar-v6 .admin-profile-v6 {
+    flex-shrink: 0 !important;
+
+    padding: 14px !important;
+  }
+
+
+  /* -----------------------------------------
+     Main content full width
+     ----------------------------------------- */
+
+  .admin-main-v6 {
+    grid-column: auto !important;
+
+    width: 100% !important;
+
+    max-width: none !important;
+
+    min-width: 0 !important;
+
+    margin: 0 !important;
+
+    padding:
+      86px
+      14px
+      30px !important;
+  }
+
+
+  .admin-top-v6 {
+    width: 100% !important;
+
+    margin: 0 !important;
+  }
+
+
+  /* -----------------------------------------
+     Hide the mobile trigger when menu is open
+     ----------------------------------------- */
+
+  .admin-sidebar-v6.mobile-sidebar-open
+    ~ .admin-mobile-logo-trigger {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
+/* =========================================================
+   MOBILE ADMIN SIDEBAR
+   Hidden by default. Opens only when logo is clicked.
+   ========================================================= */
+
+.admin-mobile-logo-trigger {
+  display: none;
+}
+
+.admin-mobile-sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 720px) {
+
+  /* Main page uses the full mobile width */
+  .admin-shell-v6 {
+    display: block !important;
+    width: 100% !important;
+    min-height: 100dvh !important;
+    overflow-x: hidden !important;
+  }
+
+  .admin-main-v6 {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 14px 30px !important;
+  }
+
+  /* BIG LOGO BUTTON */
+  .admin-mobile-logo-trigger {
+    display: flex !important;
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 82px;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px 18px;
+    border: 0;
+    background: rgba(250, 247, 238, 0.96);
+    z-index: 100;
+    cursor: pointer;
+  }
+
+  .admin-mobile-logo-trigger img {
+    width: 145px !important;
+    height: auto !important;
+    max-height: 62px;
+    object-fit: contain;
+  }
+
+  /* SIDEBAR - HIDDEN */
+  .admin-sidebar-v6 {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+
+    width: 285px !important;
+    min-width: 285px !important;
+    height: 100dvh !important;
+
+    transform: translateX(-105%) !important;
+    transition: transform 0.25s ease !important;
+
+    z-index: 1001 !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+
+    padding: 18px 14px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* SIDEBAR OPEN */
+  .admin-sidebar-v6.mobile-sidebar-open {
+    transform: translateX(0) !important;
+  }
+
+  /* Dark/blur background behind sidebar */
+  .admin-mobile-sidebar-overlay {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    padding: 0;
+    margin: 0;
+
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(2px);
+
+    z-index: 1000;
+  }
+
+  /* Bigger sidebar logo */
+  .admin-brand-v6 {
+    min-height: 90px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-bottom: 20px !important;
+  }
+
+  .admin-brand-v6 img,
+  .admin-brand-v6 .admin-brand-logo {
+    width: 190px !important;
+    max-width: 190px !important;
+    height: auto !important;
+    object-fit: contain !important;
+  }
+
+  /* Navigation becomes icon + name */
+  .admin-nav-v6 {
+    width: 100% !important;
+  }
+
+  .admin-nav-v6 button,
+  .admin-nav-v6 a {
+    width: 100% !important;
+    min-height: 52px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+
+    padding: 12px 15px !important;
+    margin-bottom: 7px !important;
+
+    text-align: left !important;
+    border-radius: 14px !important;
+  }
+
+  .admin-nav-v6 button span,
+  .admin-nav-v6 a span {
+    display: inline !important;
+  }
+}
+
+.admin-mobile-logo-trigger {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .admin-mobile-logo-trigger {
+    display: block;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 9999;
+  }
+
+  .admin-mobile-logo-trigger button {
+    width: 58px;
+    height: 58px;
+    padding: 7px;
+    border: 1px solid rgba(0, 90, 70, 0.18);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .admin-mobile-logo-trigger img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+@media (max-width: 720px) {
+  .admin-sidebar-v6 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100dvh;
+    z-index: 9998;
+
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .admin-sidebar-v6.mobile-sidebar-open {
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 720px) {
+  .admin-mobile-logo-trigger {
+    display: block;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 10000;
+  }
+
+  .admin-mobile-logo-trigger button {
+    width: 118px;
+    height: 58px;
+    padding: 8px 12px;
+
+    border: 1px solid rgba(20, 90, 70, 0.15);
+    border-radius: 14px;
+    background: #fffdf7;
+
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .admin-mobile-logo-trigger img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+}
+
+@media (max-width: 720px) {
+  .admin-top-v6 {
+    padding-left: 79px !important;
+  }
+
+  .admin-top-v6 h1 {
+    font-size: 30px !important;
+  }
+}
+
+@media (max-width: 720px) {
+
+  .admin-mobile-logo-trigger {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    width: 145px;
+    height: 62px;
+    z-index: 10000;
+  }
+
+  .admin-mobile-logo-trigger button {
+    width: 145px;
+    height: 62px;
+
+    padding: 8px 12px;
+    margin: 0;
+
+    border: 1px solid rgba(20, 90, 70, 0.15);
+    border-radius: 14px;
+
+    background: #fffdf7;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+  }
+
+  .admin-mobile-logo-trigger img {
+    width: 34px !important;
+    height: auto !important;
+
+    max-width: none !important;
+    max-height: none !important;
+
+    object-fit: contain;
+    display: block;
+
+    /* logo.png itself has empty space, so enlarge it */
+    transform: scale(1.65);
+    transform-origin: center;
+  }
+}
+
+/* Mobile admin logo */
+.admin-mobile-logo-trigger {
+  width: 68px !important;
+  height: 68px !important;
+  min-width: 68px !important;
+  min-height: 68px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 6px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.admin-mobile-logo-trigger button {
+  width: 100% !important;
+  height: 100% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.admin-mobile-logo-trigger img.admin-mobile-logo {
+  width: 100% !important;
+  height: 100% !important;
+
+  max-width: none !important;
+  max-height: none !important;
+
+  object-fit: contain !important;
+  object-position: center !important;
+
+  display: block !important;
+}
+
+@media (max-width: 720px) {
+  .admin-mobile-logo-trigger {
+    width: 32px !important;
+    height: 64px !important;
+  }
+}
+
+
+/* =========================================================
+   PREMIUM ADMIN SIDEBAR
+   ========================================================= */
+
+.admin-sidebar-v6 {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+
+  width: 248px !important;
+  height: 100dvh !important;
+
+  box-sizing: border-box !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  padding: 28px 18px 22px !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(250, 247, 237, 0.98) 0%,
+      rgba(246, 241, 228, 0.98) 100%
+    ) !important;
+
+  border-right: 1px solid rgba(18, 93, 77, 0.10) !important;
+
+  box-shadow:
+    8px 0 30px rgba(18, 65, 55, 0.06) !important;
+
+  z-index: 9000 !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(18, 93, 77, 0.20) transparent !important;
+}
+
+
+/* Chrome / Edge / Safari scrollbar */
+
+.admin-sidebar-v6::-webkit-scrollbar {
+  width: 5px !important;
+}
+
+.admin-sidebar-v6::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.admin-sidebar-v6::-webkit-scrollbar-thumb {
+  background: rgba(18, 93, 77, 0.18) !important;
+  border-radius: 20px !important;
+}
+
+.admin-sidebar-v6::-webkit-scrollbar-thumb:hover {
+  background: rgba(18, 93, 77, 0.32) !important;
+}
+
+
+/* =========================================================
+   SIDEBAR NAVIGATION
+   ========================================================= */
+
+.admin-sidebar-v6 nav,
+.admin-sidebar-v6 .admin-nav,
+.admin-sidebar-v6 .admin-nav-items {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 7px !important;
+
+  width: 100% !important;
+}
+
+
+/* Each navigation item */
+
+.admin-sidebar-v6 a,
+.admin-sidebar-v6 button {
+  position: relative !important;
+
+  width: 100% !important;
+  min-height: 54px !important;
+
+  box-sizing: border-box !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  gap: 17px !important;
+
+  padding: 0 17px !important;
+
+  border: 1px solid transparent !important;
+  border-radius: 16px !important;
+
+  background: transparent !important;
+
+  color: #075b4b !important;
+
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+
+  text-decoration: none !important;
+
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease !important;
+}
+
+
+/* Icon */
+
+.admin-sidebar-v6 a svg,
+.admin-sidebar-v6 button svg,
+.admin-sidebar-v6 .nav-icon {
+  width: 21px !important;
+  height: 21px !important;
+
+  min-width: 21px !important;
+
+  color: #08715d !important;
+
+  stroke-width: 1.8 !important;
+
+  transition:
+    transform 180ms ease,
+    color 180ms ease !important;
+}
+
+
+/* Hover */
+
+.admin-sidebar-v6 a:hover,
+.admin-sidebar-v6 button:hover {
+  background: rgba(255, 255, 255, 0.62) !important;
+
+  border-color: rgba(18, 93, 77, 0.10) !important;
+
+  box-shadow:
+    0 5px 18px rgba(18, 65, 55, 0.06) !important;
+
+  transform: translateX(2px) !important;
+}
+
+
+.admin-sidebar-v6 a:hover svg,
+.admin-sidebar-v6 button:hover svg {
+  transform: scale(1.08) !important;
+}
+
+
+/* =========================================================
+   ACTIVE ITEM
+   ========================================================= */
+
+.admin-sidebar-v6 a.active,
+.admin-sidebar-v6 button.active,
+.admin-sidebar-v6 .active {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(224, 232, 218, 0.95),
+      rgba(218, 227, 214, 0.78)
+    ) !important;
+
+  border-color: rgba(18, 93, 77, 0.16) !important;
+
+  box-shadow:
+    0 7px 22px rgba(18, 65, 55, 0.08),
+    inset 0 1px 0 rgba(255,255,255,0.7) !important;
+
+  color: #064f42 !important;
+}
+
+
+/* Premium active indicator */
+
+.admin-sidebar-v6 a.active::before,
+.admin-sidebar-v6 button.active::before,
+.admin-sidebar-v6 .active::before {
+  content: "" !important;
+
+  position: absolute !important;
+
+  left: -1px !important;
+  top: 11px !important;
+  bottom: 11px !important;
+
+  width: 3px !important;
+
+  border-radius: 0 5px 5px 0 !important;
+
+  background: #9b6a25 !important;
+}
+
+
+/* =========================================================
+   BADGE
+   ========================================================= */
+
+.admin-sidebar-v6 .badge,
+.admin-sidebar-v6 .nav-badge {
+  margin-left: auto !important;
+
+  min-width: 27px !important;
+  height: 27px !important;
+
+  padding: 0 7px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border-radius: 50% !important;
+
+  background: #dca62e !important;
+
+  color: #fff !important;
+
+  font-size: 12px !important;
+  font-weight: 700 !important;
+
+  box-shadow:
+    0 3px 8px rgba(160, 105, 20, 0.20) !important;
+}
+
+
+/* =========================================================
+   SIDEBAR FOOTER
+   ========================================================= */
+
+.admin-sidebar-v6 > *:last-child {
+  margin-top: auto !important;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 720px) {
+
+  .admin-sidebar-v6 {
+    width: min(82vw, 300px) !important;
+
+    padding:
+      22px 14px
+      max(22px, env(safe-area-inset-bottom))
+      !important;
+
+    box-shadow:
+      12px 0 40px rgba(0, 0, 0, 0.16) !important;
+  }
+
+  .admin-sidebar-v6 a,
+  .admin-sidebar-v6 button {
+    min-height: 52px !important;
+
+    padding: 0 15px !important;
+
+    border-radius: 15px !important;
+
+    font-size: 14px !important;
+  }
+
+  .admin-sidebar-v6 a svg,
+  .admin-sidebar-v6 button svg,
+  .admin-sidebar-v6 .nav-icon {
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+
+/* =========================================================
+   FINAL PREMIUM ADMIN SIDEBAR
+   ========================================================= */
+
+.admin-sidebar-v6 {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+
+  width: 250px !important;
+  height: 100dvh !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  box-sizing: border-box !important;
+
+  padding: 22px 14px !important;
+
+  background: linear-gradient(
+    180deg,
+    #f8f4e9 0%,
+    #f3eee1 100%
+  ) !important;
+
+  border-right: 1px solid rgba(20, 90, 70, 0.10) !important;
+
+  box-shadow:
+    8px 0 30px rgba(48, 42, 28, 0.07) !important;
+
+  overflow: hidden !important;
+
+  z-index: 1001 !important;
+}
+
+
+/* -------------------------
+   LOGO AREA
+   ------------------------- */
+
+.admin-brand-v6 {
+  width: 100% !important;
+  height: 82px !important;
+  min-height: 82px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 0 18px !important;
+  padding: 8px !important;
+
+  background: transparent !important;
+}
+
+.admin-brand-v6 img,
+.admin-brand-v6 .admin-brand-logo {
+  width: 175px !important;
+  max-width: 175px !important;
+  height: auto !important;
+
+  object-fit: contain !important;
+
+  background: transparent !important;
+}
+
+
+/* remove decorative sprout if it is making sidebar crowded */
+
+.admin-sprout-glass-v73 {
+  display: none !important;
+}
+
+
+/* -------------------------
+   NAVIGATION
+   ------------------------- */
+
+.admin-nav-v6 {
+  flex: 1 1 auto !important;
+
+  width: 100% !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  gap: 6px !important;
+
+  min-height: 0 !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  padding: 4px 2px 12px !important;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(92, 58, 29, 0.18) transparent;
+}
+
+
+/* scrollbar */
+
+.admin-nav-v6::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-nav-v6::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-nav-v6::-webkit-scrollbar-thumb {
+  background: rgba(92, 58, 29, 0.18);
+  border-radius: 20px;
+}
+
+
+/* -------------------------
+   NAV ITEMS
+   ------------------------- */
+
+.admin-nav-v6 button {
+  position: relative !important;
+
+  width: 100% !important;
+  min-height: 52px !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  gap: 14px !important;
+
+  padding: 10px 14px !important;
+  margin: 0 !important;
+
+  border: 1px solid transparent !important;
+  border-radius: 15px !important;
+
+  background: transparent !important;
+
+  color: #075b48 !important;
+
+  font-size: 15px !important;
+  font-weight: 600 !important;
+
+  text-align: left !important;
+
+  cursor: pointer !important;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease !important;
+}
+
+
+/* icon */
+
+.admin-nav-v6 button > span {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border-radius: 10px !important;
+
+  background: rgba(8, 88, 62, 0.055) !important;
+
+  color: #08735b !important;
+
+  font-size: 18px !important;
+
+  transition: all 0.2s ease !important;
+}
+
+
+/* page name */
+
+.admin-nav-v6 button strong {
+  flex: 1 !important;
+
+  font-size: 15px !important;
+  font-weight: 600 !important;
+
+  letter-spacing: 0.01em !important;
+}
+
+
+/* hover */
+
+.admin-nav-v6 button:hover {
+  background: rgba(8, 88, 62, 0.065) !important;
+
+  transform: translateX(2px) !important;
+}
+
+.admin-nav-v6 button:hover > span {
+  background: rgba(8, 88, 62, 0.11) !important;
+}
+
+
+/* ACTIVE */
+
+.admin-nav-v6 button.active {
+  background: linear-gradient(
+    90deg,
+    rgba(8, 88, 62, 0.12),
+    rgba(8, 88, 62, 0.055)
+  ) !important;
+
+  border-color: rgba(8, 88, 62, 0.14) !important;
+
+  box-shadow:
+    inset 3px 0 0 #8b612c,
+    0 4px 14px rgba(40, 60, 45, 0.05) !important;
+}
+
+.admin-nav-v6 button.active > span {
+  background: #e3efe6 !important;
+  color: #075b48 !important;
+}
+
+
+/* badge */
+
+.admin-nav-v6 button b {
+  min-width: 27px !important;
+  height: 27px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border-radius: 50% !important;
+
+  background: #dda52e !important;
+  color: white !important;
+
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+
+/* -------------------------
+   PROFILE AREA
+   ------------------------- */
+
+.admin-profile-v6 {
+  flex: 0 0 auto !important;
+
+  width: 100% !important;
+
+  margin-top: 10px !important;
+  padding: 12px !important;
+
+  border-top: 1px solid rgba(92, 58, 29, 0.10) !important;
+
+  background: rgba(255, 255, 255, 0.28) !important;
+
+  border-radius: 15px !important;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 720px) {
+
+  .admin-sidebar-v6 {
+    width: min(300px, 84vw) !important;
+    min-width: min(300px, 84vw) !important;
+
+    height: 100dvh !important;
+
+    position: fixed !important;
+
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+
+    padding: 18px 14px !important;
+
+    transform: translateX(-105%) !important;
+
+    transition:
+      transform 0.28s cubic-bezier(.22,.61,.36,1),
+      box-shadow 0.28s ease !important;
+
+    overflow: hidden !important;
+
+    box-shadow: none !important;
+  }
+
+
+  .admin-sidebar-v6.mobile-sidebar-open {
+    transform: translateX(0) !important;
+
+    box-shadow:
+      14px 0 40px rgba(25, 40, 30, 0.20) !important;
+  }
+
+
+  /* logo inside sidebar */
+
+  .admin-brand-v6 {
+    height: 76px !important;
+    min-height: 76px !important;
+
+    margin-bottom: 12px !important;
+  }
+
+  .admin-brand-v6 img,
+  .admin-brand-v6 .admin-brand-logo {
+    width: 170px !important;
+    max-width: 170px !important;
+  }
+
+
+  /* nav gets the remaining screen height */
+
+  .admin-nav-v6 {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+
+    padding-bottom: 16px !important;
+  }
+
+
+  .admin-nav-v6 button {
+    min-height: 54px !important;
+
+    padding: 10px 13px !important;
+
+    border-radius: 14px !important;
+  }
+
+
+  .admin-nav-v6 button strong {
+    font-size: 14px !important;
+  }
+
+
+  .admin-profile-v6 {
+    flex-shrink: 0 !important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE OVERLAY
+   ========================================================= */
+
+@media (max-width: 720px) {
+
+  .admin-mobile-sidebar-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100dvh !important;
+
+    background: rgba(18, 35, 28, 0.25) !important;
+
+    backdrop-filter: blur(3px) !important;
+    -webkit-backdrop-filter: blur(3px) !important;
+
+    z-index: 1000 !important;
+  }
+}
+
+/* =========================================================
+   ADMIN SCROLL FIX
+   ========================================================= */
+
+html,
+body,
+#root {
+  min-height: 100%;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+}
+
+/* Main admin layout */
+.admin-shell-v6 {
+  min-height: 100dvh !important;
+  height: auto !important;
+  overflow: visible !important;
+  display: flex;
+  align-items: stretch;
+}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.admin-sidebar-v6 {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  bottom: 0;
+
+  width: 240px;
+
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  max-height: none !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  overflow: hidden !important;
+
+  z-index: 1000;
+}
+
+/* ONLY the navigation scrolls */
+.admin-nav-v6 {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+
+  height: auto !important;
+  max-height: none !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  padding-bottom: 24px;
+}
+
+/* Navigation items should not shrink */
+.admin-nav-v6 > *,
+.admin-nav-v6 button,
+.admin-nav-v6 a {
+  flex-shrink: 0 !important;
+}
+
+/* Sidebar scrollbar */
+.admin-nav-v6 {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(20, 80, 65, 0.25) transparent;
+}
+
+.admin-nav-v6::-webkit-scrollbar {
+  width: 5px;
+}
+
+.admin-nav-v6::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-nav-v6::-webkit-scrollbar-thumb {
+  background: rgba(20, 80, 65, 0.25);
+  border-radius: 999px;
+}
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.admin-main-v6 {
+  min-height: 100dvh !important;
+  height: auto !important;
+
+  overflow: visible !important;
+
+  margin-left: 240px;
+  width: calc(100% - 240px);
+}
+
+/* Prevent sections from locking the page */
+.admin-main-v6,
+.admin-main-v6 > * {
+  max-height: none !important;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 720px) {
+
+  .admin-shell-v6 {
+    display: block !important;
+    min-height: 100dvh !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .admin-sidebar-v6 {
+    width: min(82vw, 300px) !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    overflow: hidden !important;
+  }
+
+  .admin-nav-v6 {
+    min-height: 0 !important;
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-main-v6 {
+    width: 100% !important;
+    margin-left: 0 !important;
+
+    min-height: 100dvh !important;
+    height: auto !important;
+
+    overflow: visible !important;
+  }
+}
+
+/* ===== Admin: page scroll + mobile sidebar fix ===== */
+html,
+body,
+#root {
+  height: auto !important;
+  min-height: 100%;
+  overflow-x: clip !important;   /* clip does not create a scroll container */
+  overflow-y: visible !important;
+}
+
+.admin-shell-v6,
+.admin-main-v6 {
+  overflow: visible !important;
+  height: auto !important;
+}
+
+.admin-mobile-logo-trigger.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 720px) {
+  /* overlay covers the whole screen, sits just under the sidebar */
+  .admin-mobile-sidebar-overlay {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 1000 !important;
+    background: rgba(18, 35, 28, 0.35) !important;
+  }
+
+  .admin-sidebar-v6 {
+    z-index: 1001 !important;
+  }
+
+  /* only the menu list scrolls inside the sidebar */
+  .admin-sidebar-v6 .admin-nav-v6 {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ===== Mobile admin logo: no card, blends with page bg ===== */
+@media (max-width: 720px) {
+  .admin-mobile-logo-trigger,
+  .admin-mobile-logo-trigger button {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 0 !important;
+    outline: none;
+  }
+
+  .admin-mobile-logo-trigger {
+    position: absolute !important;   /* scrolls away with the page header */
+    top: 10px !important;
+    left: 12px !important;
+    width: 68px !important;
+    height: 68px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+
+  .admin-mobile-logo-trigger button {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .admin-mobile-logo-trigger img,
+  .admin-mobile-logo-trigger img.admin-mobile-logo {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    transform: none !important;
+    background: transparent !important;
+    mix-blend-mode: multiply;        /* merges the logo's light pixels into the page bg */
+  }
+}
+
+/* =========================================================
+   PREMIUM ADMIN SIDEBAR — NAV + PROFILE
+   Keep at the very end of styles.css
+   ========================================================= */
+
+/* ---------- soft ambient background ---------- */
+.admin-sidebar-v6 {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(214, 232, 210, .55), transparent 38%),
+    radial-gradient(circle at 0% 100%, rgba(226, 195, 107, .16), transparent 40%),
+    linear-gradient(180deg, #faf6ea 0%, #f4eedf 100%) !important;
+}
+
+/* ---------- navigation list ---------- */
+.admin-sidebar-v6 .admin-nav-v6 {
+  gap: 8px !important;
+  padding: 6px 4px 14px !important;
+}
+
+/* small "MENU" label above the items */
+.admin-sidebar-v6 .admin-nav-v6::before {
+  content: "MENU";
+  display: block;
+  padding: 4px 14px 8px;
+  color: #a58a55;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .22em;
+}
+
+/* ---------- nav item ---------- */
+.admin-sidebar-v6 .admin-nav-v6 button {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  min-height: 56px !important;
+  padding: 8px 14px 8px 10px !important;
+  border: 1px solid transparent !important;
+  border-radius: 16px !important;
+  background: transparent !important;
+  color: #2b5a49 !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  letter-spacing: .01em;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: background .22s ease, border-color .22s ease,
+              box-shadow .22s ease, color .22s ease !important;
+}
+
+.admin-sidebar-v6 .admin-nav-v6 button strong {
+  flex: 1 !important;
+  font-family: inherit !important;
+  font-size: 15px !important;
+  font-weight: 650 !important;
+  text-align: left;
+}
+
+/* ---------- icon tile ---------- */
+.admin-sidebar-v6 .admin-nav-v6 button > span {
+  flex: 0 0 38px !important;
+  width: 38px !important;
+  height: 38px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 12px !important;
+  background: linear-gradient(145deg, #ffffff, #e7efe5) !important;
+  border: 1px solid rgba(8, 88, 62, .10);
+  color: #0a6a50 !important;
+  font-size: 18px !important;
+  box-shadow: 0 3px 8px rgba(24, 62, 46, .07),
+              inset 0 1px 0 rgba(255, 255, 255, .9);
+  transition: background .22s ease, color .22s ease,
+              transform .22s ease, box-shadow .22s ease !important;
+}
+
+/* ---------- hover ---------- */
+.admin-sidebar-v6 .admin-nav-v6 button:hover {
+  background: rgba(255, 255, 255, .72) !important;
+  border-color: rgba(8, 88, 62, .10) !important;
+  box-shadow: 0 8px 20px rgba(24, 62, 46, .08) !important;
+  color: #064f3c !important;
+}
+
+.admin-sidebar-v6 .admin-nav-v6 button:hover > span {
+  transform: scale(1.07) rotate(-3deg);
+}
+
+/* ---------- active ---------- */
+.admin-sidebar-v6 .admin-nav-v6 button.active {
+  background: linear-gradient(100deg, #e2eedd 0%, #eef4e8 100%) !important;
+  border-color: rgba(8, 88, 62, .16) !important;
+  color: #05452f !important;
+  box-shadow: 0 10px 24px rgba(24, 62, 46, .10),
+              inset 0 1px 0 rgba(255, 255, 255, .8) !important;
+}
+
+/* gold accent bar */
+.admin-sidebar-v6 .admin-nav-v6 button.active::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 14px;
+  bottom: 14px;
+  width: 4px;
+  border-radius: 0 6px 6px 0;
+  background: linear-gradient(180deg, #e6bd5a, #a8741f);
+}
+
+/* active icon = solid forest green */
+.admin-sidebar-v6 .admin-nav-v6 button.active > span {
+  background: linear-gradient(145deg, #0d7a58, #065540) !important;
+  border-color: transparent;
+  color: #f6e7b8 !important;
+  box-shadow: 0 6px 14px rgba(6, 85, 64, .30),
+              inset 0 1px 0 rgba(255, 255, 255, .22);
+}
+
+/* ---------- count badge (inline, right side) ---------- */
+.admin-sidebar-v6 .admin-nav-v6 button b {
+  position: static !important;
+  flex: 0 0 auto !important;
+  min-width: 26px !important;
+  width: auto !important;
+  height: 26px !important;
+  padding: 0 8px !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  border-radius: 999px !important;
+  background: linear-gradient(145deg, #efc766, #cf9a2b) !important;
+  color: #4a3410 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 10px rgba(200, 150, 40, .35),
+              inset 0 1px 0 rgba(255, 255, 255, .5);
+}
+
+/* =========================================================
+   PROFILE CARD
+   ========================================================= */
+.admin-sidebar-v6 .admin-profile-v6 {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: 46px minmax(0, 1fr) !important;
+  align-items: center !important;
+  justify-items: stretch !important;
+  gap: 4px 12px !important;
+  margin-top: 8px !important;
+  padding: 14px !important;
+  overflow: hidden;
+  border: 1px solid rgba(226, 195, 107, .30) !important;
+  border-radius: 20px !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(226, 195, 107, .20), transparent 45%),
+    linear-gradient(150deg, #0b6a4f 0%, #065540 55%, #04382c 100%) !important;
+  box-shadow: 0 14px 30px rgba(4, 56, 44, .28),
+              inset 0 1px 0 rgba(255, 255, 255, .12) !important;
+  text-align: left !important;
+}
+
+/* show name + email again (mobile rule used to hide them) */
+.admin-sidebar-v6 .admin-profile-v6 > div:nth-child(2) {
+  display: block !important;
+  min-width: 0;
+}
+
+.admin-sidebar-v6 .admin-avatar-v6 {
+  width: 46px !important;
+  height: 46px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 50% !important;
+  background: linear-gradient(145deg, #f3d98a, #c8923a) !important;
+  border: 2px solid rgba(255, 255, 255, .55);
+  color: #4a3410 !important;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px !important;
+  font-weight: 700;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .25);
+}
+
+.admin-sidebar-v6 .admin-profile-v6 strong {
+  display: block;
+  overflow: hidden;
+  color: #fbf3da !important;
+  font-size: 14.5px !important;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-sidebar-v6 .admin-profile-v6 small {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: rgba(251, 243, 218, .68) !important;
+  font-size: 11.5px !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- logout button ---------- */
+.admin-sidebar-v6 .admin-profile-v6 button {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-height: 44px !important;
+  margin-top: 10px !important;
+  padding: 0 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  border: 1px solid rgba(255, 255, 255, .22) !important;
+  border-radius: 13px !important;
+  background: rgba(255, 255, 255, .10) !important;
+  color: #fbf3da !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: .04em;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: background .2s ease, border-color .2s ease, color .2s ease !important;
+}
+
+.admin-sidebar-v6 .admin-profile-v6 button::after {
+  content: "→";
+  font-size: 15px;
+  transition: transform .2s ease;
+}
+
+.admin-sidebar-v6 .admin-profile-v6 button:hover {
+  background: linear-gradient(145deg, #f3d98a, #d9a63f) !important;
+  border-color: transparent !important;
+  color: #3d2b0c !important;
+}
+
+.admin-sidebar-v6 .admin-profile-v6 button:hover::after {
+  transform: translateX(4px);
 }
