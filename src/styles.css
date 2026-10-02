@@ -22869,3 +22869,96 @@ body:has(.admin-login-page),
     font-size: 16px;
   }
 }
+
+/* =========================================================
+   ADMIN LOGIN - FIXED LEFT-ALIGNED RESPONSIVE LAYOUT
+   ========================================================= */
+
+.admin-login-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  /* Do NOT center the contents */
+  display: block;
+}
+
+/* Background always fills the viewport */
+.admin-login-background {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+}
+
+/* Overlay */
+.admin-login-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Login card stays anchored */
+.admin-login-card {
+  position: relative;
+  z-index: 2;
+
+  width: min(560px, calc(100vw - 48px));
+  min-height: 600px;
+
+  /* LEFT SIDE POSITION */
+  margin-left: 48px;
+  margin-right: 0;
+
+  /* Prevent auto-centering */
+  transform: none;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .admin-login-card {
+    width: min(520px, calc(100vw - 40px));
+    margin-left: 40px;
+    margin-right: 0;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .admin-login-page {
+    min-height: 100svh;
+    padding: 24px 0;
+  }
+
+  .admin-login-card {
+    width: calc(100vw - 32px);
+
+    /* STILL LEFT ALIGNED */
+    margin-left: 16px;
+    margin-right: 0;
+
+    min-height: auto;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 400px) {
+  .admin-login-card {
+    width: calc(100vw - 24px);
+    margin-left: 12px;
+  }
+}
