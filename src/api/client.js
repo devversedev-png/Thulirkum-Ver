@@ -33,6 +33,8 @@ function handleAdminAuthorizationFailure(path, status) {
 
   localStorage.removeItem('tvb_token')
   localStorage.removeItem('tvb_user')
+  sessionStorage.removeItem('tvb_token')
+  sessionStorage.removeItem('tvb_user')
 
   const reason =
     status === 401
@@ -55,6 +57,8 @@ function handleCustomerAuthorizationFailure(path, status) {
 
   localStorage.removeItem('tvb_token')
   localStorage.removeItem('tvb_user')
+  sessionStorage.removeItem('tvb_token')
+  sessionStorage.removeItem('tvb_user')
 
   window.dispatchEvent(
     new Event('tvb:session-expired')
@@ -63,7 +67,8 @@ function handleCustomerAuthorizationFailure(path, status) {
 
 export async function api(path, options = {}) {
   const token =
-    localStorage.getItem('tvb_token')
+    localStorage.getItem('tvb_token') ||
+    sessionStorage.getItem('tvb_token')
 
   const headers = {
     Accept: 'application/json',

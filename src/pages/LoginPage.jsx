@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
 
   if (user?.role === 'ADMIN') return <Navigate to="/admin" replace />
   if (user) return <Navigate to="/home" replace />
@@ -23,7 +24,7 @@ export default function LoginPage() {
     setBusy(true)
     setError('')
     try {
-      if (mode === 'login') await login(form.email, form.password)
+      if (mode === 'login') await login(form.email, form.password, rememberMe)
       else await register(form)
       navigate('/home')
     } catch (err) {
@@ -56,7 +57,7 @@ export default function LoginPage() {
           <form onSubmit={submit}>
             {mode === 'register' && <><label>Name</label><input name="name" value={form.name} onChange={change} required /><label>Mobile Number</label><input name="mobile" value={form.mobile} onChange={change} /></>}
             <label>Email</label><input name="email" type="email" value={form.email} onChange={change} required />
-            <label>Password</label><label>Password</label>
+            <label>Password</label>
 
 <div className="password-input-wrap">
   <input
@@ -81,6 +82,18 @@ export default function LoginPage() {
     )}
   </button>
 </div>
+            {mode === 'login' && (
+              <label className="remember-me">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(event) =>
+                setRememberMe(event.target.checked)
+            }
+              />
+              <span>Remember me</span>
+            </label>
+            )}
             {error && <div className="form-error">{error}</div>}
             <button className="primary-btn full big" disabled={busy}>{busy ? 'Please wait...' : mode === 'login' ? 'Login' : 'Create Account'}</button>
           </form>

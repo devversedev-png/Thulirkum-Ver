@@ -3997,6 +3997,31 @@ main {
   margin-bottom: 24px;
 }
 
+/* Remember Me */
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  appearance: auto;
+}
+
+.remember-me span {
+  cursor: pointer;
+}
+
 .login-card h2, .admin-login-card h1 {
   margin: 8px 0 5px;
   font-size: 30px;

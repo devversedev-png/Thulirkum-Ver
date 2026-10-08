@@ -10,14 +10,30 @@ import { api } from '../api/client'
 
 const AuthContext = createContext(null)
 
+const TOKEN_KEY = 'tvb_token'
+const USER_KEY = 'tvb_user'
+
+function getStorage() {
+  return localStorage.getItem(TOKEN_KEY)
+    ? localStorage
+    : sessionStorage
+}
+
 function readStoredUser() {
   try {
-    const saved = localStorage.getItem('tvb_user')
+    const storage = getStorage()
+    const saved = storage.getItem(USER_KEY)
+
     if (!saved) return null
+
     return JSON.parse(saved)
   } catch {
-    localStorage.removeItem('tvb_user')
-    localStorage.removeItem('tvb_token')
+    localStorage.removeItem(USER_KEY)
+    localStorage.removeItem(TOKEN_KEY)
+
+    sessionStorage.removeItem(USER_KEY)
+    sessionStorage.removeItem(TOKEN_KEY)
+
     return null
   }
 }
@@ -27,18 +43,29 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     function handleSessionExpired() {
-      localStorage.removeItem('tvb_token')
-      localStorage.removeItem('tvb_user')
+      localStorage.removeItem(TOKEN_KEY)
+      localStorage.removeItem(USER_KEY)
+
+      sessionStorage.removeItem(TOKEN_KEY)
+      sessionStorage.removeItem(USER_KEY)
+
       setUser(null)
     }
 
-    window.addEventListener('tvb:session-expired', handleSessionExpired)
+    window.addEventListener(
+      'tvb:session-expired',
+      handleSessionExpired
+    )
+
     return () => {
-      window.removeEventListener('tvb:session-expired', handleSessionExpired)
+      window.removeEventListener(
+        'tvb:session-expired',
+        handleSessionExpired
+      )
     }
   }, [])
 
-  async function login(email, password) {
+  async function login(email, password, rememberMe = false) {
     const data = await api('/auth/login', {
       method: 'POST',
       body: JSON.stringify({
@@ -47,7 +74,7 @@ export function AuthProvider({ children }) {
       }),
     })
 
-    updateSession(data)
+    updateSession(data, rememberMe)
 
     return data
   }
@@ -61,7 +88,7 @@ export function AuthProvider({ children }) {
       }),
     })
 
-    updateSession(data)
+    updateSession(data, true)
 
     return data
   }
@@ -72,12 +99,12 @@ export function AuthProvider({ children }) {
       body: JSON.stringify(form),
     })
 
-    updateSession(data)
+    updateSession(data, true)
 
     return data
   }
 
-  function updateSession(data) {
+  function updateSession(data, rememberMe = true) {
     const account = {
       id: data.id,
       name: data.name,
@@ -85,14 +112,31 @@ export function AuthProvider({ children }) {
       role: data.role || 'CUSTOMER',
     }
 
-    localStorage.setItem('tvb_token', data.token)
-    localStorage.setItem('tvb_user', JSON.stringify(account))
+    const storage = rememberMe
+      ? localStorage
+      : sessionStorage
+
+    const otherStorage = rememberMe
+      ? sessionStorage
+      : localStorage
+
+    // Remove old session from the other storage
+    otherStorage.removeItem(TOKEN_KEY)
+    otherStorage.removeItem(USER_KEY)
+
+    storage.setItem(TOKEN_KEY, data.token)
+    storage.setItem(USER_KEY, JSON.stringify(account))
+
     setUser(account)
   }
 
   function logout() {
-    localStorage.removeItem('tvb_token')
-    localStorage.removeItem('tvb_user')
+    localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(USER_KEY)
+
+    sessionStorage.removeItem(TOKEN_KEY)
+    sessionStorage.removeItem(USER_KEY)
+
     setUser(null)
   }
 
