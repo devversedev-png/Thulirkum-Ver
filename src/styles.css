@@ -25022,3 +25022,43 @@ body,
 .admin-sidebar-v6 .admin-profile-v6 button:hover::after {
   transform: translateX(4px);
 }
+/* Add-to-cart stepper:  −  N item(s) added  + */
+.cart-stepper {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 30px;
+  margin-top: auto;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--green-800, #0b6549);
+  color: #fff;
+}
+.cart-stepper button {
+  flex: 0 0 34px;
+  border: 0;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+.cart-stepper button:hover:not(:disabled) { background: rgba(255, 255, 255, .28); }
+.cart-stepper button:disabled { opacity: .45; cursor: not-allowed; }
+.cart-stepper span {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.details-action-row .cart-stepper {
+  margin-top: 0;
+  min-height: 44px;
+  border-radius: 8px;
+}
+.details-action-row .cart-stepper span { font-size: 13px; }
+.details-action-row .cart-stepper button { flex-basis: 48px; font-size: 20px; }

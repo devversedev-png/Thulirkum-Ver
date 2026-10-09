@@ -2,6 +2,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useState } from 'react'
 import { useStore } from '../context/StoreContext'
 import BookCard from '../components/BookCard'
+import CartControl from '../components/CartControl'
 
 export default function BookDetailsPage() {
   const { id } = useParams()
@@ -112,7 +113,23 @@ export default function BookDetailsPage() {
           </div>
 
           <div className="details-action-row">
-            <button className="primary-btn big" onClick={() => cart(false)} disabled={!available || busy}>🛒 {!available ? 'Out of Stock' : added ? 'Added ✓' : busy ? 'Adding...' : 'Add to Cart'}</button>
+            <CartControl
+              book={book}
+              available={available}
+              className="primary-btn big"
+              addQuantity={qty}
+              addLabel="🛒 Add to Cart"
+              guard={() => {
+                if (!backendReady && String(book.id).startsWith('demo-')) {
+                  setMessage('Cart is temporarily unavailable. Please try again in a moment.')
+                  return false
+                }
+                setMessage('')
+                return true
+              }}
+              onAdd={() => setQty(1)}
+              onError={err => setMessage(err.message)}
+            />
             <button className={wish ? 'outline-btn selected-outline' : 'outline-btn'} onClick={() => backendReady && toggleWishlist(book.id)}>{wish ? '♥' : '♡'} {wish ? 'Wishlisted' : 'Add to Wishlist'}</button>
             <button className="buy-now-btn" onClick={() => cart(true)} disabled={!available || busy}>⚡ Buy Now</button>
           </div>

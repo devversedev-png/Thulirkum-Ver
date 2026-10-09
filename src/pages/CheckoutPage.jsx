@@ -2,6 +2,7 @@ import { Navigate, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
+import { api } from '../api/client'
 import {
   createRazorpayOrder,
   verifyRazorpayPayment
@@ -38,6 +39,12 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState(searchParams.get('coupon') || '')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+
+  // Wake the backend (Render free tier sleeps) while the user fills the form,
+  // so "Place Order" does not wait for a cold start.
+  useEffect(() => {
+    api('/health').catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (!addresses.length) return

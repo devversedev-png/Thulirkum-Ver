@@ -1,18 +1,16 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../context/StoreContext'
+import CartControl from './CartControl'
 
 export default function BookCard({ book, variant = 'default' }) {
   const {
     account,
-    addToCart,
     toggleWishlist,
     backendReady,
   } = useStore()
 
-  const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
-  const [added, setAdded] = useState(false)
 
   const inWishlist = account?.wishlist?.includes(book.id)
 
@@ -29,39 +27,6 @@ export default function BookCard({ book, variant = 'default' }) {
           ((book.originalPrice - book.price) / book.originalPrice) * 100
         )
       : 0
-
-  async function cartClick() {
-    if (!available || busy) return
-
-    if (!backendReady && String(book.id).startsWith('demo-')) {
-      setError('Cart is temporarily unavailable.')
-      return
-    }
-
-    setBusy(true)
-    setError('')
-    setAdded(false)
-
-    /*
-     * addToCart is optimistic: StoreContext updates the local cart
-     * before the backend request starts. Do not keep the button locked
-     * for the full network round-trip (especially when the backend is
-     * waking up on Render). The request continues in the background.
-     */
-    const request = addToCart(book.id, 1)
-
-    setBusy(false)
-    setAdded(true)
-
-    window.setTimeout(() => {
-      setAdded(false)
-    }, 700)
-
-    request.catch(err => {
-      setAdded(false)
-      setError(err.message)
-    })
-  }
 
   async function wishClick() {
     if (!backendReady && String(book.id).startsWith('demo-')) return
@@ -173,19 +138,19 @@ export default function BookCard({ book, variant = 'default' }) {
           )}
         </div>
 
-        <button
-          className="market-cart-button"
-          onClick={cartClick}
-          disabled={!available || busy}
-        >
-          {!available
-            ? 'Out of Stock'
-            : added
-              ? 'Added ✓'
-              : busy
-                ? 'Adding...'
-                : 'Add to Cart'}
-        </button>
+        <CartControl
+          book={book}
+          available={available}
+          guard={() => {
+            if (!backendReady && String(book.id).startsWith('demo-')) {
+              setError('Cart is temporarily unavailable.')
+              return false
+            }
+            setError('')
+            return true
+          }}
+          onError={err => setError(err.message)}
+        />
 
         {error && (
           <small className="card-error">
