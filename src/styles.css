@@ -2541,7 +2541,7 @@ main {
 }
 
 .form-grid label, .address-form-grid-v7 label, .admin-form-grid-v6 label, .admin-login-card label, .login-card label {
-  display: block;
+  /* display: block; */
   margin-bottom: 5px;
   color: #314d40;
   font-size: 12.5px;
