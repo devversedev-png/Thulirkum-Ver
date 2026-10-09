@@ -14,6 +14,7 @@ import { useStore } from '../context/StoreContext'
 
 import PremiumConfirm from '../components/PremiumConfirm'
 import PremiumSelect from '../components/PremiumSelect'
+import { getAccuratePosition, reverseGeocode, addressFromPlace, locationErrorMessage, accuracyNote } from '../utils/location'
 
 function statusLabel(value) {
   if (!value) {
@@ -323,185 +324,57 @@ export default function AccountPage() {
     )
   }
 
-  async function reverseGeocode(
-    latitude,
-    longitude
-  ) {
-    const baseUrl =
-      import.meta.env
-        .VITE_REVERSE_GEOCODE_URL ||
-      'https://nominatim.openstreetmap.org/reverse'
-
-    const separator =
-      baseUrl.includes('?')
-        ? '&'
-        : '?'
-
-    const url =
-      `${baseUrl}${separator}` +
-      `format=jsonv2&addressdetails=1` +
-      `&lat=${encodeURIComponent(
-        latitude
-      )}` +
-      `&lon=${encodeURIComponent(
-        longitude
-      )}`
-
-    const response =
-      await fetch(url, {
-        headers: {
-          'Accept-Language':
-            'en',
-        },
-      })
-
-    if (!response.ok) {
-      throw new Error(
-        'Unable to read the address from the map'
-      )
-    }
-
-    return response.json()
-  }
-
-  function useCurrentLocation() {
+  async function useCurrentLocation() {
     setAddressError('')
     setLocationMessage('')
-
-    if (
-      !navigator.geolocation
-    ) {
-      setAddressError(
-        'Location access is not supported by this browser.'
-      )
-
-      return
-    }
-
     setLocationBusy(true)
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const latitude =
-          Number(
-            position.coords.latitude.toFixed(
-              6
-            )
-          )
+    let pending = Promise.resolve()
+    let latest = 0
+    let geocoded = false
 
-        const longitude =
-          Number(
-            position.coords.longitude.toFixed(
-              6
-            )
-          )
-
-        setAddressForm(
-          (current) => ({
-            ...current,
-            latitude,
-            longitude,
-          })
-        )
-
-        try {
-          const place =
-            await reverseGeocode(
-              latitude,
-              longitude
-            )
-
-          const data =
-            place.address || {}
-
-          const road = [
-            data.house_number,
-            data.road ||
-            data.pedestrian ||
-            data.residential,
-          ]
-            .filter(Boolean)
-            .join(' ')
-
-          const locality =
-            data.suburb ||
-            data.neighbourhood ||
-            data.quarter ||
-            data.hamlet ||
-            ''
-
-          const city =
-            data.city ||
-            data.town ||
-            data.village ||
-            data.municipality ||
-            data.county ||
-            ''
-
-          setAddressForm(
-            (current) => ({
-              ...current,
-              latitude,
-              longitude,
-              line1:
-                road ||
-                current.line1,
-              line2:
-                locality ||
-                current.line2,
-              city:
-                city ||
-                current.city,
-              district:
-                data.state_district ||
-                data.county ||
-                data.district ||
-                current.district,
-              state:
-                data.state ||
-                current.state,
-              pincode:
-                data.postcode ||
-                current.pincode,
-              locationLabel:
-                place.display_name ||
-                current.locationLabel,
-            })
-          )
-
-          setLocationMessage(
-            'Live location captured and address details filled. You can edit them before saving.'
-          )
-        } catch {
-          setLocationMessage(
-            'Live location captured. Please complete the address fields before saving.'
-          )
-        } finally {
-          setLocationBusy(false)
-        }
-      },
-      (error) => {
-        setLocationBusy(false)
-
-        if (
-          error.code ===
-          error.PERMISSION_DENIED
-        ) {
-          setAddressError(
-            'Location permission was denied. Allow location access in the browser and try again.'
-          )
-        } else {
-          setAddressError(
-            'Unable to fetch your live location right now. You can still enter the address manually.'
-          )
-        }
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 12000,
-        maximumAge: 30000,
+    const fill = async position => {
+      const run = ++latest
+      const latitude = Number(position.coords.latitude.toFixed(6))
+      const longitude = Number(position.coords.longitude.toFixed(6))
+      setAddressForm(current => ({ ...current, latitude, longitude }))
+      try {
+        const found = addressFromPlace(await reverseGeocode(latitude, longitude))
+        if (run !== latest) return
+        geocoded = true
+        setAddressForm(current => ({
+          ...current,
+          latitude,
+          longitude,
+          line1: found.line1 || current.line1,
+          line2: found.line2 || current.line2,
+          city: found.city || current.city,
+          district: found.district || current.district,
+          state: found.state || current.state,
+          pincode: found.pincode || current.pincode,
+          locationLabel: found.locationLabel || current.locationLabel,
+        }))
+      } catch {
+        /* keep coordinates; user can type the address */
       }
-    )
+    }
+
+    try {
+      const best = await getAccuratePosition({
+        onFix: position => { pending = pending.then(() => fill(position)) },
+      })
+      await pending
+      const note = accuracyNote(best.coords.accuracy)
+      setLocationMessage(
+        (geocoded
+          ? 'Live location captured and address details filled. You can edit them before saving.'
+          : 'Live location captured. Please complete the address fields before saving.') + note
+      )
+    } catch (err) {
+      setAddressError(locationErrorMessage(err))
+    } finally {
+      setLocationBusy(false)
+    }
   }
 
   async function saveAddress(
@@ -667,10 +540,9 @@ export default function AccountPage() {
 
               Wishlist
 
-              <b>
-                {wishlistCount ||
-                  ''}
-              </b>
+              {wishlistCount > 0 && (
+                <b>{wishlistCount}</b>
+              )}
             </Link>
 
             <a href="#address">

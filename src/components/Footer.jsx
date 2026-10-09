@@ -26,10 +26,10 @@ export default function Footer() {
         <div>
           <h4>Quick Links</h4>
 
-          <Link to="/home">About Us</Link>
+          <Link to="/about">About Us</Link>
           <Link to="/shop">All Books</Link>
-          <Link to="/shop">Shipping & Delivery</Link>
-          <Link to="/offers">Returns & Refunds</Link>
+          <Link to="/shipping">Shipping & Delivery</Link>
+          <Link to="/returns">Returns & Refunds</Link>
         </div>
 
         {/* Account */}
@@ -46,8 +46,8 @@ export default function Footer() {
         <div>
           <h4>Support</h4>
 
-          <Link to="/account">FAQs</Link>
-          <Link to="/account">Order Tracking</Link>
+          <Link to="/faq">FAQs</Link>
+          <Link to="/track-order">Order Tracking</Link>
           <Link to="/account#address">
             Saved Addresses
           </Link>
@@ -81,9 +81,9 @@ export default function Footer() {
           </span>
 
           <span>
-            Terms & Conditions
+            <Link to="/terms">Terms & Conditions</Link>
             &nbsp; | &nbsp;
-            Privacy Policy
+            <Link to="/privacy">Privacy Policy</Link>
             &nbsp; | &nbsp;
             Read · Learn · Grow
           </span>

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
 import { api } from '../api/client'
+import { getAccuratePosition, reverseGeocode, addressFromPlace, locationErrorMessage, accuracyNote } from '../utils/location'
 import {
   createRazorpayOrder,
   verifyRazorpayPayment
@@ -78,62 +79,51 @@ export default function CheckoutPage() {
     setAddress(blankAddress(user))
   }
 
-  async function reverseGeocode(latitude, longitude) {
-    const baseUrl =
-      import.meta.env.VITE_REVERSE_GEOCODE_URL ||
-      'https://nominatim.openstreetmap.org/reverse'
-    const separator = baseUrl.includes('?') ? '&' : '?'
-    const response = await fetch(
-      `${baseUrl}${separator}format=jsonv2&addressdetails=1&lat=${encodeURIComponent(latitude)}&lon=${encodeURIComponent(longitude)}`,
-      { headers: { 'Accept-Language': 'en' } }
-    )
-    if (!response.ok) throw new Error('Unable to read the address from the map')
-    return response.json()
-  }
-
-  function useCurrentLocation() {
+  async function useCurrentLocation() {
     setError('')
-    if (!navigator.geolocation) {
-      setError('Location access is not supported by this browser.')
-      return
+    setBusy(true)
+
+    let pending = Promise.resolve()
+    let latest = 0
+
+    const fill = async position => {
+      const run = ++latest
+      const latitude = Number(position.coords.latitude.toFixed(6))
+      const longitude = Number(position.coords.longitude.toFixed(6))
+      // Show the coordinates straight away
+      setAddress(current => ({ ...current, latitude, longitude }))
+      try {
+        const found = addressFromPlace(await reverseGeocode(latitude, longitude))
+        if (run !== latest) return // a newer, better fix is already being applied
+        setAddress(current => ({
+          ...current,
+          latitude,
+          longitude,
+          locationLabel: found.locationLabel || current.locationLabel,
+          line1: found.line1 || current.line1,
+          line2: found.line2 || current.line2,
+          city: found.city || current.city,
+          district: found.district || current.district,
+          state: found.state || current.state,
+          pincode: found.pincode || current.pincode,
+        }))
+      } catch (err) {
+        if (run === latest) setError(err.message || 'Unable to read the address from the map.')
+      }
     }
 
-    setBusy(true)
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const latitude = Number(position.coords.latitude.toFixed(6))
-          const longitude = Number(position.coords.longitude.toFixed(6))
-          const data = await reverseGeocode(latitude, longitude)
-          const geo = data?.address || {}
-          setAddress(current => ({
-            ...current,
-            latitude,
-            longitude,
-            locationLabel: data?.display_name || '',
-            line1: current.line1 || [geo.house_number, geo.road].filter(Boolean).join(' '),
-            city: current.city || geo.city || geo.town || geo.village || geo.municipality || '',
-            district: current.district || geo.state_district || geo.county || geo.district || '',
-            state: current.state || geo.state || '',
-            pincode: current.pincode || geo.postcode || '',
-          }))
-        } catch (err) {
-          setError(err.message || 'Unable to fetch the current address.')
-        } finally {
-          setBusy(false)
-        }
-      },
-      (error) => {
-        setBusy(false)
-        const messages = {
-          1: 'Location permission was denied. Please allow location access and try again.',
-          2: 'Your current location could not be determined.',
-          3: 'Location request timed out. Please try again.',
-        }
-        setError(messages[error.code] || 'Unable to get your current location.')
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-    )
+    try {
+      const best = await getAccuratePosition({
+        onFix: position => { pending = pending.then(() => fill(position)) },
+      })
+      await pending
+      const note = accuracyNote(best.coords.accuracy)
+      if (note) setError(note.trim())
+    } catch (err) {
+      setError(locationErrorMessage(err))
+    } finally {
+      setBusy(false)
+    }
   }
 
   async function submit(event) {
