@@ -86,7 +86,13 @@
 
 .info-empty { padding: 36px 20px; text-align: center; border-radius: 12px; background: #f6fbf7; border: 1px dashed #cfe3d3; color: #4a6056; }
 .info-empty.error { color: var(--danger, #c84436); }
-.info-empty .primary-btn { display: inline-block; margin-top: 8px; text-decoration: none; }
+.info-empty .primary-btn {  margin-top: 8px; text-decoration: none; }
+/* .info-content a made the link text dark green on the green button */
+.info-content a.primary-btn,
+.info-content a.primary-btn:hover,
+.info-content a.primary-btn:focus-visible { color: #fff; font-weight: 700; }
+.info-content .info-cta a.primary-btn,
+.info-content .info-cta a.primary-btn:hover { color: #5b4310; }
 
 .track-search input { width: 100%; padding: 12px 14px; border: 1px solid #d5e0d7; border-radius: 10px; font-size: 14px; background: #fbfdfb; }
 .track-picker { display: flex; gap: 10px; overflow-x: auto; padding: 14px 2px; }
@@ -118,13 +124,13 @@
 .track-items div { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: #455a50; }
 .track-items .total { padding-top: 8px; border-top: 1px solid #e1e8e0; font-size: 15px; font-weight: 800; color: var(--green-950, #053b2d); }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .info-layout { grid-template-columns: 1fr; }
   .info-side { position: static; }
   .info-side nav { grid-template-columns: repeat(2, 1fr); }
   .info-hero blockquote { display: none; }
 }
-@media (max-width: 640px) {
+@media (max-width: 640px) and (pointer: coarse) {
   .info-hero h1 { font-size: 28px; }
   .info-hero-inner { padding-block: 24px 26px; }
   .info-content { padding: 20px 16px; }

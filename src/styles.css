@@ -86,7 +86,7 @@ main {
 }
 
 .site-shell {
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
   background: var(--cream);
 }
 
@@ -96,7 +96,7 @@ main {
 }
 
 .min-page {
-  min-height: 62vh;
+  min-height: calc(62 * var(--vh, 1vh));
 }
 
 .section {
@@ -661,7 +661,7 @@ main {
 
 .c9-home-copy h1 {
   margin: 12px 0 10px;
-  font-size: clamp(46px, 5vw, 70px);
+  font-size: clamp(46px, calc(5 * var(--vw, 1vw)), 70px);
   line-height: .92;
   letter-spacing: -.045em;
   font-weight: 600;
@@ -3784,7 +3784,7 @@ main {
 
 .address-modal-v7 {
   width: min(760px,100%);
-  max-height: 90vh;
+  max-height: calc(90 * var(--vh, 1vh));
   overflow: auto;
   border-radius: 12px;
   padding: 18px;
@@ -3911,7 +3911,7 @@ main {
    ========================================================= */
 
 .login-page, .admin-login-page {
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
   display: grid;
   grid-template-columns: 1.05fr .95fr;
   background: var(--cream);
@@ -3950,7 +3950,7 @@ main {
 
 .login-art h1, .admin-login-side h1 {
   margin: 12px 0;
-  font-size: clamp(48px,6vw,78px);
+  font-size: clamp(48px,calc(6 * var(--vw, 1vw)),78px);
   line-height: .95;
   letter-spacing: -.04em;
 }
@@ -4095,7 +4095,7 @@ main {
    ========================================================= */
 
 .admin-shell-v6 {
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
   display: grid;
   grid-template-columns: 238px minmax(0,1fr);
   background: #f8f7f1;
@@ -4104,7 +4104,7 @@ main {
 .admin-sidebar-v6 {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: calc(100 * var(--vh, 1vh));
   display: flex;
   flex-direction: column;
   padding: 22px 12px 16px;
@@ -4958,7 +4958,7 @@ main {
 
 .admin-order-modal {
   width: min(850px,100%);
-  max-height: 90vh;
+  max-height: calc(90 * var(--vh, 1vh));
   overflow: auto;
   border-radius: 12px;
   padding: 18px;
@@ -5209,7 +5209,7 @@ main {
    RESPONSIVE
    ========================================================= */
 
-@media (max-width: 1180px) {
+@media (max-width: 1180px) and (pointer: coarse) {
   .market-header {
     grid-template-columns: 190px minmax(280px,1fr) auto;
     gap: 15px;
@@ -5244,7 +5244,7 @@ main {
   }
 }
 
-@media (max-width: 960px) {
+@media (max-width: 960px) and (pointer: coarse) {
   .store-topbar {
     grid-template-columns: 1fr auto;
   }
@@ -5335,7 +5335,7 @@ main {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   :root {
     --page: 100%;
   }
@@ -5613,7 +5613,7 @@ main {
   }
 }
 
-@media (max-width: 460px) {
+@media (max-width: 460px) and (pointer: coarse) {
   .market-header-actions {
     gap: 0;
   }
@@ -5898,7 +5898,7 @@ h1, h2, h3, h4, blockquote {
 .tv-hero-left h1 {
   margin: 0;
   color: #0d4d3b;
-  font-size: clamp(52px, 4.2vw, 68px);
+  font-size: clamp(52px, calc(4.2 * var(--vw, 1vw)), 68px);
   line-height: .98;
   letter-spacing: -.045em;
 }
@@ -6445,7 +6445,7 @@ h1, h2, h3, h4, blockquote {
 
 /* ---------- Responsive ---------- */
 
-@media (max-width: 1180px) {
+@media (max-width: 1180px) and (pointer: coarse) {
   .market-header {
     grid-template-columns: 190px minmax(320px, 1fr) auto;
     gap: 16px;
@@ -6474,7 +6474,7 @@ h1, h2, h3, h4, blockquote {
   }
 }
 
-@media (max-width: 960px) {
+@media (max-width: 960px) and (pointer: coarse) {
   .tv-hero {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -6509,7 +6509,7 @@ h1, h2, h3, h4, blockquote {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   .tv-homepage .page-width, .market-footer-grid, .market-footer-bottom .page-width {
     width: calc(100% - 24px);
   }
@@ -6556,7 +6556,7 @@ h1, h2, h3, h4, blockquote {
   }
 }
 
-@media (max-width: 460px) {
+@media (max-width: 460px) and (pointer: coarse) {
   .tv-hero-left h1 {
     font-size: 39px;
   }
@@ -6685,7 +6685,7 @@ h1, h2, h3, h4, blockquote {
       Header + title section already occupy top area.
       Remaining viewport becomes shop area.
     */
-  height: calc(100vh - 355px);
+  height: calc(calc(100 * var(--vh, 1vh)) - 355px);
   min-height: 520px;
   padding-top: 18px;
   padding-bottom: 18px;
@@ -6803,15 +6803,15 @@ h1, h2, h3, h4, blockquote {
    RESPONSIVE
    ========================================================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1100px) and (pointer: coarse) {
   .concept-shop-layout {
     grid-template-columns: 220px minmax(0, 1fr);
-    height: calc(100vh - 330px);
+    height: calc(calc(100 * var(--vh, 1vh)) - 330px);
     gap: 15px;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (pointer: coarse) {
   .concept-shop-layout {
     display: block;
     height: auto;
@@ -6877,7 +6877,7 @@ h1, h2, h3, h4, blockquote {
 
 .market-shop-heading h1 {
   margin: 0 !important;
-  font-size: clamp( 34px, 3vw, 48px ) !important;
+  font-size: clamp( 34px, calc(3 * var(--vw, 1vw)), 48px ) !important;
   line-height: 1 !important;
   color: #064c3c;
 }
@@ -6948,7 +6948,7 @@ h1, h2, h3, h4, blockquote {
   display: grid !important;
   grid-template-columns: 255px minmax(0, 1fr) !important;
   gap: 20px !important;
-  height: calc( 100vh - 315px ) !important;
+  height: calc( calc(100 * var(--vh, 1vh)) - 315px ) !important;
   min-height: 520px;
   padding-top: 14px !important;
   padding-bottom: 14px !important;
@@ -7131,7 +7131,7 @@ h1, h2, h3, h4, blockquote {
   left: 0;
   bottom: 0;
   width: 100%;
-  height: min( 82vh, 690px );
+  height: min( calc(82 * var(--vh, 1vh)), 690px );
   display: flex;
   flex-direction: column;
   background: #ffffff;
@@ -7216,7 +7216,7 @@ h1, h2, h3, h4, blockquote {
    TABLET
    ========================================================= */
 
-@media ( max-width: 1000px ) {
+@media ( max-width: 1000px ) and (pointer: coarse) {
   .market-shop-heading {
     grid-template-columns: .8fr 1.2fr;
     min-height: 100px !important;
@@ -7230,7 +7230,7 @@ h1, h2, h3, h4, blockquote {
    MOBILE
    ========================================================= */
 
-@media ( max-width: 768px ) {
+@media ( max-width: 768px ) and (pointer: coarse) {
   /* HERO */
   .shop-title-band {
     overflow: hidden;
@@ -7327,7 +7327,7 @@ h1, h2, h3, h4, blockquote {
    SMALL MOBILE
    ========================================================= */
 
-@media ( max-width: 430px ) {
+@media ( max-width: 430px ) and (pointer: coarse) {
   .market-shop-heading h1 {
     font-size: 28px !important;
   }
@@ -7482,7 +7482,7 @@ h1, h2, h3, h4, blockquote {
    TABLET
    ========================================================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1100px) and (pointer: coarse) {
   .market-shop-heading {
     grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.2fr) !important;
     gap: 24px !important;
@@ -7493,7 +7493,7 @@ h1, h2, h3, h4, blockquote {
    MOBILE
    ========================================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (pointer: coarse) {
   .market-shop-heading {
     display: block !important;
     min-height: 0 !important;
@@ -7724,7 +7724,7 @@ h1, h2, h3, h4, blockquote {
    TABLET
    ========================================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .shop-slider-content {
     grid-template-columns: 1fr 200px;
     padding: 16px 55px;
@@ -7741,7 +7741,7 @@ h1, h2, h3, h4, blockquote {
    MOBILE
    ========================================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (pointer: coarse) {
   .shop-book-slider {
     padding: 8px 0;
   }
@@ -7981,14 +7981,14 @@ h1, h2, h3, h4, blockquote {
 
 /* Shop content height now accounts for the new slider */
 
-@media (min-width: 769px) {
+@media (min-width: 769px), (pointer: fine) {
   .concept-shop-layout {
-    height: calc(100dvh - 355px) !important;
+    height: calc(calc(100 * var(--dvh, 1dvh)) - 355px) !important;
     min-height: 500px;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (pointer: coarse) {
   .shop-book-slider {
     padding: 7px 0;
   }
@@ -8179,7 +8179,7 @@ h1, h2, h3, h4, blockquote {
   max-width: 580px;
   margin: 0 0 8px;
   color: #07483a;
-  font-size: clamp(28px, 2.4vw, 38px);
+  font-size: clamp(28px, calc(2.4 * var(--vw, 1vw)), 38px);
   line-height: .98;
   letter-spacing: -.025em;
 }
@@ -8401,7 +8401,7 @@ h1, h2, h3, h4, blockquote {
   background: #0a684a;
 }
 
-@media (max-width: 980px) {
+@media (max-width: 980px) and (pointer: coarse) {
   .category-feature-slide {
     grid-template-columns: minmax(0, 1fr) minmax(270px, .85fr);
     padding-inline: 54px;
@@ -8414,7 +8414,7 @@ h1, h2, h3, h4, blockquote {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (pointer: coarse) {
   .home-category-showcase {
     width: 100%;
     padding-top: 15px;
@@ -8523,7 +8523,7 @@ h1, h2, h3, h4, blockquote {
   }
 }
 
-@media (max-width: 430px) {
+@media (max-width: 430px) and (pointer: coarse) {
   .category-feature-slide {
     grid-template-columns: minmax(0, 1fr) 102px;
     padding-right: 28px;
@@ -8747,7 +8747,7 @@ h1, h2, h3, h4, blockquote {
 
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1200px) and (pointer: coarse) {
 
   .eyebrow,
   .store-topbar,
@@ -9033,7 +9033,7 @@ h1, h2, h3, h4, blockquote {
 
 }
 
-@media (max-width: 992px) {
+@media (max-width: 992px) and (pointer: coarse) {
 
   .eyebrow,
   .store-topbar,
@@ -9313,7 +9313,7 @@ h1, h2, h3, h4, blockquote {
 
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (pointer: coarse) {
 
   .eyebrow,
   .store-topbar,
@@ -9583,7 +9583,7 @@ h1, h2, h3, h4, blockquote {
 
 }
 
-@media (max-width: 480px) {
+@media (max-width: 480px) and (pointer: coarse) {
 
   .eyebrow,
   .store-topbar,
@@ -9847,7 +9847,7 @@ h1, h2, h3, h4, blockquote {
 
 }
 
-@media (max-width: 390px) {
+@media (max-width: 390px) and (pointer: coarse) {
 
   .eyebrow,
   .store-topbar,
@@ -10250,7 +10250,7 @@ body,
    TABLET / SMALL LAPTOP
    ------------------------- */
 
-@media (max-width: 960px) {
+@media (max-width: 960px) and (pointer: coarse) {
   .market-header {
     width: calc(100% - 32px) !important;
     grid-template-columns: 170px minmax(0, 1fr) !important;
@@ -10327,7 +10327,7 @@ body,
    MOBILE
    ------------------------- */
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   :root {
     --page: 100%;
   }
@@ -10373,7 +10373,7 @@ body,
     grid-column: 1 !important;
     grid-row: 1 !important;
     width: 145px !important;
-    max-width: 46vw !important;
+    max-width: calc(46 * var(--vw, 1vw)) !important;
     min-width: 0 !important;
   }
 
@@ -10634,10 +10634,10 @@ body,
    SMALL MOBILE
    ------------------------- */
 
-@media (max-width: 480px) {
+@media (max-width: 480px) and (pointer: coarse) {
   .market-brand {
     width: 132px !important;
-    max-width: 42vw !important;
+    max-width: calc(42 * var(--vw, 1vw)) !important;
   }
 
   .market-brand img {
@@ -10743,7 +10743,7 @@ img.admin-brand-logo {
    TABLET ADMIN
    ========================= */
 
-@media (max-width: 960px) {
+@media (max-width: 960px) and (pointer: coarse) {
 
   body .admin-sidebar-v6
   .admin-brand-v6
@@ -10762,7 +10762,7 @@ img.admin-brand-logo {
    MOBILE ADMIN
    ========================= */
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
 
   body .admin-sidebar-v6
   .admin-brand-v6 {
@@ -10853,7 +10853,7 @@ img.admin-brand-logo {
 
 /* TABLET */
 
-@media (max-width: 960px) {
+@media (max-width: 960px) and (pointer: coarse) {
 
   .admin-sidebar-v6
   .admin-brand-v6
@@ -10868,7 +10868,7 @@ img.admin-brand-logo {
 
 /* MOBILE */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .admin-home-section-toolbar-v7,
   .admin-home-config-grid-v7 {
     grid-template-columns: 1fr;
@@ -10879,7 +10879,7 @@ img.admin-brand-logo {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
 
   .admin-sidebar-v6 .admin-brand-v6 {
     min-height: 62px !important;
@@ -11245,7 +11245,7 @@ img.admin-brand-logo {
   background-repeat: no-repeat;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1100px) and (pointer: coarse) {
   .admin-home-book-grid-v7 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -11255,7 +11255,7 @@ img.admin-brand-logo {
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 760px) and (pointer: coarse) {
   .admin-home-section-toolbar-v7,
   .admin-banner-manager-v7,
   .admin-home-book-grid-v7 {
@@ -11323,7 +11323,7 @@ body h4 {
 /* Admin login: premium editorial / luxury bookstore treatment. */
 .admin-login-page {
   position: relative !important;
-  min-height: 100vh !important;
+  min-height: calc(100 * var(--vh, 1vh)) !important;
   grid-template-columns: minmax(0, 1.04fr) minmax(480px, .96fr) !important;
   overflow: hidden !important;
   background: #f8f6ef !important;
@@ -11343,8 +11343,8 @@ body h4 {
 
 .admin-login-side {
   position: relative !important;
-  min-height: 100vh !important;
-  padding: 64px clamp(44px, 7vw, 105px) 58px !important;
+  min-height: calc(100 * var(--vh, 1vh)) !important;
+  padding: 64px clamp(44px, calc(7 * var(--vw, 1vw)), 105px) 58px !important;
   justify-content: center !important;
   gap: 0 !important;
   overflow: hidden !important;
@@ -11403,7 +11403,7 @@ body h4 {
   margin: 0 0 24px !important;
   color: #fff !important;
   font-family: Georgia, 'Times New Roman', serif !important;
-  font-size: clamp(54px, 6vw, 86px) !important;
+  font-size: clamp(54px, calc(6 * var(--vw, 1vw)), 86px) !important;
   line-height: .93 !important;
   letter-spacing: -.055em !important;
   text-wrap: balance;
@@ -11587,7 +11587,7 @@ body h4 {
   text-underline-offset: 4px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .admin-login-page {
     grid-template-columns: 1fr !important;
     overflow: auto !important;
@@ -11609,7 +11609,7 @@ body h4 {
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 520px) and (pointer: coarse) {
   .admin-login-side {
     min-height: 350px !important;
     padding: 32px 22px 38px !important;
@@ -11731,7 +11731,7 @@ body h4 {
   margin: 0;
   color: var(--account-text);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(44px, 5vw, 62px);
+  font-size: clamp(44px, calc(5 * var(--vw, 1vw)), 62px);
   line-height: 0.98;
   letter-spacing: -0.035em;
 }
@@ -12080,7 +12080,7 @@ body h4 {
 
   font-family: Georgia, "Times New Roman", serif;
 
-  font-size: clamp(27px, 3vw, 39px) !important;
+  font-size: clamp(27px, calc(3 * var(--vw, 1vw)), 39px) !important;
   line-height: 1.05;
 
   letter-spacing: -0.025em;
@@ -12652,7 +12652,7 @@ p {
    ACCOUNT RESPONSIVE
    ========================================================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1100px) and (pointer: coarse) {
   .account-page-v7 {
     grid-template-columns: 235px minmax(0, 1fr);
     gap: 20px;
@@ -12676,7 +12676,7 @@ p {
   }
 }
 
-@media (max-width: 850px) {
+@media (max-width: 850px) and (pointer: coarse) {
   .account-page-v7 {
     grid-template-columns: 1fr;
   }
@@ -12732,7 +12732,7 @@ p {
   }
 }
 
-@media (max-width: 650px) {
+@media (max-width: 650px) and (pointer: coarse) {
   .account-page-v7 {
     width: min(100% - 24px, 1480px);
 
@@ -12793,7 +12793,7 @@ p {
   }
 }
 
-@media (max-width: 430px) {
+@media (max-width: 430px) and (pointer: coarse) {
   .account-title-banner h1 {
     font-size: 35px;
   }
@@ -13126,13 +13126,13 @@ p {
   font-size: 10px;
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1180px) and (pointer: coarse) {
   .admin-order-cards-v7 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   .admin-order-cards-v7 {
     grid-template-columns: 1fr;
   }
@@ -13160,7 +13160,7 @@ p {
   }
 }
 
-@media (max-width: 460px) {
+@media (max-width: 460px) and (pointer: coarse) {
   .admin-order-card-head-v7 {
     align-items: flex-start;
   }
@@ -13430,7 +13430,7 @@ p {
 .admin-login-page {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
   overflow: hidden;
 
   display: flex;
@@ -13495,9 +13495,9 @@ p {
   position: relative;
   z-index: 2;
 
-  width: min(510px, calc(100vw - 60px));
+  width: min(510px, calc(calc(100 * var(--vw, 1vw)) - 60px));
 
-  margin-right: clamp(40px, 5vw, 100px);
+  margin-right: clamp(40px, calc(5 * var(--vw, 1vw)), 100px);
 
   padding: 48px 52px 42px;
 
@@ -13625,7 +13625,7 @@ p {
     'Times New Roman',
     serif;
 
-  font-size: clamp(38px, 4vw, 52px);
+  font-size: clamp(38px, calc(4 * var(--vw, 1vw)), 52px);
 
   line-height: 1.05;
 
@@ -13887,9 +13887,9 @@ p {
    TABLET
    ========================================================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1100px) and (pointer: coarse) {
   .admin-login-card {
-    width: min(470px, calc(100vw - 50px));
+    width: min(470px, calc(calc(100 * var(--vw, 1vw)) - 50px));
 
     margin-right: 35px;
 
@@ -13906,12 +13906,12 @@ p {
    MOBILE
    ========================================================= */
 
-@media (max-width: 800px) {
+@media (max-width: 800px) and (pointer: coarse) {
   .admin-login-page {
     align-items: flex-end;
     justify-content: center;
 
-    min-height: 100vh;
+    min-height: calc(100 * var(--vh, 1vh));
 
     padding: 25px;
   }
@@ -13951,7 +13951,7 @@ p {
    SMALL MOBILE
    ========================================================= */
 
-@media (max-width: 480px) {
+@media (max-width: 480px) and (pointer: coarse) {
   .admin-login-page {
     padding: 15px;
   }
@@ -13996,13 +13996,13 @@ p {
 .admin-login-page {
     position: relative;
     width: 100%;
-    min-height: 100vh;
+    min-height: calc(100 * var(--vh, 1vh));
 
     display: flex;
     align-items: center;
     justify-content: flex-end;
 
-    padding: 40px 5vw;
+    padding: 40px calc(5 * var(--vw, 1vw));
 
     overflow: hidden;
 
@@ -14064,7 +14064,7 @@ p {
 
     z-index: 2;
 
-    width: min(560px, 92vw);
+    width: min(560px, calc(92 * var(--vw, 1vw)));
 
     padding: 46px 58px;
 
@@ -14129,7 +14129,7 @@ p {
 .admin-login-card h1 {
     margin: 0 0 10px;
 
-    font-size: clamp(42px, 4vw, 58px);
+    font-size: clamp(42px, calc(4 * var(--vw, 1vw)), 58px);
     line-height: 1.05;
 
     color: #073f32;
@@ -14282,7 +14282,7 @@ p {
    RESPONSIVE
    ========================================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
 
     .admin-login-page {
         justify-content: center;
@@ -14290,7 +14290,7 @@ p {
     }
 
     .admin-login-card {
-        width: min(560px, 95vw);
+        width: min(560px, calc(95 * var(--vw, 1vw)));
         padding: 38px 35px;
     }
 
@@ -14300,7 +14300,7 @@ p {
 }
 
 
-@media (max-width: 600px) {
+@media (max-width: 600px) and (pointer: coarse) {
 
     .admin-login-page {
         padding: 15px;
@@ -14330,7 +14330,7 @@ p {
 
 .admin-login-page {
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
   width: 100%;
   overflow: hidden;
 
@@ -14338,7 +14338,7 @@ p {
   align-items: center;
   justify-content: flex-end;
 
-  padding: 40px 6vw;
+  padding: 40px calc(6 * var(--vw, 1vw));
 
   background: #073f32;
 }
@@ -14379,7 +14379,7 @@ p {
 
   padding: 48px 48px 42px;
 
-  margin-right: 1.5vw;
+  margin-right: calc(1.5 * var(--vw, 1vw));
 
   border-radius: 28px;
 
@@ -14523,7 +14523,7 @@ p {
 
   font-family: Georgia, "Times New Roman", serif;
 
-  font-size: clamp(42px, 4vw, 58px);
+  font-size: clamp(42px, calc(4 * var(--vw, 1vw)), 58px);
   line-height: 1.02;
 
   font-weight: 700;
@@ -14790,7 +14790,7 @@ p {
    TABLET
    --------------------------------------------------------- */
 
-@media (max-width: 1100px) {
+@media (max-width: 1100px) and (pointer: coarse) {
   .admin-login-page {
     justify-content: center;
 
@@ -14812,9 +14812,9 @@ p {
    MOBILE
    --------------------------------------------------------- */
 
-@media (max-width: 650px) {
+@media (max-width: 650px) and (pointer: coarse) {
   .admin-login-page {
-    min-height: 100svh;
+    min-height: calc(100 * var(--svh, 1svh));
 
     padding: 20px 15px;
 
@@ -14877,8 +14877,8 @@ p {
 .admin-login-page {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: calc(100 * var(--vh, 1vh));
+  min-height: calc(100 * var(--dvh, 1dvh));
 
   overflow: hidden;
 
@@ -14886,7 +14886,7 @@ p {
   align-items: center;
   justify-content: flex-end;
 
-  padding: 40px 6vw;
+  padding: 40px calc(6 * var(--vw, 1vw));
 
   background: #063f32;
 }
@@ -14943,7 +14943,7 @@ p {
 
   width: min(500px, 100%);
 
-  margin-right: 1.5vw;
+  margin-right: calc(1.5 * var(--vw, 1vw));
 
   padding: 48px 48px 42px;
 
@@ -14987,7 +14987,7 @@ p {
    MOBILE
    --------------------------------------------------------- */
 
-@media (max-width: 700px) {
+@media (max-width: 700px) and (pointer: coarse) {
 
   .admin-login-page {
     justify-content: center;
@@ -15015,8 +15015,8 @@ p {
 .admin-login-page {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
+  height: calc(100 * var(--vh, 1vh));
 
   display: flex;
   align-items: center;
@@ -15090,9 +15090,9 @@ p {
 
   z-index: 5;
 
-  width: min(520px, calc(100vw - 48px));
+  width: min(520px, calc(calc(100 * var(--vw, 1vw)) - 48px));
 
-  margin-right: clamp(35px, 7vw, 120px);
+  margin-right: clamp(35px, calc(7 * var(--vw, 1vw)), 120px);
 
   padding: 48px 52px 42px;
 
@@ -15264,7 +15264,7 @@ p {
     "Times New Roman",
     serif;
 
-  font-size: clamp(42px, 4vw, 58px);
+  font-size: clamp(42px, calc(4 * var(--vw, 1vw)), 58px);
 
   line-height: 1.02;
 
@@ -15522,7 +15522,7 @@ p {
    RESPONSIVE
    --------------------------------------------------------- */
 
-@media (max-width: 1000px) {
+@media (max-width: 1000px) and (pointer: coarse) {
 
   .admin-login-page {
     justify-content: center;
@@ -15535,17 +15535,17 @@ p {
   .admin-login-card {
     margin-right: 0;
 
-    width: min(540px, calc(100vw - 40px));
+    width: min(540px, calc(calc(100 * var(--vw, 1vw)) - 40px));
 
     padding: 42px 42px 36px;
   }
 }
 
 
-@media (max-width: 650px) {
+@media (max-width: 650px) and (pointer: coarse) {
 
   .admin-login-page {
-    min-height: 100svh;
+    min-height: calc(100 * var(--svh, 1svh));
     height: auto;
 
     padding: 24px 0;
@@ -15569,7 +15569,7 @@ p {
   }
 
   .admin-login-card {
-    width: calc(100vw - 28px);
+    width: calc(calc(100 * var(--vw, 1vw)) - 28px);
 
     margin: 0;
 
@@ -15621,7 +15621,7 @@ p {
 
 .admin-login-page {
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
   width: 100%;
   overflow: hidden;
 
@@ -15629,7 +15629,7 @@ p {
   align-items: center;
   justify-content: flex-end;
 
-  padding: 40px 9vw;
+  padding: 40px calc(9 * var(--vw, 1vw));
 
   background: #0b3027;
 }
@@ -15690,7 +15690,7 @@ p {
   position: relative;
   z-index: 2;
 
-  width: min(500px, 92vw);
+  width: min(500px, calc(92 * var(--vw, 1vw)));
 
   padding: 48px 54px 42px;
 
@@ -15847,7 +15847,7 @@ p {
     "Times New Roman",
     serif;
 
-  font-size: clamp(38px, 4vw, 54px);
+  font-size: clamp(38px, calc(4 * var(--vw, 1vw)), 54px);
 
   font-weight: 700;
 
@@ -16100,7 +16100,7 @@ p {
    RESPONSIVE
    ========================================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
 
   .admin-login-page {
     justify-content: center;
@@ -16113,7 +16113,7 @@ p {
   }
 
   .admin-login-card {
-    width: min(500px, 94vw);
+    width: min(500px, calc(94 * var(--vw, 1vw)));
 
     padding: 40px 36px 34px;
   }
@@ -16121,10 +16121,10 @@ p {
 }
 
 
-@media (max-width: 600px) {
+@media (max-width: 600px) and (pointer: coarse) {
 
   .admin-login-page {
-    min-height: 100svh;
+    min-height: calc(100 * var(--svh, 1svh));
 
     padding: 20px 14px;
   }
@@ -16156,14 +16156,14 @@ p {
 .admin-login-page {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: calc(100 * var(--vh, 1vh));
+  min-height: calc(100 * var(--dvh, 1dvh));
 
   display: flex;
   align-items: center;
   justify-content: flex-end;
 
-  padding: 35px 6vw;
+  padding: 35px calc(6 * var(--vw, 1vw));
 
   overflow: hidden;
 
@@ -16229,9 +16229,9 @@ p {
   position: relative;
   z-index: 5;
 
-  width: min(500px, calc(100vw - 50px));
+  width: min(500px, calc(calc(100 * var(--vw, 1vw)) - 50px));
 
-  margin-right: 2vw;
+  margin-right: calc(2 * var(--vw, 1vw));
 
   padding: 46px 52px 38px;
 
@@ -16545,7 +16545,7 @@ p {
    TABLET
    ========================================================= */
 
-@media (max-width: 1000px) {
+@media (max-width: 1000px) and (pointer: coarse) {
 
   .admin-login-page {
     justify-content: center;
@@ -16563,7 +16563,7 @@ p {
    MOBILE
    ========================================================= */
 
-@media (max-width: 650px) {
+@media (max-width: 650px) and (pointer: coarse) {
 
   .admin-login-page {
     justify-content: center;
@@ -16598,7 +16598,7 @@ p {
 
 .admin-login-page {
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
   width: 100%;
   overflow: hidden;
   background: #0b3028;
@@ -16644,7 +16644,7 @@ p {
   position: relative;
   z-index: 2;
 
-  width: min(630px, calc(100vw - 40px));
+  width: min(630px, calc(calc(100 * var(--vw, 1vw)) - 40px));
   min-height: 650px;
 
   margin: 0 auto;
@@ -16735,7 +16735,7 @@ p {
 
   color: #ffffff;
 
-  font-size: clamp(42px, 5vw, 58px);
+  font-size: clamp(42px, calc(5 * var(--vw, 1vw)), 58px);
   line-height: 1.05;
   font-weight: 700;
 }
@@ -16906,10 +16906,10 @@ p {
    MOBILE
    ========================================================= */
 
-@media (max-width: 700px) {
+@media (max-width: 700px) and (pointer: coarse) {
 
   .admin-login-card {
-    width: calc(100vw - 28px);
+    width: calc(calc(100 * var(--vw, 1vw)) - 28px);
 
     min-height: auto;
 
@@ -16935,11 +16935,11 @@ p {
   position: relative;
   z-index: 2;
 
-  width: min(630px, calc(100vw - 40px));
+  width: min(630px, calc(calc(100 * var(--vw, 1vw)) - 40px));
   min-height: 650px;
 
   /* MOVE CARD TO RIGHT */
-  margin: 0 7vw 0 auto;
+  margin: 0 calc(7 * var(--vw, 1vw)) 0 auto;
 
   padding: 58px 58px 48px;
 
@@ -16964,14 +16964,14 @@ p {
 .admin-login-page {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
   overflow: hidden;
 
   display: flex;
   align-items: center;
   justify-content: flex-end;
 
-  padding: 40px 7vw;
+  padding: 40px calc(7 * var(--vw, 1vw));
   background: #082f24;
 }
 
@@ -17020,7 +17020,7 @@ p {
   position: relative;
   z-index: 2;
 
-  width: min(520px, 42vw);
+  width: min(520px, calc(42 * var(--vw, 1vw)));
   min-height: 650px;
 
   margin-left: auto;
@@ -17128,7 +17128,7 @@ p {
 
   color: #ffffff;
 
-  font-size: clamp(38px, 3.5vw, 52px);
+  font-size: clamp(38px, calc(3.5 * var(--vw, 1vw)), 52px);
   line-height: 1.05;
   font-weight: 700;
 
@@ -17296,7 +17296,7 @@ p {
    RESPONSIVE
    ========================================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
 
   .admin-login-page {
     justify-content: center;
@@ -17304,7 +17304,7 @@ p {
   }
 
   .admin-login-card {
-    width: min(520px, 92vw);
+    width: min(520px, calc(92 * var(--vw, 1vw)));
 
     margin: 0;
 
@@ -17316,7 +17316,7 @@ p {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 600px) and (pointer: coarse) {
 
   .admin-login-page {
     padding: 20px 14px;
@@ -17348,14 +17348,14 @@ p {
 .admin-login-page {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: calc(100 * var(--vh, 1vh));
+  min-height: calc(100 * var(--dvh, 1dvh));
 
   display: flex;
   align-items: center;
   justify-content: flex-end;
 
-  padding: 40px 6vw;
+  padding: 40px calc(6 * var(--vw, 1vw));
 
   box-sizing: border-box;
   overflow: hidden;
@@ -17421,9 +17421,9 @@ p {
   position: relative;
   z-index: 5;
 
-  width: min(520px, calc(100vw - 50px));
+  width: min(520px, calc(calc(100 * var(--vw, 1vw)) - 50px));
 
-  margin-right: clamp(20px, 5vw, 90px);
+  margin-right: clamp(20px, calc(5 * var(--vw, 1vw)), 90px);
 
   padding: 48px 52px 42px;
 
@@ -17530,7 +17530,7 @@ p {
 
   color: #ffffff;
 
-  font-size: clamp(42px, 4vw, 58px);
+  font-size: clamp(42px, calc(4 * var(--vw, 1vw)), 58px);
 
   line-height: 1.05;
 
@@ -17726,7 +17726,7 @@ p {
    RESPONSIVE
    ========================= */
 
-@media (max-width: 1000px) {
+@media (max-width: 1000px) and (pointer: coarse) {
 
   .admin-login-page {
     justify-content: center;
@@ -17737,15 +17737,15 @@ p {
   .admin-login-card {
     margin-right: 0;
 
-    width: min(520px, calc(100vw - 40px));
+    width: min(520px, calc(calc(100 * var(--vw, 1vw)) - 40px));
   }
 }
 
 
-@media (max-width: 650px) {
+@media (max-width: 650px) and (pointer: coarse) {
 
   .admin-login-page {
-    min-height: 100svh;
+    min-height: calc(100 * var(--svh, 1svh));
 
     padding: 20px 14px;
   }
@@ -17785,15 +17785,15 @@ p {
 .admin-login-page {
   position: relative !important;
   width: 100% !important;
-  min-height: 100vh !important;
-  height: 100vh !important;
+  min-height: calc(100 * var(--vh, 1vh)) !important;
+  height: calc(100 * var(--vh, 1vh)) !important;
   overflow: hidden !important;
 
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
 
-  padding: 40px 8vw 40px 40px !important;
+  padding: 40px calc(8 * var(--vw, 1vw)) 40px 40px !important;
 
   background: #0b3329 !important;
 }
@@ -17845,7 +17845,7 @@ p {
 
   z-index: 2 !important;
 
-  width: min(500px, 42vw) !important;
+  width: min(500px, calc(42 * var(--vw, 1vw))) !important;
   max-width: 500px !important;
 
   min-height: auto !important;
@@ -17929,7 +17929,7 @@ p {
 
   color: #ffffff !important;
 
-  font-size: clamp(38px, 4vw, 54px) !important;
+  font-size: clamp(38px, calc(4 * var(--vw, 1vw)), 54px) !important;
   line-height: 1.05 !important;
 
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25) !important;
@@ -18078,7 +18078,7 @@ p {
    MOBILE
    --------------------------------------------------------- */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .admin-login-page {
     justify-content: center !important;
 
@@ -18086,7 +18086,7 @@ p {
   }
 
   .admin-login-card {
-    width: min(500px, 94vw) !important;
+    width: min(500px, calc(94 * var(--vw, 1vw))) !important;
     max-width: none !important;
 
     padding: 40px 32px !important;
@@ -18116,8 +18116,8 @@ p {
 .admin-login-page {
   position: relative !important;
   width: 100% !important;
-  height: 100vh !important;
-  min-height: 100vh !important;
+  height: calc(100 * var(--vh, 1vh)) !important;
+  min-height: calc(100 * var(--vh, 1vh)) !important;
 
   overflow: hidden !important;
 
@@ -18125,7 +18125,7 @@ p {
   align-items: center !important;
   justify-content: flex-end !important;
 
-  padding: 28px 7vw 28px 5vw !important;
+  padding: 28px calc(7 * var(--vw, 1vw)) 28px calc(5 * var(--vw, 1vw)) !important;
 
   background: #123f34 !important;
 }
@@ -18188,7 +18188,7 @@ p {
   z-index: 2 !important;
 
   width: 500px !important;
-  max-width: 42vw !important;
+  max-width: calc(42 * var(--vw, 1vw)) !important;
 
   margin: 0 !important;
 
@@ -18493,16 +18493,16 @@ p {
    RESPONSIVE
    ========================================================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1100px) and (pointer: coarse) {
 
   .admin-login-page {
-    padding-right: 4vw !important;
-    padding-left: 4vw !important;
+    padding-right: calc(4 * var(--vw, 1vw)) !important;
+    padding-left: calc(4 * var(--vw, 1vw)) !important;
   }
 
   .admin-login-card {
     width: 470px !important;
-    max-width: 46vw !important;
+    max-width: calc(46 * var(--vw, 1vw)) !important;
 
     padding: 40px 46px !important;
   }
@@ -18513,7 +18513,7 @@ p {
 }
 
 
-@media (max-width: 800px) {
+@media (max-width: 800px) and (pointer: coarse) {
 
   .admin-login-page {
     justify-content: center !important;
@@ -18527,7 +18527,7 @@ p {
   }
 
   .admin-login-card {
-    width: min(500px, 94vw) !important;
+    width: min(500px, calc(94 * var(--vw, 1vw))) !important;
     max-width: none !important;
 
     padding: 38px 30px !important;
@@ -18539,7 +18539,7 @@ p {
 }
 
 
-@media (max-width: 480px) {
+@media (max-width: 480px) and (pointer: coarse) {
 
   .admin-login-card {
     padding: 32px 22px !important;
@@ -18567,8 +18567,8 @@ p {
 .admin-login-page {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
+  height: calc(100 * var(--vh, 1vh));
   overflow: hidden;
 
   display: flex;
@@ -18622,8 +18622,8 @@ p {
   position: relative;
   z-index: 2;
 
-  width: min(570px, 42vw);
-  min-height: 100vh;
+  width: min(570px, calc(42 * var(--vw, 1vw)));
+  min-height: calc(100 * var(--vh, 1vh));
 
   margin-left: auto;
   margin-right: 7%;
@@ -18713,7 +18713,7 @@ p {
 
   color: #123f32;
 
-  font-size: clamp(42px, 3.3vw, 58px);
+  font-size: clamp(42px, calc(3.3 * var(--vw, 1vw)), 58px);
   line-height: 1.05;
 
   font-weight: 700;
@@ -18901,14 +18901,14 @@ p {
    RESPONSIVE
    --------------------------------------------------------- */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
 
   .admin-login-background {
     object-position: center;
   }
 
   .admin-login-card {
-    width: min(560px, 92vw);
+    width: min(560px, calc(92 * var(--vw, 1vw)));
 
     min-height: auto;
 
@@ -18922,10 +18922,10 @@ p {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 600px) and (pointer: coarse) {
 
   .admin-login-page {
-    min-height: 100dvh;
+    min-height: calc(100 * var(--dvh, 1dvh));
   }
 
   .admin-login-card {
@@ -18988,8 +18988,8 @@ p {
   position: relative;
   z-index: 2;
 
-  width: min(570px, 42vw);
-  min-height: 100vh;
+  width: min(570px, calc(42 * var(--vw, 1vw)));
+  min-height: calc(100 * var(--vh, 1vh));
 
   margin-left: auto;
   margin-right: 7%;
@@ -19022,7 +19022,7 @@ p {
 .admin-login-page {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
   overflow: hidden;
 
   display: flex;
@@ -19360,7 +19360,7 @@ p {
   transform: translateY(-50%);
 
   width: 460px;
-  max-width: 42vw;
+  max-width: calc(42 * var(--vw, 1vw));
 
   /* reduce overall height */
   padding: 28px 40px 24px;
@@ -19449,15 +19449,15 @@ p {
 
 
 /* Mobile */
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .admin-login-card {
     right: 4%;
     width: 440px;
-    max-width: 92vw;
+    max-width: calc(92 * var(--vw, 1vw));
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 600px) and (pointer: coarse) {
   .admin-login-card {
     position: relative;
     top: auto;
@@ -19480,7 +19480,7 @@ p {
 
 .admin-login-page {
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
   width: 100%;
   overflow: hidden;
 
@@ -19501,10 +19501,10 @@ p {
 
   /* smaller height */
   height: auto;
-  max-height: calc(100vh - 56px);
+  max-height: calc(calc(100 * var(--vh, 1vh)) - 56px);
 
   /* width */
-  width: min(520px, 42vw);
+  width: min(520px, calc(42 * var(--vw, 1vw)));
 
   /* cream background */
   background: rgba(247, 242, 225, 0.88);
@@ -19581,7 +19581,7 @@ p {
    RESPONSIVE
    ========================================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .admin-login-page {
     justify-content: center;
     padding: 24px;
@@ -19599,7 +19599,7 @@ p {
 .admin-login-page {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
   overflow: hidden;
 
   display: flex;
@@ -19622,11 +19622,11 @@ p {
   position: relative;
 
   width: 470px;
-  max-width: 42vw;
+  max-width: calc(42 * var(--vw, 1vw));
 
   height: auto;
   min-height: 650px;
-  max-height: calc(100vh - 68px);
+  max-height: calc(calc(100 * var(--vh, 1vh)) - 68px);
 
   margin: 0;
 
@@ -19720,7 +19720,7 @@ p {
 
   color: #073f32;
 
-  font-size: clamp(38px, 3.2vw, 48px);
+  font-size: clamp(38px, calc(3.2 * var(--vw, 1vw)), 48px);
   font-weight: 700;
 
   line-height: 1.08;
@@ -19973,7 +19973,7 @@ p {
    MOBILE / SMALL SCREEN
    ========================================================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1100px) and (pointer: coarse) {
 
   .admin-login-page {
     padding-right: 4%;
@@ -19981,13 +19981,13 @@ p {
 
   .admin-login-card {
     width: 460px;
-    max-width: 48vw;
+    max-width: calc(48 * var(--vw, 1vw));
   }
 
 }
 
 
-@media (max-width: 850px) {
+@media (max-width: 850px) and (pointer: coarse) {
 
   .admin-login-page {
     justify-content: center;
@@ -20007,7 +20007,7 @@ p {
 }
 
 
-@media (max-width: 500px) {
+@media (max-width: 500px) and (pointer: coarse) {
 
   .admin-login-page {
     padding: 16px;
@@ -20045,11 +20045,11 @@ p {
    ADMIN LOGIN - MOBILE RESPONSIVE
    ========================================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (pointer: coarse) {
 
   .admin-login-page {
     position: relative;
-    min-height: 100svh;
+    min-height: calc(100 * var(--svh, 1svh));
     width: 100%;
     padding: 18px 14px 24px;
     display: flex;
@@ -20139,7 +20139,7 @@ p {
   .admin-login-card h1 {
     margin: 0 0 8px;
     text-align: center;
-    font-size: clamp(32px, 9vw, 42px);
+    font-size: clamp(32px, calc(9 * var(--vw, 1vw)), 42px);
     line-height: 1.05;
   }
 
@@ -20192,7 +20192,7 @@ p {
 
 
 /* Smaller phones */
-@media (max-width: 430px) {
+@media (max-width: 430px) and (pointer: coarse) {
 
   .admin-login-page {
     padding: 14px 12px 20px;
@@ -20236,11 +20236,11 @@ p {
    ADMIN LOGIN - MOBILE BACKGROUND FIX
    ========================================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (pointer: coarse) {
 
   .admin-login-page {
     position: relative;
-    min-height: 100svh;
+    min-height: calc(100 * var(--svh, 1svh));
     width: 100%;
     overflow-x: hidden;
     overflow-y: auto;
@@ -20397,7 +20397,7 @@ p {
    SMALL MOBILE
    ========================================================= */
 
-@media (max-width: 430px) {
+@media (max-width: 430px) and (pointer: coarse) {
 
   .admin-login-page {
     padding: 14px 10px 20px;
@@ -20428,11 +20428,11 @@ p {
    Show the RIGHT side of admin-login-bg.png
    ========================================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (pointer: coarse) {
 
   .admin-login-page {
     position: relative;
-    min-height: 100svh;
+    min-height: calc(100 * var(--svh, 1svh));
     width: 100%;
     overflow-x: hidden;
     overflow-y: auto;
@@ -20500,7 +20500,7 @@ p {
    SMALL MOBILE
    ========================================================= */
 
-@media (max-width: 430px) {
+@media (max-width: 430px) and (pointer: coarse) {
 
   .admin-login-page {
     padding: 14px 10px 20px;
@@ -20956,8 +20956,8 @@ p {
    ========================================= */
 
 .admin-sidebar {
-  height: 100vh;
-  min-height: 100vh;
+  height: calc(100 * var(--vh, 1vh));
+  min-height: calc(100 * var(--vh, 1vh));
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -20989,8 +20989,8 @@ p {
    ========================================================= */
 
 .admin-sidebar-v6 {
-    height: 100dvh !important;
-    min-height: 100dvh !important;
+    height: calc(100 * var(--dvh, 1dvh)) !important;
+    min-height: calc(100 * var(--dvh, 1dvh)) !important;
 
     display: flex !important;
     flex-direction: column !important;
@@ -21068,7 +21068,7 @@ p {
    ========================================================= */
 
 .admin-login-page {
-  min-height: 100svh !important;
+  min-height: calc(100 * var(--svh, 1svh)) !important;
   padding: 28px 6% !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
@@ -21103,7 +21103,7 @@ p {
 .admin-login-card {
   position: relative !important;
   z-index: 2 !important;
-  width: min(500px, calc(100vw - 48px)) !important;
+  width: min(500px, calc(calc(100 * var(--vw, 1vw)) - 48px)) !important;
   max-width: 500px !important;
   margin: 0 4% 0 auto !important;
   padding: 34px 42px 30px !important;
@@ -21197,21 +21197,21 @@ p {
   text-align: center !important;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .admin-login-page {
     padding: 24px 18px !important;
     overflow-y: auto !important;
   }
 
   .admin-login-card {
-    width: min(500px, calc(100vw - 36px)) !important;
+    width: min(500px, calc(calc(100 * var(--vw, 1vw)) - 36px)) !important;
     margin: 18px auto !important;
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 520px) and (pointer: coarse) {
   .admin-login-page {
-    min-height: 100svh !important;
+    min-height: calc(100 * var(--svh, 1svh)) !important;
     padding: 18px 12px 24px !important;
   }
 
@@ -21220,7 +21220,7 @@ p {
   }
 
   .admin-login-card {
-    width: calc(100vw - 24px) !important;
+    width: calc(calc(100 * var(--vw, 1vw)) - 24px) !important;
     margin: 14px auto !important;
     padding: 30px 22px 24px !important;
     border-radius: 20px !important;
@@ -21248,12 +21248,12 @@ p {
 .admin-login-page {
   position: relative !important;
   width: 100% !important;
-  min-height: 100dvh !important;
+  min-height: calc(100 * var(--dvh, 1dvh)) !important;
   box-sizing: border-box !important;
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  padding: 32px clamp(24px, 5vw, 84px) !important;
+  padding: 32px clamp(24px, calc(5 * var(--vw, 1vw)), 84px) !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
   isolation: isolate !important;
@@ -21285,7 +21285,7 @@ p {
   position: relative !important;
   z-index: 2 !important;
   flex: 0 1 500px !important;
-  width: min(500px, 43vw) !important;
+  width: min(500px, calc(43 * var(--vw, 1vw))) !important;
   max-width: 500px !important;
   min-width: 0 !important;
   min-height: 0 !important;
@@ -21337,7 +21337,7 @@ p {
 .admin-login-card h1 {
   margin: 0 0 7px !important;
   text-align: center !important;
-  font-size: clamp(36px, 3vw, 44px) !important;
+  font-size: clamp(36px, calc(3 * var(--vw, 1vw)), 44px) !important;
   line-height: 1.08 !important;
 }
 
@@ -21387,7 +21387,7 @@ p {
 }
 
 /* Medium screens: keep the card comfortable without squeezing it. */
-@media (max-width: 1100px) {
+@media (max-width: 1100px) and (pointer: coarse) {
   .admin-login-page {
     justify-content: center !important;
     padding: 28px 24px !important;
@@ -21404,11 +21404,11 @@ p {
 }
 
 /* Tablet / phone: the card becomes the main foreground element. */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (pointer: coarse) {
   .admin-login-page {
     align-items: flex-start !important;
     justify-content: center !important;
-    min-height: 100dvh !important;
+    min-height: calc(100 * var(--dvh, 1dvh)) !important;
     padding: 24px 16px 30px !important;
   }
 
@@ -21442,7 +21442,7 @@ p {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 480px) and (pointer: coarse) {
   .admin-login-page {
     padding: 16px 12px 24px !important;
   }
@@ -21489,7 +21489,7 @@ p {
   }
 }
 
-@media (max-height: 760px) and (min-width: 769px) {
+@media (max-height: 760px) and (min-width: 769px), (max-height: 760px) and (pointer: fine) {
   .admin-login-page {
     align-items: flex-start !important;
     padding-top: 18px !important;
@@ -21544,10 +21544,10 @@ body:has(.admin-login-page),
 
 .admin-login-page {
   width: 100% !important;
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-  max-height: 100dvh !important;
-  padding: 24px clamp(20px, 4vw, 64px) !important;
+  height: calc(100 * var(--dvh, 1dvh)) !important;
+  min-height: calc(100 * var(--dvh, 1dvh)) !important;
+  max-height: calc(100 * var(--dvh, 1dvh)) !important;
+  padding: 24px clamp(20px, calc(4 * var(--vw, 1vw)), 64px) !important;
   margin: 0 !important;
   box-sizing: border-box !important;
   display: flex !important;
@@ -21561,13 +21561,13 @@ body:has(.admin-login-page),
   position: fixed !important;
   inset: 0 !important;
   width: 100% !important;
-  height: 100dvh !important;
+  height: calc(100 * var(--dvh, 1dvh)) !important;
 }
 
 .admin-login-card {
-  width: min(500px, 43vw) !important;
+  width: min(500px, calc(43 * var(--vw, 1vw))) !important;
   max-width: 500px !important;
-  max-height: calc(100dvh - 48px) !important;
+  max-height: calc(calc(100 * var(--dvh, 1dvh)) - 48px) !important;
   margin: 0 !important;
   padding: 28px 38px 24px !important;
   overflow: auto !important;
@@ -21593,7 +21593,7 @@ body:has(.admin-login-page),
 }
 
 .admin-login-card h1 {
-  font-size: clamp(34px, 3vw, 42px) !important;
+  font-size: clamp(34px, calc(3 * var(--vw, 1vw)), 42px) !important;
   margin-bottom: 6px !important;
 }
 
@@ -21626,7 +21626,7 @@ body:has(.admin-login-page),
   margin-top: 11px !important;
 }
 
-@media (max-width: 1100px) and (min-width: 769px) {
+@media (max-width: 1100px) and (min-width: 769px) and (pointer: coarse) {
   .admin-login-page {
     justify-content: center !important;
     padding: 20px 24px !important;
@@ -21637,14 +21637,14 @@ body:has(.admin-login-page),
   }
 }
 
-@media (max-height: 700px) and (min-width: 769px) {
+@media (max-height: 700px) and (min-width: 769px), (max-height: 700px) and (pointer: fine) {
   .admin-login-page {
     padding-top: 12px !important;
     padding-bottom: 12px !important;
   }
 
   .admin-login-card {
-    max-height: calc(100dvh - 24px) !important;
+    max-height: calc(calc(100 * var(--dvh, 1dvh)) - 24px) !important;
     padding: 20px 34px 18px !important;
   }
 
@@ -21675,10 +21675,10 @@ body:has(.admin-login-page),
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (pointer: coarse) {
   .admin-login-page {
     height: auto !important;
-    min-height: 100dvh !important;
+    min-height: calc(100 * var(--dvh, 1dvh)) !important;
     max-height: none !important;
     padding: 20px 16px 24px !important;
     align-items: center !important;
@@ -21695,7 +21695,7 @@ body:has(.admin-login-page),
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 480px) and (pointer: coarse) {
   .admin-login-page {
     padding: 14px 12px 20px !important;
   }
@@ -21801,7 +21801,7 @@ body:has(.admin-login-page),
   background: transparent !important;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .admin-sidebar-v6 {
     box-shadow: 0 6px 22px rgba(45, 38, 27, 0.08) !important;
   }
@@ -21816,7 +21816,7 @@ body:has(.admin-login-page),
 .admin-shell-v6 {
   width: 100% !important;
   max-width: none !important;
-  min-height: 100dvh !important;
+  min-height: calc(100 * var(--dvh, 1dvh)) !important;
   display: grid !important;
   grid-template-columns: 250px minmax(0, 1fr) !important;
   align-items: stretch !important;
@@ -21830,8 +21830,8 @@ body:has(.admin-login-page),
   inset: 0 auto auto 0 !important;
   width: 250px !important;
   min-width: 250px !important;
-  height: 100dvh !important;
-  max-height: 100dvh !important;
+  height: calc(100 * var(--dvh, 1dvh)) !important;
+  max-height: calc(100 * var(--dvh, 1dvh)) !important;
   box-sizing: border-box !important;
   align-self: start !important;
   overflow: hidden !important;
@@ -21857,7 +21857,7 @@ body:has(.admin-login-page),
 }
 
 /* Tablet: keep the sidebar vertical and on the left. */
-@media (max-width: 1100px) and (min-width: 721px) {
+@media (max-width: 1100px) and (min-width: 721px) and (pointer: coarse) {
   .admin-shell-v6 {
     grid-template-columns: 210px minmax(0, 1fr) !important;
   }
@@ -21886,12 +21886,12 @@ body:has(.admin-login-page),
 
 /* Mobile: compact vertical rail remains on the LEFT instead of
    becoming a horizontal bar across the top. */
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   .admin-shell-v6 {
     display: grid !important;
     grid-template-columns: 76px minmax(0, 1fr) !important;
     width: 100% !important;
-    min-height: 100dvh !important;
+    min-height: calc(100 * var(--dvh, 1dvh)) !important;
     overflow-x: hidden !important;
   }
 
@@ -21901,8 +21901,8 @@ body:has(.admin-login-page),
     left: 0 !important;
     width: 76px !important;
     min-width: 76px !important;
-    height: 100dvh !important;
-    max-height: 100dvh !important;
+    height: calc(100 * var(--dvh, 1dvh)) !important;
+    max-height: calc(100 * var(--dvh, 1dvh)) !important;
     padding: 10px 7px !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
@@ -22250,13 +22250,13 @@ body:has(.admin-login-page),
   background: rgba(247,245,236,.55);
 }
 
-@media (min-width: 900px) {
+@media (min-width: 900px), (pointer: fine) {
   .customer-card-details-v8 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   .customer-tools-v8 {
     grid-template-columns: 1fr;
     gap: 8px;
@@ -22278,7 +22278,7 @@ body:has(.admin-login-page),
   }
 }
 
-@media (max-width: 430px) {
+@media (max-width: 430px) and (pointer: coarse) {
   /* Keep two detail cells per row on phones so the cards stay short. */
   .customer-card-details-v8 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -22378,7 +22378,7 @@ body:has(.admin-login-page),
   margin-top: 20px;
 }
 
-@media (max-width: 1180px) and (min-width: 901px) {
+@media (max-width: 1180px) and (min-width: 901px) and (pointer: coarse) {
   .admin-home-section-toolbar-v7 {
     grid-template-columns: minmax(240px, 1fr) minmax(260px, 1fr);
   }
@@ -22394,7 +22394,7 @@ body:has(.admin-login-page),
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .admin-home-section-toolbar-v7,
   .admin-home-config-grid-v7,
   .admin-home-extra-grid-v7 {
@@ -22476,7 +22476,7 @@ body:has(.admin-login-page),
   height: 48px !important;
 }
 
-@media (max-width: 1180px) and (min-width: 901px) {
+@media (max-width: 1180px) and (min-width: 901px) and (pointer: coarse) {
   .admin-home-content-v7 .admin-home-section-toolbar-v7 {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
   }
@@ -22492,7 +22492,7 @@ body:has(.admin-login-page),
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .admin-home-content-v7 .admin-home-section-toolbar-v7,
   .admin-home-content-v7 .admin-home-config-grid-v7 {
     grid-template-columns: 1fr !important;
@@ -22616,13 +22616,13 @@ body:has(.admin-login-page),
 
 .admin-login-page {
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
   width: 100%;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 40px 6vw 40px 40px;
+  padding: 40px calc(6 * var(--vw, 1vw)) 40px 40px;
   box-sizing: border-box;
 }
 
@@ -22658,11 +22658,11 @@ body:has(.admin-login-page),
   position: relative;
   z-index: 2;
 
-  width: min(560px, 42vw);
+  width: min(560px, calc(42 * var(--vw, 1vw)));
   min-height: 620px;
 
   margin-left: auto;
-  margin-right: 2vw;
+  margin-right: calc(2 * var(--vw, 1vw));
 
   padding: 42px 52px;
 
@@ -22729,7 +22729,7 @@ body:has(.admin-login-page),
 
   color: #063f35;
 
-  font-size: clamp(38px, 3vw, 52px);
+  font-size: clamp(38px, calc(3 * var(--vw, 1vw)), 52px);
   line-height: 1.05;
 }
 
@@ -22839,13 +22839,13 @@ body:has(.admin-login-page),
    TABLET
 ================================ */
 
-@media (max-width: 1000px) {
+@media (max-width: 1000px) and (pointer: coarse) {
   .admin-login-page {
     padding: 30px;
   }
 
   .admin-login-card {
-    width: min(520px, 55vw);
+    width: min(520px, calc(55 * var(--vw, 1vw)));
     margin-right: 0;
   }
 }
@@ -22855,7 +22855,7 @@ body:has(.admin-login-page),
    MOBILE
 ================================ */
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   .admin-login-page {
     justify-content: center;
 
@@ -22894,7 +22894,7 @@ body:has(.admin-login-page),
 .admin-login-page {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
   overflow-x: hidden;
   overflow-y: auto;
 
@@ -22926,7 +22926,7 @@ body:has(.admin-login-page),
   position: relative;
   z-index: 2;
 
-  width: min(560px, calc(100vw - 48px));
+  width: min(560px, calc(calc(100 * var(--vw, 1vw)) - 48px));
   min-height: 600px;
 
   /* LEFT SIDE POSITION */
@@ -22943,9 +22943,9 @@ body:has(.admin-login-page),
    TABLET
    ========================================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .admin-login-card {
-    width: min(520px, calc(100vw - 40px));
+    width: min(520px, calc(calc(100 * var(--vw, 1vw)) - 40px));
     margin-left: 40px;
     margin-right: 0;
   }
@@ -22955,14 +22955,14 @@ body:has(.admin-login-page),
    MOBILE
    ========================================================= */
 
-@media (max-width: 600px) {
+@media (max-width: 600px) and (pointer: coarse) {
   .admin-login-page {
-    min-height: 100svh;
+    min-height: calc(100 * var(--svh, 1svh));
     padding: 24px 0;
   }
 
   .admin-login-card {
-    width: calc(100vw - 32px);
+    width: calc(calc(100 * var(--vw, 1vw)) - 32px);
 
     /* STILL LEFT ALIGNED */
     margin-left: 16px;
@@ -22973,9 +22973,9 @@ body:has(.admin-login-page),
 }
 
 /* Very small screens */
-@media (max-width: 400px) {
+@media (max-width: 400px) and (pointer: coarse) {
   .admin-login-card {
-    width: calc(100vw - 24px);
+    width: calc(calc(100 * var(--vw, 1vw)) - 24px);
     margin-left: 12px;
   }
 }
@@ -22986,7 +22986,7 @@ body:has(.admin-login-page),
 
 .admin-login-page {
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100 * var(--vh, 1vh));
   width: 100%;
   overflow: hidden;
 
@@ -22994,7 +22994,7 @@ body:has(.admin-login-page),
   align-items: center;
   justify-content: flex-end;
 
-  padding: 40px 7vw;
+  padding: 40px calc(7 * var(--vw, 1vw));
   box-sizing: border-box;
 }
 
@@ -23022,7 +23022,7 @@ body:has(.admin-login-page),
   position: relative;
   z-index: 2;
 
-  width: min(560px, 42vw);
+  width: min(560px, calc(42 * var(--vw, 1vw)));
   max-width: 560px;
   min-width: 420px;
 
@@ -23049,13 +23049,13 @@ body:has(.admin-login-page),
    LAPTOP / SMALL DESKTOP
    ================================ */
 
-@media (max-width: 1200px) {
+@media (max-width: 1200px) and (pointer: coarse) {
   .admin-login-page {
-    padding: 32px 5vw;
+    padding: 32px calc(5 * var(--vw, 1vw));
   }
 
   .admin-login-card {
-    width: min(520px, 44vw);
+    width: min(520px, calc(44 * var(--vw, 1vw)));
     min-width: 400px;
     padding: 42px 44px;
   }
@@ -23066,14 +23066,14 @@ body:has(.admin-login-page),
    TABLET
    ================================ */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (pointer: coarse) {
   .admin-login-page {
     justify-content: center;
     padding: 24px;
   }
 
   .admin-login-card {
-    width: min(520px, 90vw);
+    width: min(520px, calc(90 * var(--vw, 1vw)));
     min-width: 0;
     margin: 0;
   }
@@ -23084,9 +23084,9 @@ body:has(.admin-login-page),
    MOBILE
    ================================ */
 
-@media (max-width: 600px) {
+@media (max-width: 600px) and (pointer: coarse) {
   .admin-login-page {
-    min-height: 100dvh;
+    min-height: calc(100 * var(--dvh, 1dvh));
     padding: 16px;
     align-items: center;
     justify-content: center;
@@ -23104,7 +23104,7 @@ body:has(.admin-login-page),
 
 /* Admin login card - zoom responsive */
 .admin-login-card {
-  width: min(46vw, 760px);
+  width: min(calc(46 * var(--vw, 1vw)), 760px);
   max-width: 760px;
   min-width: 420px;
   box-sizing: border-box;
@@ -23113,31 +23113,31 @@ body:has(.admin-login-page),
 /* Zoom / smaller viewport */
 @media (max-width: 1400px) {
   .admin-login-card {
-    width: 44vw;
+    width: calc(44 * var(--vw, 1vw));
     min-width: 400px;
     padding: 42px 46px;
   }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1200px) and (pointer: coarse) {
   .admin-login-card {
-    width: 43vw;
+    width: calc(43 * var(--vw, 1vw));
     min-width: 380px;
     padding: 36px 40px;
   }
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1000px) and (pointer: coarse) {
   .admin-login-card {
-    width: 42vw;
+    width: calc(42 * var(--vw, 1vw));
     min-width: 360px;
     padding: 32px 34px;
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 800px) and (pointer: coarse) {
   .admin-login-card {
-    width: 90vw;
+    width: calc(90 * var(--vw, 1vw));
     min-width: 0;
     max-width: 520px;
     padding: 30px 28px;
@@ -23152,18 +23152,18 @@ body:has(.admin-login-page),
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  padding: 40px 4vw 40px 40px !important;
+  padding: 40px calc(4 * var(--vw, 1vw)) 40px 40px !important;
   box-sizing: border-box;
   overflow: hidden;
 }
 
 .admin-login-card {
-  width: clamp(420px, 38vw, 560px) !important;
+  width: clamp(420px, calc(38 * var(--vw, 1vw)), 560px) !important;
   min-height: auto !important;
-  max-height: calc(100vh - 50px);
+  max-height: calc(calc(100 * var(--vh, 1vh)) - 50px);
   margin-left: auto !important;
   margin-right: 0 !important;
-  padding: clamp(30px, 3vw, 48px) clamp(28px, 3vw, 52px) !important;
+  padding: clamp(30px, calc(3 * var(--vw, 1vw)), 48px) clamp(28px, calc(3 * var(--vw, 1vw)), 52px) !important;
   box-sizing: border-box;
   overflow-y: auto;
 }
@@ -23171,27 +23171,27 @@ body:has(.admin-login-page),
 /* IMPORTANT:
    Do NOT center the card when browser zoom changes.
 */
-@media (max-width: 1000px) {
+@media (max-width: 1000px) and (pointer: coarse) {
   .admin-login-page {
     justify-content: flex-end !important;
     padding: 25px 20px !important;
   }
 
   .admin-login-card {
-    width: min(520px, 55vw) !important;
+    width: min(520px, calc(55 * var(--vw, 1vw))) !important;
     margin-left: auto !important;
     margin-right: 0 !important;
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 700px) and (pointer: coarse) {
   .admin-login-page {
     justify-content: center !important;
     padding: 16px !important;
   }
 
   .admin-login-card {
-    width: min(520px, calc(100vw - 32px)) !important;
+    width: min(520px, calc(calc(100 * var(--vw, 1vw)) - 32px)) !important;
     margin: 0 auto !important;
   }
 }
@@ -23213,7 +23213,7 @@ body:has(.admin-login-page),
    MOBILE ONLY
    ========================================================= */
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
 
   /* -----------------------------------------
      Main page becomes full width
@@ -23222,7 +23222,7 @@ body:has(.admin-login-page),
   .admin-shell-v6 {
     display: block !important;
     width: 100% !important;
-    min-height: 100dvh !important;
+    min-height: calc(100 * var(--dvh, 1dvh)) !important;
     overflow-x: hidden !important;
   }
 
@@ -23238,9 +23238,9 @@ body:has(.admin-login-page),
     left: 0 !important;
     bottom: 0 !important;
 
-    width: min(310px, 82vw) !important;
-    min-width: min(310px, 82vw) !important;
-    height: 100dvh !important;
+    width: min(310px, calc(82 * var(--vw, 1vw))) !important;
+    min-width: min(310px, calc(82 * var(--vw, 1vw))) !important;
+    height: calc(100 * var(--dvh, 1dvh)) !important;
 
     z-index: 1001 !important;
 
@@ -23561,13 +23561,13 @@ body:has(.admin-login-page),
   display: none;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
 
   /* Main page uses the full mobile width */
   .admin-shell-v6 {
     display: block !important;
     width: 100% !important;
-    min-height: 100dvh !important;
+    min-height: calc(100 * var(--dvh, 1dvh)) !important;
     overflow-x: hidden !important;
   }
 
@@ -23610,7 +23610,7 @@ body:has(.admin-login-page),
 
     width: 285px !important;
     min-width: 285px !important;
-    height: 100dvh !important;
+    height: calc(100 * var(--dvh, 1dvh)) !important;
 
     transform: translateX(-105%) !important;
     transition: transform 0.25s ease !important;
@@ -23694,7 +23694,7 @@ body:has(.admin-login-page),
   display: none;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   .admin-mobile-logo-trigger {
     display: block;
     position: fixed;
@@ -23725,13 +23725,13 @@ body:has(.admin-login-page),
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   .admin-sidebar-v6 {
     position: fixed;
     top: 0;
     left: 0;
     width: 280px;
-    height: 100dvh;
+    height: calc(100 * var(--dvh, 1dvh));
     z-index: 9998;
 
     transform: translateX(-100%);
@@ -23743,7 +23743,7 @@ body:has(.admin-login-page),
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   .admin-mobile-logo-trigger {
     display: block;
     position: fixed;
@@ -23776,7 +23776,7 @@ body:has(.admin-login-page),
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   .admin-top-v6 {
     padding-left: 79px !important;
   }
@@ -23786,7 +23786,7 @@ body:has(.admin-login-page),
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
 
   .admin-mobile-logo-trigger {
     position: fixed;
@@ -23874,7 +23874,7 @@ body:has(.admin-login-page),
   display: block !important;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   .admin-mobile-logo-trigger {
     width: 32px !important;
     height: 64px !important;
@@ -23893,7 +23893,7 @@ body:has(.admin-login-page),
   bottom: 0 !important;
 
   width: 248px !important;
-  height: 100dvh !important;
+  height: calc(100 * var(--dvh, 1dvh)) !important;
 
   box-sizing: border-box !important;
 
@@ -24131,10 +24131,10 @@ body:has(.admin-login-page),
    MOBILE
    ========================================================= */
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
 
   .admin-sidebar-v6 {
-    width: min(82vw, 300px) !important;
+    width: min(calc(82 * var(--vw, 1vw)), 300px) !important;
 
     padding:
       22px 14px
@@ -24175,7 +24175,7 @@ body:has(.admin-login-page),
   bottom: 0 !important;
 
   width: 250px !important;
-  height: 100dvh !important;
+  height: calc(100 * var(--dvh, 1dvh)) !important;
 
   display: flex !important;
   flex-direction: column !important;
@@ -24434,13 +24434,13 @@ body:has(.admin-login-page),
    MOBILE
    ========================================================= */
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
 
   .admin-sidebar-v6 {
-    width: min(300px, 84vw) !important;
-    min-width: min(300px, 84vw) !important;
+    width: min(300px, calc(84 * var(--vw, 1vw))) !important;
+    min-width: min(300px, calc(84 * var(--vw, 1vw))) !important;
 
-    height: 100dvh !important;
+    height: calc(100 * var(--dvh, 1dvh)) !important;
 
     position: fixed !important;
 
@@ -24523,14 +24523,14 @@ body:has(.admin-login-page),
    MOBILE OVERLAY
    ========================================================= */
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
 
   .admin-mobile-sidebar-overlay {
     position: fixed !important;
     inset: 0 !important;
 
     width: 100% !important;
-    height: 100dvh !important;
+    height: calc(100 * var(--dvh, 1dvh)) !important;
 
     background: rgba(18, 35, 28, 0.25) !important;
 
@@ -24556,7 +24556,7 @@ body,
 
 /* Main admin layout */
 .admin-shell-v6 {
-  min-height: 100dvh !important;
+  min-height: calc(100 * var(--dvh, 1dvh)) !important;
   height: auto !important;
   overflow: visible !important;
   display: flex;
@@ -24575,8 +24575,8 @@ body,
 
   width: 240px;
 
-  height: 100dvh !important;
-  min-height: 100dvh !important;
+  height: calc(100 * var(--dvh, 1dvh)) !important;
+  min-height: calc(100 * var(--dvh, 1dvh)) !important;
   max-height: none !important;
 
   display: flex !important;
@@ -24632,7 +24632,7 @@ body,
    ========================================================= */
 
 .admin-main-v6 {
-  min-height: 100dvh !important;
+  min-height: calc(100 * var(--dvh, 1dvh)) !important;
   height: auto !important;
 
   overflow: visible !important;
@@ -24652,19 +24652,19 @@ body,
    MOBILE
    ========================================================= */
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
 
   .admin-shell-v6 {
     display: block !important;
-    min-height: 100dvh !important;
+    min-height: calc(100 * var(--dvh, 1dvh)) !important;
     height: auto !important;
     overflow: visible !important;
   }
 
   .admin-sidebar-v6 {
-    width: min(82vw, 300px) !important;
-    height: 100dvh !important;
-    min-height: 100dvh !important;
+    width: min(calc(82 * var(--vw, 1vw)), 300px) !important;
+    height: calc(100 * var(--dvh, 1dvh)) !important;
+    min-height: calc(100 * var(--dvh, 1dvh)) !important;
 
     position: fixed !important;
     top: 0;
@@ -24685,7 +24685,7 @@ body,
     width: 100% !important;
     margin-left: 0 !important;
 
-    min-height: 100dvh !important;
+    min-height: calc(100 * var(--dvh, 1dvh)) !important;
     height: auto !important;
 
     overflow: visible !important;
@@ -24713,7 +24713,7 @@ body,
   pointer-events: none;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   /* overlay covers the whole screen, sits just under the sidebar */
   .admin-mobile-sidebar-overlay {
     display: block !important;
@@ -24735,7 +24735,7 @@ body,
 }
 
 /* ===== Mobile admin logo: no card, blends with page bg ===== */
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   .admin-mobile-logo-trigger,
   .admin-mobile-logo-trigger button {
     background: transparent !important;
@@ -25065,7 +25065,7 @@ body,
 }
 .qty-box button { cursor: pointer; }
 .qty-box button:disabled { opacity: .45; cursor: not-allowed; }
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   .cart-item .qty-box {
     grid-column: 2;
     grid-template-columns: 40px minmax(40px, auto) 40px;
@@ -25075,7 +25075,7 @@ body,
   .cart-item .qty-box button { font-size: 20px !important; touch-action: manipulation; }
   .cart-item .qty-box span { font-size: 14px !important; padding: 0 6px; }
 }
-@media (max-width: 380px) {
+@media (max-width: 380px) and (pointer: coarse) {
   .cart-item .qty-box { grid-template-columns: 36px minmax(34px, auto) 36px; height: 36px; }
 }
 
@@ -25106,7 +25106,8 @@ body,
   border-color: #cfe3d3;
 }
 
-.market-footer-bottom a { color: inherit; text-decoration: none; }
+.market-footer-bottom a { color: inherit; text-decoration: none; display: inline; }
+.market-footer-bottom .page-width > span:last-child { white-space: nowrap; }
 .market-footer-bottom a:hover { text-decoration: underline; }
 
 /* Order tracking header + status chip: responsive, never stretches into an oval */
@@ -25130,7 +25131,7 @@ body,
   font-size: 11px !important;
   line-height: 1;
 }
-@media (max-width: 480px) {
+@media (max-width: 480px) and (pointer: coarse) {
   .track-panel-head .status-chip { padding: 5px 11px; font-size: 10px !important; }
   .track-panel-head h3 { font-size: 17px !important; word-break: break-all; }
 }
@@ -25143,7 +25144,7 @@ body,
 .account-sidebar-v7 nav b:empty { display: none !important; }
 
 /* Mobile cart item: big cover fills the whole left side, details on the right */
-@media (max-width: 720px) {
+@media (max-width: 720px) and (pointer: coarse) {
   .cart-item {
     grid-template-columns: minmax(112px, 36%) minmax(0, 1fr) auto;
     grid-template-rows: auto auto 1fr;
@@ -25168,7 +25169,26 @@ body,
   .cart-item .qty-box { grid-column: 2; grid-row: 3; align-self: end; margin-top: 0; }
   .cart-item .remove-btn { grid-column: 3; grid-row: 1; }
 }
-@media (max-width: 380px) {
+@media (max-width: 380px) and (pointer: coarse) {
   .cart-item { grid-template-columns: minmax(96px, 34%) minmax(0, 1fr) auto; column-gap: 10px; }
   .cart-item > img { min-height: 170px; }
 }
+
+/* =========================================================
+   DESKTOP ZOOM LOCK — KEEP AT THE VERY END OF styles.css
+   utils/desktopFit.js adds html.desktop-fit and sets --fit-scale
+   when a mouse/trackpad device has a window narrower than 1280px
+   (browser zoom, small window). The desktop layout is then scaled
+   instead of collapsing into the tablet / mobile layout.
+   ========================================================= */
+html.desktop-fit #root {
+  zoom: var(--fit-scale, 1);
+}
+
+@media print {
+  html.desktop-fit #root {
+    zoom: 1;
+  }
+}
+
+

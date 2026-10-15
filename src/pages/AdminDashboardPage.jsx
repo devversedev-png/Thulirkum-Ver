@@ -279,7 +279,7 @@ export default function AdminDashboardPage() {
     useEffect(() => {
     if (!mobileSidebarOpen) return
 
-    const isMobile = window.innerWidth <= 720
+    const isMobile = window.innerWidth <= 720 && window.matchMedia('(pointer: coarse)').matches
     if (isMobile) document.body.style.overflow = 'hidden'
 
     const onKey = (e) => e.key === 'Escape' && setMobileSidebarOpen(false)
