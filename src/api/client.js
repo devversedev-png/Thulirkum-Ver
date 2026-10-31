@@ -9,6 +9,9 @@ const AUTH_ENDPOINTS = new Set([
   '/auth/login',
   '/auth/register',
   '/auth/admin/login',
+  '/auth/otp/config',
+  '/auth/otp/send',
+  '/auth/otp/verify',
 ])
 
 export class ApiError extends Error {

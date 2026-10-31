@@ -104,6 +104,35 @@ export function AuthProvider({ children }) {
     return data
   }
 
+  // ---- Mobile OTP (MSG91, handled by the backend) ----
+
+  function getOtpConfig() {
+    return api('/auth/otp/config')
+  }
+
+  function sendOtp(mobile, purpose) {
+    return api('/auth/otp/send', {
+      method: 'POST',
+      body: JSON.stringify({ mobile, purpose }),
+    })
+  }
+
+  // purpose REGISTER -> { verified, otpToken }; purpose LOGIN -> normal auth response
+  function verifyOtp(mobile, purpose, otp) {
+    return api('/auth/otp/verify', {
+      method: 'POST',
+      body: JSON.stringify({ mobile, purpose, otp }),
+    })
+  }
+
+  async function loginWithOtp(mobile, otp, rememberMe = false) {
+    const data = await verifyOtp(mobile, 'LOGIN', otp)
+
+    updateSession(data, rememberMe)
+
+    return data
+  }
+
   function updateSession(data, rememberMe = true) {
     const account = {
       id: data.id,
@@ -146,6 +175,10 @@ export function AuthProvider({ children }) {
       login,
       adminLogin,
       register,
+      getOtpConfig,
+      sendOtp,
+      verifyOtp,
+      loginWithOtp,
       updateSession,
       logout,
     }),

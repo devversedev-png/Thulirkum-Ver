@@ -1,0 +1,33 @@
+.otp-code-input {
+  letter-spacing: 0.5em;
+  font-size: 22px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.otp-note {
+  margin: 4px 0 10px;
+  font-size: 13px;
+  color: var(--tv-copy, #52675e);
+}
+
+.otp-note strong {
+  color: var(--ink, #182921);
+}
+
+.otp-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 10px 0 4px;
+}
+
+.otp-actions .text-btn {
+  padding: 0;
+}
+
+.otp-actions .text-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

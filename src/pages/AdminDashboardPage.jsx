@@ -11,6 +11,7 @@ import { useAuth } from '../context/AuthContext'
 import PremiumConfirm from '../components/PremiumConfirm'
 import PremiumSelect from '../components/PremiumSelect'
 import PremiumDatePicker from '../components/PremiumDatePicker'
+import AmazonOrdersPanel from '../components/AmazonOrdersPanel'
 
 const emptyBook = {
   title: '',
@@ -1728,6 +1729,11 @@ export default function AdminDashboardPage() {
       'Customers',
     ],
     [
+      'amazon',
+      '⌁',
+      'Amazon Orders',
+    ],
+    [
       'authors',
       '✎',
       'Authors',
@@ -2803,6 +2809,9 @@ export default function AdminDashboardPage() {
             </div>
           </section>
         )}
+
+        {/* Amazon seller orders */}
+        {tab === 'amazon' && <AmazonOrdersPanel />}
 
         {/* Authors */}
         {tab === 'authors' && (
