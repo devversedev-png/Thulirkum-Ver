@@ -1,0 +1,9 @@
+
+{
+  "appId": "com.thulirkumver.user",
+  "appName": "Thulirkum Ver",
+  "webDir": "dist-user",
+  "android": {
+    "path": "android-user"
+  }
+}

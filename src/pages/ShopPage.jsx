@@ -8,7 +8,7 @@ import { demoBooks } from '../data/siteCatalog'
 const PAGE_SIZE = 12
 
 export default function ShopPage() {
-  const { books } = useStore()
+  const { books, homeSections } = useStore()
 
   const catalogue = useMemo(() => {
     return books?.length ? books : demoBooks
@@ -26,6 +26,7 @@ export default function ShopPage() {
   const rating = Number(params.get('rating') || 0)
   const inStockOnly = params.get('stock') === '1'
   const offerOnly = params.get('offer') === '1'
+  const homeSection = params.get('homeSection') || ''
   const page = Math.max(1, Number(params.get('page') || 1))
 
   const categories = useMemo(
@@ -160,6 +161,12 @@ export default function ShopPage() {
     promoBooks.length
   ])
 
+  const sectionBookIds = useMemo(() => {
+    if (!homeSection || homeSection === 'discounted') return null
+    const section = (homeSections || []).find(item => item.key === homeSection)
+    return section ? new Set((section.bookIds || []).map(String)) : null
+  }, [homeSections, homeSection])
+
   const filtered = useMemo(() => {
     const text = q.toLowerCase().trim()
 
@@ -199,6 +206,12 @@ export default function ShopPage() {
           Number(book.stock || 0) > 0
         )
 
+      const sectionMatch =
+        !homeSection ||
+        (homeSection === 'discounted'
+          ? Number(book.originalPrice || 0) > Number(book.price || 0)
+          : sectionBookIds !== null && sectionBookIds.has(String(book.id)))
+
       const offerMatch =
         !offerOnly ||
         Number(book.originalPrice || 0) >
@@ -211,6 +224,7 @@ export default function ShopPage() {
         priceMatch &&
         (!rating || Number(book.rating || 0) >= rating) &&
         stockMatch &&
+        sectionMatch &&
         offerMatch
       )
     })
@@ -257,7 +271,9 @@ export default function ShopPage() {
     price,
     rating,
     inStockOnly,
-    offerOnly
+    offerOnly,
+    homeSection,
+    sectionBookIds
   ])
 
   const pageCount = Math.max(

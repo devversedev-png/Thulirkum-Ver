@@ -1,9 +1,11 @@
+import { LayoutDashboard, ShoppingCart, BookOpen, Users, Menu, Plus, BarChart3, RefreshCw, ExternalLink, Package, IndianRupee, Bell, ArrowRight, Layers } from 'lucide-react'
 import {
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 import { api } from '../api/client'
 import { useAuth } from '../context/AuthContext'
@@ -166,7 +168,13 @@ function money(value) {
 export default function AdminDashboardPage() {
   const { user, logout } = useAuth()
 
-  const [tab, setTab] = useState('overview')
+  // Keep admin sections in the URL so Android Back restores the previous section.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const tab = searchParams.get('tab') || 'overview'
+  const setTab = (nextTab) => {
+    const next = typeof nextTab === 'function' ? nextTab(tab) : nextTab
+    if (next !== tab) setSearchParams(next === 'overview' ? {} : { tab: next })
+  }
 
   const [books, setBooks] = useState([])
   const [orders, setOrders] = useState([])
@@ -176,6 +184,7 @@ export default function AdminDashboardPage() {
   const [homeSections, setHomeSections] = useState([])
   const [selectedHomeSectionKey, setSelectedHomeSectionKey] = useState('discounted')
   const [selectedHomeBookIds, setSelectedHomeBookIds] = useState([])
+  const [perBookDiscounts, setPerBookDiscounts] = useState({})
   const [homeBookSearch, setHomeBookSearch] = useState('')
   const [homeConfigForm, setHomeConfigForm] = useState(HOME_SECTION_DEFAULTS.discounted)
   const [homeSettingsForm, setHomeSettingsForm] = useState({ bannerUrls: ['', '', '', ''], activeBannerIndex: 0 })
@@ -204,6 +213,13 @@ export default function AdminDashboardPage() {
 
   const [message, setMessage] =
     useState('')
+
+  // Automatically dismiss admin feedback after two seconds.
+  useEffect(() => {
+    if (!message) return undefined
+    const timer = window.setTimeout(() => setMessage(''), 2000)
+    return () => window.clearTimeout(timer)
+  }, [message])
 
   const [inventorySearch, setInventorySearch] =
     useState('')
@@ -270,6 +286,7 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     const selected = homeSections.find(section => section.key === selectedHomeSectionKey)
     setSelectedHomeBookIds(selected?.bookIds || [])
+    setPerBookDiscounts(selected?.config?.perBookDiscounts || {})
     setHomeConfigForm({
       ...(HOME_SECTION_DEFAULTS[selectedHomeSectionKey] || {}),
       ...(selected?.config || {}),
@@ -295,6 +312,38 @@ export default function AdminDashboardPage() {
       window.removeEventListener('resize', onResize)
     }
   }, [mobileSidebarOpen])
+
+  // Close custom discount menus when clicking outside, pressing Escape,
+  // or opening another discount menu.
+  useEffect(() => {
+    const closeMenus = (event) => {
+      document.querySelectorAll('details.tv-discount-dropdown[open]').forEach(menu => {
+        if (!menu.contains(event.target)) menu.open = false
+      })
+    }
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') {
+        document.querySelectorAll('details.tv-discount-dropdown[open]').forEach(menu => {
+          menu.open = false
+        })
+      }
+    }
+    const closeOtherMenus = (event) => {
+      const opened = event.target
+      if (!opened.open || !opened.matches('details.tv-discount-dropdown')) return
+      document.querySelectorAll('details.tv-discount-dropdown[open]').forEach(menu => {
+        if (menu !== opened) menu.open = false
+      })
+    }
+    document.addEventListener('pointerdown', closeMenus)
+    document.addEventListener('keydown', closeOnEscape)
+    document.addEventListener('toggle', closeOtherMenus, true)
+    return () => {
+      document.removeEventListener('pointerdown', closeMenus)
+      document.removeEventListener('keydown', closeOnEscape)
+      document.removeEventListener('toggle', closeOtherMenus, true)
+    }
+  }, [])
 
   async function loadEverything() {
     // Load each admin area independently. One unavailable endpoint (for example
@@ -1563,121 +1612,46 @@ export default function AdminDashboardPage() {
     })
   }
 
+  const [homeSectionSaving, setHomeSectionSaving] = useState(false)
+
   async function saveHomeSection() {
-    const selectedSection =
-      homeSections.find(
-        section =>
-          section.key === selectedHomeSectionKey
-      )
-
-    const updated = homeSections.map(section =>
-      section.key === selectedHomeSectionKey
-        ? {
-          ...section,
-          bookIds: selectedHomeBookIds,
-          config: homeConfigForm,
+    if (homeSectionSaving) return
+    const key = selectedHomeSectionKey
+    const selectedIds = [...selectedHomeBookIds]
+    const config = { ...homeConfigForm }
+    if (key === 'discounted' && config.mode === 'MANUAL') {
+      if (!selectedIds.length) { setMessage('Please select at least one book.'); return }
+      const discounts = {}
+      for (const id of selectedIds) {
+        const entry = perBookDiscounts[id] || { type: 'PERCENT', value: Number(config.discountPercent ?? 10) }
+        const value = Number(entry.value)
+        const book = books.find(item => item.id === id)
+        const original = Number(book?.originalPrice || book?.price || 0)
+        if (!Number.isFinite(value) || value <= 0 ||
+            (entry.type === 'PERCENT' && value > 100) ||
+            (entry.type === 'FIXED' && value >= original)) {
+          setMessage(`Enter a valid discount for ${book?.title || id}.`)
+          return
         }
-        : section
-    )
-
-    try {
-      /*
-       * Apply the actual catalogue discount when
-       * Discounted Books is in manual mode.
-       */
-      if (
-        selectedHomeSectionKey === 'discounted' &&
-        homeConfigForm.mode === 'MANUAL'
-      ) {
-        const discountPercent = Math.min(
-          100,
-          Math.max(
-            0,
-            Number(
-              homeConfigForm.discountPercent || 0
-            )
-          )
-        )
-
-        if (selectedHomeBookIds.length === 0) {
-          throw new Error(
-            'Please select at least one book.'
-          )
-        }
-
-        if (discountPercent <= 0) {
-          throw new Error(
-            'Enter a discount percentage greater than 0.'
-          )
-        }
-
-        const selectedBooks = books.filter(book =>
-          selectedHomeBookIds.includes(book.id)
-        )
-
-        await Promise.all(
-          selectedBooks.map(async book => {
-            const originalPrice = Number(
-              book.originalPrice ||
-              book.price ||
-              0
-            )
-
-            if (originalPrice <= 0) {
-              return
-            }
-
-            const newPrice =
-              Math.round(
-                originalPrice *
-                (1 - discountPercent / 100) *
-                100
-              ) / 100
-
-            await api(
-              `/admin/books/${book.id}`,
-              {
-                method: 'PUT',
-                body: JSON.stringify({
-                  ...book,
-
-                  originalPrice,
-
-                  price: newPrice,
-                }),
-              }
-            )
-          })
-        )
+        discounts[id] = { type: entry.type === 'FIXED' ? 'FIXED' : 'PERCENT', value }
       }
-
-      const saved = await api(
-        '/admin/home-sections',
-        {
-          method: 'PUT',
-          body: JSON.stringify(updated),
-        }
-      )
-
-      setHomeSections(saved)
-
-      /*
-       * Refresh books so the new prices immediately
-       * appear in the admin UI.
-       */
-      const refreshedBooks =
-        await api('/admin/books')
-
-      setBooks(refreshedBooks)
-
-      setMessage(
-        'Home section and discount saved successfully'
-      )
+      config.perBookDiscounts = discounts
+    }
+    setHomeSectionSaving(true)
+    try {
+      const saved = await api(`/admin/home-sections/${encodeURIComponent(key)}`, {
+        method: 'PUT',
+        body: JSON.stringify({ key, bookIds: selectedIds, config }),
+      })
+      setHomeSections(current => current.some(section => section.key === key)
+        ? current.map(section => section.key === key ? saved : section)
+        : [...current, saved])
+      setBooks(await api('/admin/books'))
+      setMessage('Home section and individual discounts saved successfully')
     } catch (err) {
-      setMessage(
-        err.message ||
-        'Unable to save home section'
-      )
+      setMessage(err.message || 'Unable to save home section')
+    } finally {
+      setHomeSectionSaving(false)
     }
   }
 
@@ -1775,6 +1749,23 @@ export default function AdminDashboardPage() {
           aria-label="Close menu"
         />
       )}
+      <nav className="tv-admin-bottom-nav" aria-label="Admin mobile navigation">
+        {[
+          ['overview', LayoutDashboard, 'Home'],
+          ['orders', ShoppingCart, 'Orders'],
+          ['inventory', BookOpen, 'Books'],
+          ['customers', Users, 'Customers'],
+        ].map(([key, Icon, label]) => (
+          <button type="button" key={key} className={tab === key ? 'is-active' : ''}
+            onClick={() => { setTab(key); setMobileSidebarOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+            aria-current={tab === key ? 'page' : undefined}>
+            <Icon size={21} strokeWidth={2} /><span>{label}</span>
+          </button>
+        ))}
+        <button type="button" onClick={() => setMobileSidebarOpen(true)} aria-label="More admin sections">
+          <Menu size={21} strokeWidth={2}/><span>More</span>
+        </button>
+      </nav>
       {/* Sidebar */}
       <aside
         className={`admin-sidebar-v6 glass-admin-sidebar ${mobileSidebarOpen ? 'mobile-sidebar-open' : ''
@@ -1886,8 +1877,12 @@ export default function AdminDashboardPage() {
 
       {/* Main */}
       <main className="admin-main-v6">
-        <header className="admin-top-v6 glass-panel">
-          <div>
+        <header className="admin-top-v6 glass-panel tv-admin-premium-top">
+          <div className="tv-admin-header-brand" aria-label="Thulirkum Ver admin portal">
+            <img src="/logo-icon.jpeg" alt="Thulirkum Ver" />
+            <div><strong>Thulirkum Ver</strong><small>ADMIN PORTAL</small></div>
+          </div>
+          <div className="tv-admin-header-copy">
             <span className="admin-kicker-v6">
               STORE MANAGEMENT
             </span>
@@ -1902,8 +1897,11 @@ export default function AdminDashboardPage() {
             </h1>
 
             <p>
-              Live data from your catalogue,
-              customers and orders.
+              {tab === 'homeSections'
+                ? 'Curate collections and discounts for your storefront.'
+                : tab === 'overview'
+                  ? 'Your store at a glance.'
+                  : 'Manage your store with confidence.'}
             </p>
           </div>
 
@@ -1919,6 +1917,7 @@ export default function AdminDashboardPage() {
                 )
               }
             >
+              <ExternalLink size={16} aria-hidden="true" />
               View website
             </button>
 
@@ -1935,36 +1934,26 @@ export default function AdminDashboardPage() {
                 refreshing
               }
             >
-              <span className="refresh-icon-v73">
-                ↻
-              </span>
+              <RefreshCw size={16} aria-hidden="true" className={refreshing ? 'tv-spin' : ''} />
 
               {refreshing
                 ? 'Refreshing...'
                 : 'Refresh'}
             </button>
           </div>
+          {message && (
+            <div className="tv-admin-header-notice" role="status" aria-live="polite">
+              <span className="tv-admin-notice-symbol" aria-hidden="true">✓</span>
+              <span className="tv-admin-notice-text">{message}</span>
+              <button type="button" aria-label="Dismiss notification" onClick={() => setMessage('')}>×</button>
+            </div>
+          )}
         </header>
-
-        {message && (
-          <button
-            className="admin-toast-v6"
-            onClick={() =>
-              setMessage('')
-            }
-          >
-            {message}
-
-            <span>
-              ×
-            </span>
-          </button>
-        )}
 
         {/* Overview */}
         {tab === 'overview' && (
           <>
-            <section className="admin-hero-v6 glass-panel">
+            <section className="admin-hero-v6 glass-panel tv-admin-premium-hero">
               <div>
                 <span>
                   STORE OVERVIEW
@@ -1972,10 +1961,8 @@ export default function AdminDashboardPage() {
 
                 <h2>
                   Welcome back,{' '}
-                  {user?.name?.split(
-                    ' '
-                  )[0] ||
-                    'Admin'}
+                  {
+                    'Cheif'}
                   .
                 </h2>
 
@@ -2009,12 +1996,12 @@ export default function AdminDashboardPage() {
               </div>
             </section>
 
-            <section className="admin-kpi-grid-v6 concept-kpi-grid">
+            <section className="admin-kpi-grid-v6 concept-kpi-grid tv-admin-premium-kpis">
               <KpiCard
                 label="Total Orders"
                 value={stats.orders}
                 detail={`${stats.toProcess} need processing`}
-                icon="▣"
+                icon={<ShoppingCart size={25} />}
               />
 
               <KpiCard
@@ -2023,7 +2010,7 @@ export default function AdminDashboardPage() {
                   stats.revenue
                 ).toLocaleString()}`}
                 detail="Excludes cancelled orders"
-                icon="₹"
+                icon={<IndianRupee size={25} />}
               />
 
               <KpiCard
@@ -2032,15 +2019,30 @@ export default function AdminDashboardPage() {
                   stats.customers
                 }
                 detail="Registered accounts"
-                icon="◎"
+                icon={<Users size={25} />}
               />
 
               <KpiCard
                 label="Total Books"
                 value={stats.books}
                 detail={`${stats.lowStock} stock alerts`}
-                icon="▤"
+                icon={<BookOpen size={25} />}
               />
+            </section>
+
+            <section className="tv-admin-quick-actions" aria-label="Quick actions">
+              <div className="tv-admin-quick-heading"><h2>Quick Actions</h2></div>
+              <div className="tv-admin-quick-grid">
+                {[
+                  ['inventory', Plus, 'Add Book'],
+                  ['orders', ShoppingCart, 'Orders'],
+                  ['customers', Users, 'Customers'],
+                ].map(([key, Icon, label]) => (
+                  <button type="button" key={label} onClick={() => {setTab(key); window.scrollTo({top: 0, behavior: 'smooth'})}}>
+                    <Icon size={23} strokeWidth={2.1}/><span>{label}</span>
+                  </button>
+                ))}
+              </div>
             </section>
 
             <section className="admin-analytics-grid-c8">
@@ -3208,8 +3210,8 @@ export default function AdminDashboardPage() {
                   {HOME_SECTION_OPTIONS.find(option => option.key === selectedHomeSectionKey)?.copy}
                 </div>
 
-                <button className="admin-primary-v6" type="button" onClick={saveHomeSection}>
-                  Save section
+                <button className="admin-primary-v6" type="button" onClick={saveHomeSection} disabled={homeSectionSaving}>
+                  {homeSectionSaving ? 'Saving...' : 'Save section'}
                 </button>
               </div>
 
@@ -3253,7 +3255,7 @@ export default function AdminDashboardPage() {
 
                     {homeConfigForm.mode === 'MANUAL' ? (
                       <label>
-                        Discount to apply
+                        Default discount for newly selected books
 
                         <div className="admin-home-input-with-suffix-v7">
                           <input
@@ -3280,7 +3282,7 @@ export default function AdminDashboardPage() {
                         </div>
 
                         <small className="admin-home-field-help-v7">
-                          This discount will be applied to the selected books.
+                          Each selected book can have its own percentage or fixed-amount discount below.
                         </small>
                       </label>
                     ) : (
@@ -3689,7 +3691,7 @@ export default function AdminDashboardPage() {
                 (selectedHomeSectionKey === 'recommended' && homeConfigForm.mode === 'MANUAL')) && (
                   <div className="admin-home-manual-picker-v7">
                     <div className="admin-home-section-meta-v7">
-                      <div>
+                      <div className="tv-home-manual-copy">
                         <strong>Select books manually</strong>
                         <small>Choose specific books for this section. Selecting any book automatically switches this section to manual mode.</small>
                       </div>
@@ -3705,33 +3707,39 @@ export default function AdminDashboardPage() {
                       />
                     </label>
 
-                    <div className="admin-home-book-grid-v7">
-                      {filteredHomeBooks.map(book => {
+                    {[
+                      { title: 'Books in this section', selectedGroup: true, items: filteredHomeBooks.filter(book => selectedHomeBookIds.includes(book.id)) },
+                      { title: 'Available books — select to add', selectedGroup: false, items: filteredHomeBooks.filter(book => !selectedHomeBookIds.includes(book.id)) },
+                    ].map(group => (
+                      <div key={group.title} className={`tv-curation-group ${group.selectedGroup ? 'tv-curation-selected' : 'tv-curation-available'}`}>
+                        <div className="tv-curation-group-head"><div><span className="tv-curation-eyebrow">{group.selectedGroup ? 'YOUR COLLECTION' : 'DISCOVER & ADD'}</span><h3>{group.title}</h3><p>{group.selectedGroup ? 'Fine-tune the offer for each selected title.' : 'Add more titles to build your collection.'}</p></div><span className="tv-curation-count">{group.items.length} {group.items.length === 1 ? 'book' : 'books'}</span></div>
+                        <div className="admin-home-book-grid-v7">
+                      {group.items.map(book => {
                         const checked = selectedHomeBookIds.includes(book.id)
 
                         const originalPrice = Number(
                           book.originalPrice || book.price || 0
                         )
 
-                        const discountPercent =
-                          selectedHomeSectionKey === 'discounted' &&
-                            homeConfigForm.mode === 'MANUAL'
-                            ? Number(homeConfigForm.discountPercent || 0)
-                            : 0
-
-                        const discountedPrice =
-                          discountPercent > 0
-                            ? originalPrice * (1 - discountPercent / 100)
-                            : Number(book.price || 0)
+                        const discountEntry = perBookDiscounts[book.id] || {
+                          type: 'PERCENT', value: Number(homeConfigForm.discountPercent ?? 10)
+                        }
+                        const discountValue = Number(discountEntry.value || 0)
+                        const discountedPrice = checked
+                          ? Math.max(0, Math.round((discountEntry.type === 'FIXED'
+                              ? originalPrice - discountValue
+                              : originalPrice * (1 - discountValue / 100)) * 100) / 100)
+                          : originalPrice
 
                         return (
-                          <label
-                            className={`admin-home-book-option-v7 ${checked ? 'selected' : ''
+                          <div
+                            className={`admin-home-book-option-v7 tv-curation-card ${checked ? 'selected' : ''
                               }`}
                             key={book.id}
                           >
                             <input
                               type="checkbox"
+                              aria-label={`Select ${book.title} for this section`}
                               checked={checked}
                               onChange={() =>
                                 setSelectedHomeBookIds(current =>
@@ -3766,8 +3774,49 @@ export default function AdminDashboardPage() {
                               </em>
 
                               {selectedHomeSectionKey === 'discounted' &&
-                                homeConfigForm.mode === 'MANUAL' && (
+                                homeConfigForm.mode === 'MANUAL' && !checked && (
                                   <span className="admin-home-price-preview-v7">
+                                    <b>₹{originalPrice.toFixed(2)}</b>
+                                  </span>
+                                )}
+                              {selectedHomeSectionKey === 'discounted' &&
+                                homeConfigForm.mode === 'MANUAL' && checked && (
+                                  <div className="admin-home-individual-discount"><span className="tv-curation-control-label">CUSTOM OFFER</span>
+                                    <details className="tv-discount-dropdown">
+                                      <summary aria-label={`Discount type for ${book.title}`}>
+                                        <span className="tv-discount-dropdown-icon">{discountEntry.type === 'FIXED' ? '₹' : '%'}</span>
+                                        <span>{discountEntry.type === 'FIXED' ? 'Amount off' : 'Percentage off'}</span>
+                                        <span className="tv-discount-dropdown-chevron" aria-hidden="true">⌄</span>
+                                      </summary>
+                                      <div className="tv-discount-dropdown-menu" role="group" aria-label={`Discount type for ${book.title}`}>
+                                        {[{ type: 'PERCENT', symbol: '%', label: 'Percentage off' }, { type: 'FIXED', symbol: '₹', label: 'Fixed amount off' }].map(option => (
+                                          <button key={option.type} type="button"
+                                            className={`tv-discount-dropdown-option ${discountEntry.type === option.type ? 'is-selected' : ''}`}
+                                            aria-pressed={discountEntry.type === option.type}
+                                            onClick={event => {
+                                              setPerBookDiscounts(current => ({ ...current, [book.id]: { type: option.type, value: 0 } }))
+                                              event.currentTarget.closest('details')?.removeAttribute('open')
+                                            }}>
+                                            <span className="tv-discount-dropdown-option-icon">{option.symbol}</span>
+                                            <span>{option.label}</span>
+                                            {discountEntry.type === option.type && <span className="tv-discount-dropdown-check" aria-hidden="true">✓</span>}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    </details>
+                                    <input type="number" min="0" step="0.01"
+                                      max={discountEntry.type === 'PERCENT' ? 100 : originalPrice}
+                                      aria-label={`Discount amount for ${book.title}`}
+                                      value={discountEntry.value}
+                                      onChange={event => setPerBookDiscounts(current => ({ ...current,
+                                        [book.id]: { ...discountEntry, value: event.target.value }
+                                      }))}
+                                      style={{ width: 100, minWidth: 0 }} />
+                                  </div>
+                                )}
+                              {selectedHomeSectionKey === 'discounted' &&
+                                homeConfigForm.mode === 'MANUAL' && checked && (
+                                  <span className="admin-home-price-preview-v7 tv-curation-final-price">
                                     <del>
                                       ₹{originalPrice.toFixed(2)}
                                     </del>
@@ -3777,15 +3826,32 @@ export default function AdminDashboardPage() {
                                     </b>
 
                                     <mark>
-                                      {discountPercent}% OFF
+                                      {discountEntry.type === 'FIXED' ? `₹${discountValue} OFF` : `${discountValue}% OFF`}
                                     </mark>
                                   </span>
                                 )}
                             </span>
-                          </label>
+                            {checked && (
+                              <button
+                                type="button"
+                                className="admin-home-remove-book-v7"
+                                aria-label={`Remove ${book.title} from this section`}
+                                title="Remove from this section"
+                                onClick={event => {
+                                  event.preventDefault()
+                                  event.stopPropagation()
+                                  setSelectedHomeBookIds(current => current.filter(id => id !== book.id))
+                                }}
+                              >
+                                Remove from section
+                              </button>
+                            )}
+                          </div>
                         )
                       })}
-                    </div>
+                        </div>
+                      </div>
+                    ))}
 
                     {!filteredHomeBooks.length && (
                       <div className="admin-empty-v6 glass-card">No books match your search.</div>
@@ -5054,3 +5120,4 @@ function formatDateTime(value) {
     ).toLocaleString()
     : '—'
 }
+

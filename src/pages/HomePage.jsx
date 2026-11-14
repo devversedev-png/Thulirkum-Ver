@@ -72,11 +72,15 @@ export default function HomePage() {
   const [categoryPaused, setCategoryPaused] = useState(false)
   const [activeOfferSlide, setActiveOfferSlide] = useState(0)
   const { books, offers, authors, homeSections, homeSettings, loading } = useStore()
-  console.log('HOME SECTIONS FROM BACKEND:', homeSections)
 
   const catalogue = useMemo(
     () => decorateBooks(books || []),
     [books]
+  )
+
+  const catalogueById = useMemo(
+    () => new Map(catalogue.map(book => [String(book.id), book])),
+    [catalogue]
   )
 
   const homeBookSections = useMemo(() => {
@@ -86,7 +90,7 @@ export default function HomePage() {
     .map(section => ({
       ...section,
       books: (section.bookIds || [])
-        .map(id => catalogue.find(book => book.id === id))
+        .map(id => catalogueById.get(String(id)))
         .filter(Boolean),
     }))
     .filter(section => {
@@ -117,7 +121,7 @@ export default function HomePage() {
         Number(a.displayOrder || 0) -
         Number(b.displayOrder || 0)
     )
-}, [homeSections, catalogue])
+}, [homeSections, catalogueById])
 
   const offerRows = useMemo(
     () => (offers || []).filter(offer => offer.active !== false),

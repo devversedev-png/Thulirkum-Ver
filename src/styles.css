@@ -16182,7 +16182,7 @@ p {
   width: 100%;
   height: 100%;
 
-  background-image: url('/admin-logo-bg.png');
+  background-image: url('/admin-login-bg.png');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -16610,7 +16610,7 @@ p {
   inset: 0;
   z-index: 0;
 
-  background-image: url('/admin-logo-bg.png');
+  background-image: url('/admin-login-bg.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -25192,3 +25192,703 @@ html.desktop-fit #root {
 }
 
 
+
+
+/* Thulirkum Ver Android: admin phone/tablet responsive overrides. */
+@media (max-width: 900px) and (pointer: coarse) {
+  .admin-login-page {
+    min-height: 100dvh !important;
+    height: auto !important;
+    width: 100% !important;
+    padding: max(18px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+  .admin-login-card {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 480px !important;
+    min-width: 0 !important;
+    max-height: none !important;
+    margin: 12px auto !important;
+    padding: clamp(20px, 6vw, 32px) !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+  .admin-login-card form, .admin-login-card form input, .admin-login-card .password-input-wrap,
+  .admin-login-card .admin-login-submit { min-width: 0 !important; max-width: 100% !important; width: 100% !important; box-sizing: border-box !important; }
+  .admin-login-card input { font-size: 16px !important; }
+  .admin-login-card h1 { font-size: clamp(25px, 7vw, 34px) !important; }
+  .admin-login-background, .admin-login-overlay { position: fixed !important; inset: 0 !important; }
+  .admin-shell-v6 { width: 100% !important; min-width: 0 !important; display: block !important; }
+  .admin-main-v6 {
+    margin: 0 !important; width: 100% !important; max-width: 100% !important;
+    min-width: 0 !important; padding: max(76px, calc(env(safe-area-inset-top) + 68px)) 16px max(24px, env(safe-area-inset-bottom)) !important;
+    box-sizing: border-box !important;
+  }
+  .admin-main-v6 > *, .admin-main-v6 section, .admin-main-v6 article,
+  .admin-main-v6 .glass-panel, .admin-main-v6 .admin-panel-v6 {
+    min-width: 0 !important; max-width: 100% !important; box-sizing: border-box !important;
+  }
+  .admin-top-v6, .admin-hero-v6 { flex-wrap: wrap !important; gap: 12px !important; padding: 18px !important; }
+  .admin-top-actions-v6, .admin-hero-actions-v6 { flex-wrap: wrap !important; max-width: 100% !important; }
+  .admin-kpi-grid-v6, .admin-analytics-grid-c8, .admin-form-grid-v6,
+  .admin-home-config-grid-v7, .admin-home-extra-grid-v7, .admin-authors-layout-c8 {
+    display: grid !important; grid-template-columns: minmax(0, 1fr) !important; gap: 14px !important;
+  }
+  .admin-main-v6 input, .admin-main-v6 select, .admin-main-v6 textarea { max-width: 100% !important; min-width: 0 !important; box-sizing: border-box !important; }
+  .admin-main-v6 table { min-width: 580px; }
+  .admin-main-v6 :is(.admin-table-wrap-v6, .admin-table-scroll-v6, .table-responsive, .admin-table-container, .admin-orders-table-wrap) {
+    overflow-x: auto !important; max-width: 100% !important; -webkit-overflow-scrolling: touch;
+  }
+  .admin-sidebar-v6 { max-width: min(320px, 86vw) !important; }
+  .admin-mobile-logo-trigger { z-index: 1100 !important; }
+  .admin-modal-backdrop { padding: 12px !important; box-sizing: border-box !important; }
+  .admin-order-modal { width: 100% !important; max-width: 100% !important; max-height: 90dvh !important; overflow-y: auto !important; }
+}
+@media (max-width: 480px) and (pointer: coarse) {
+  .admin-main-v6 { padding-left: 12px !important; padding-right: 12px !important; }
+  .admin-main-v6 .admin-panel-v6 { padding: 14px !important; }
+  .market-brand { width: 150px !important; max-width: 45vw !important; }
+  .market-brand img { height: 53px !important; max-height: 53px !important; width: auto !important; object-fit: contain !important; }
+}
+.tv-android-back-toast { position: fixed; left: 50%; bottom: max(28px, env(safe-area-inset-bottom)); transform: translateX(-50%); padding: 12px 18px; border-radius: 12px; color: #fff; background: rgba(22, 30, 27, .9); font: 500 14px system-ui; z-index: 99999; pointer-events: none; opacity: 0; transition: opacity .15s; white-space: nowrap; }
+.tv-android-back-toast.visible { opacity: 1; }
+
+
+/* Thulirkum Ver — premium native-feeling mobile admin overview */
+.tv-admin-bottom-nav { display:none; }
+.tv-admin-quick-actions { margin: 25px 0 28px; }
+.tv-admin-quick-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+.tv-admin-quick-heading h2 { font-family:Georgia,serif; font-size:clamp(22px,3vw,30px); color:#123f30; margin:0; }
+.tv-admin-quick-heading button { display:inline-flex; align-items:center; gap:5px; border:1px solid #e3e7df; background:white; color:#174c37; padding:9px 12px; border-radius:20px; font-weight:700; }
+.tv-admin-quick-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.tv-admin-quick-grid button { border:1px solid #e8e7df; border-radius:18px; background:#fff; color:#0d553a; min-height:100px; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:12px; font-weight:700; box-shadow:0 8px 22px rgba(23,52,36,.06); cursor:pointer; }
+.tv-admin-quick-grid button:hover { transform:translateY(-2px); }
+@media(max-width:720px) {
+  .admin-shell-v6 { background:#fbf8f1 !important; }
+  .admin-main-v6 { padding: 86px 14px calc(112px + env(safe-area-inset-bottom)) !important; background:linear-gradient(160deg,#faf7ee 0%,#fffdfa 55%,#f8f7f0 100%) !important; }
+  .admin-mobile-logo-trigger { left:16px !important; top:12px !important; }
+  .admin-mobile-logo-trigger button { background:transparent !important; box-shadow:none !important; border:none !important; }
+  .admin-mobile-logo-trigger img { width:112px !important; height:70px !important; object-fit:contain !important; object-position:left center !important; }
+  .admin-top-v6.tv-admin-premium-top { background:transparent !important; border:0 !important; box-shadow:none !important; backdrop-filter:none !important; padding: 18px 6px 22px !important; margin:0 !important; border-radius:0 !important; }
+  .tv-admin-premium-top .admin-kicker-v6 { color:#57705d !important; letter-spacing:.23em !important; font-size:11px !important; font-weight:800 !important; }
+  .tv-admin-premium-top h1 { font-family:Georgia,'Times New Roman',serif !important; font-size:clamp(38px,10vw,55px) !important; line-height:1.12 !important; letter-spacing:-.035em !important; color:#073d2c !important; margin:8px 0 !important; }
+  .tv-admin-premium-top p { color:#798078 !important; font-size:14px !important; }
+  .tv-admin-premium-top .admin-top-actions-v6 { width:100% !important; display:grid !important; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) !important; gap:10px !important; margin-top:14px !important; }
+  .tv-admin-premium-top .admin-top-actions-v6 button { width:100% !important; min-width:0 !important; border-radius:14px !important; min-height:48px !important; font-weight:750 !important; font-size:13px !important; padding:10px 12px !important; }
+  .tv-admin-premium-top .admin-view-store-btn { background:linear-gradient(145deg,#08744d,#034b36) !important; color:white !important; box-shadow:0 8px 20px rgba(3,88,55,.16) !important; }
+  .admin-hero-v6.tv-admin-premium-hero { background:radial-gradient(circle at 95% 12%,rgba(214,186,116,.25),transparent 40%),linear-gradient(120deg,#104934,#063c2c 75%) !important; border:1px solid #2b6149 !important; color:#fff !important; border-radius:24px !important; box-shadow:0 16px 32px rgba(16,64,43,.16) !important; padding:26px 22px !important; overflow:hidden !important; position:relative !important; }
+  .tv-admin-premium-hero:after { content:'❧'; position:absolute; right:-4px; top:-36px; color:rgba(222,199,132,.15); font-size:180px; pointer-events:none; }
+  .tv-admin-premium-hero > * { position:relative; z-index:1; }
+  .tv-admin-premium-hero span { color:#d8e9cf !important; letter-spacing:.2em !important; font-size:11px !important; }
+  .tv-admin-premium-hero h2 { font-family:Georgia,serif !important; font-size:clamp(27px,7.2vw,42px) !important; line-height:1.12 !important; color:#fff5d8 !important; margin:12px 0 !important; }
+  .tv-admin-premium-hero p { color:#e2ece2 !important; font-size:14px !important; line-height:1.6 !important; }
+  .tv-admin-premium-hero .admin-hero-actions-v6 { display:grid !important; grid-template-columns:1fr 1fr !important; gap:9px !important; width:100% !important; }
+  .tv-admin-premium-hero .admin-hero-actions-v6 button { background:#fffdf7 !important; color:#124c35 !important; border:0 !important; border-radius:12px !important; min-width:0 !important; width:100% !important; font-size:12px !important; font-weight:800 !important; padding:12px 8px !important; }
+  .admin-kpi-grid-v6.tv-admin-premium-kpis { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:11px !important; margin-top:20px !important; }
+  .tv-admin-premium-kpis .admin-kpi-v6 { display:flex !important; flex-direction:column !important; align-items:flex-start !important; gap:12px !important; min-width:0 !important; min-height:158px !important; padding:16px 13px !important; border:1px solid #e7eee7 !important; border-radius:21px !important; background:linear-gradient(140deg,#fff,#f0f9f1) !important; box-shadow:0 8px 22px rgba(24,67,47,.08) !important; }
+  .tv-admin-premium-kpis .admin-kpi-v6:nth-child(2) { background:linear-gradient(140deg,#fff,#fff4df) !important; }
+  .tv-admin-premium-kpis .admin-kpi-v6:nth-child(3) { background:linear-gradient(140deg,#fff,#e9f5ff) !important; }
+  .tv-admin-premium-kpis .admin-kpi-v6:nth-child(4) { background:linear-gradient(140deg,#fff,#f4eafa) !important; }
+  .tv-admin-premium-kpis .admin-kpi-v6 > span { width:43px !important; height:43px !important; border-radius:15px !important; display:grid !important; place-items:center !important; color:#08633f !important; background:#d5f0dc !important; padding:0 !important; flex:none !important; }
+  .tv-admin-premium-kpis .admin-kpi-v6:nth-child(2)>span { background:#ffedc9 !important; color:#a76a10 !important; }
+  .tv-admin-premium-kpis .admin-kpi-v6:nth-child(3)>span { background:#d7eafa !important; color:#176b97 !important; }
+  .tv-admin-premium-kpis .admin-kpi-v6:nth-child(4)>span { background:#e8d7fa !important; color:#6a35a0 !important; }
+  .tv-admin-premium-kpis .admin-kpi-v6 > div { width:100% !important; min-width:0 !important; }
+  .tv-admin-premium-kpis .admin-kpi-v6 small { font-size:12px !important; color:#52645c !important; }
+  .tv-admin-premium-kpis .admin-kpi-v6 strong { display:block !important; font-family:Georgia,serif !important; font-size:clamp(26px,7vw,35px) !important; line-height:1.2 !important; color:#113c2c !important; margin:3px 0 !important; }
+  .tv-admin-premium-kpis .admin-kpi-v6 p { font-size:10px !important; color:#68796e !important; line-height:1.35 !important; overflow-wrap:anywhere !important; margin:0 !important; }
+  .tv-admin-quick-actions { margin:24px 0 28px; }
+  .tv-admin-quick-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; }
+  .tv-admin-quick-grid button { border-radius:15px; min-height:83px; gap:10px; font-size:10px; padding:10px 3px; }
+  .tv-admin-bottom-nav { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:2px; position:fixed; bottom:0; left:0; right:0; padding:10px 9px calc(10px + env(safe-area-inset-bottom)); z-index:1200; background:linear-gradient(110deg,#006044,#024431); border-radius:23px 23px 0 0; box-shadow:0 -8px 25px rgba(3,58,41,.15); }
+  .tv-admin-bottom-nav button { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; min-width:0; min-height:55px; padding:7px 1px; border:0; border-radius:13px; color:#e3f2e9; background:transparent; font-size:10px; font-weight:700; }
+  .tv-admin-bottom-nav button.is-active { color:#064330; background:#f7edcd; }
+  .admin-sidebar-v6 { z-index:1300 !important; }
+  .admin-mobile-sidebar-overlay { z-index:1250 !important; }
+}
+@media(max-width:360px) {
+  .tv-admin-premium-kpis .admin-kpi-v6 { padding:13px 10px !important; }
+  .tv-admin-quick-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+
+/* Premium compact admin header — overrides earlier mobile header experiments */
+.tv-admin-premium-top.tv-admin-premium-top {
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) auto !important;
+  align-items: center !important;
+  gap: 12px 22px !important;
+  padding: 20px 24px !important;
+  margin-bottom: 20px !important;
+  background: linear-gradient(115deg,#fffdf8,#f3f7ee) !important;
+  border: 1px solid #e5e9df !important;
+  border-radius: 20px !important;
+  box-shadow: 0 8px 26px rgba(13,65,43,.055) !important;
+}
+.tv-admin-header-brand { display:none; }
+.tv-admin-header-copy { min-width:0; }
+.tv-admin-premium-top .admin-kicker-v6 { color:#53816a !important; font-size:10px !important; font-weight:800 !important; letter-spacing:.16em !important; }
+.tv-admin-premium-top h1 { font-size:clamp(26px,2.8vw,37px) !important; line-height:1.14 !important; margin:4px 0 6px !important; letter-spacing:-.025em !important; }
+.tv-admin-premium-top p { margin:0 !important; font-size:12px !important; color:#687b70 !important; line-height:1.5 !important; }
+.tv-admin-premium-top .admin-top-actions-v6 { display:flex !important; flex-wrap:wrap !important; gap:9px !important; margin:0 !important; width:auto !important; }
+.tv-admin-premium-top .admin-top-actions-v6 button { display:inline-flex !important; justify-content:center !important; align-items:center !important; gap:8px !important; min-height:42px !important; width:auto !important; padding:10px 15px !important; border-radius:12px !important; font-size:12px !important; font-weight:750 !important; }
+.tv-spin { animation:tv-header-spin 1s linear infinite; }
+@keyframes tv-header-spin { to { transform:rotate(360deg); } }
+@media(max-width:720px) {
+  .admin-main-v6 { padding-top:16px !important; }
+  .admin-mobile-logo-trigger { display:none !important; }
+  .tv-admin-premium-top.tv-admin-premium-top {
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:13px !important;
+    padding:15px !important;
+    margin:0 0 16px !important;
+    border-radius:19px !important;
+  }
+  .tv-admin-header-brand { display:flex !important; align-items:center; gap:10px; padding-bottom:12px; border-bottom:1px solid #e7ece5; min-width:0; }
+  .tv-admin-header-brand img { width:44px; height:44px; object-fit:contain; border-radius:10px; background:#fff; padding:3px; flex:none; }
+  .tv-admin-header-brand div { display:flex; flex-direction:column; min-width:0; gap:3px; }
+  .tv-admin-header-brand strong { font-size:14px; color:#104a36; line-height:1.2; }
+  .tv-admin-header-brand small { font-size:9px; letter-spacing:.16em; color:#8b7652; font-weight:800; }
+  .tv-admin-premium-top .admin-kicker-v6 { font-size:9px !important; letter-spacing:.13em !important; }
+  .tv-admin-premium-top h1 { font-size:clamp(27px,7vw,34px) !important; line-height:1.12 !important; margin:5px 0 !important; }
+  .tv-admin-premium-top p { font-size:11px !important; }
+  .tv-admin-premium-top .admin-top-actions-v6 { display:grid !important; grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important; gap:9px !important; width:100% !important; margin:0 !important; }
+  .tv-admin-premium-top .admin-top-actions-v6 button { width:100% !important; min-width:0 !important; min-height:43px !important; padding:10px 6px !important; border-radius:11px !important; font-size:11px !important; }
+  .admin-main-v6 .admin-panel-v6 { min-width:0; }
+}
+
+/* Admin feedback: readable inline header notification, auto-dismissed by React */
+.tv-admin-premium-top .tv-admin-header-notice {
+  grid-column:1 / -1;
+  display:flex; align-items:center; gap:11px; min-width:0;
+  width:100%; padding:12px 14px; border-radius:13px;
+  border:1px solid #b9dec8; background:#e9f8ee; color:#145b39;
+  font-size:13px; font-weight:650; line-height:1.45;
+  box-shadow:0 4px 14px rgba(10,80,48,.08);
+  animation:tv-notice-in .18s ease-out both;
+}
+.tv-admin-header-notice .tv-admin-notice-symbol {
+  flex:none; display:grid; place-items:center; width:26px; height:26px;
+  border-radius:50%; background:#17794d; color:white; font-size:14px; font-weight:800;
+}
+.tv-admin-header-notice .tv-admin-notice-text { flex:1; min-width:0; overflow-wrap:anywhere; }
+.tv-admin-premium-top .tv-admin-header-notice button {
+  flex:none; display:grid; place-items:center; width:30px; height:30px;
+  border:0; border-radius:8px; background:transparent; color:#145b39;
+  font-size:23px; cursor:pointer;
+}
+.tv-admin-premium-top .tv-admin-header-notice button:hover { background:#d4ebdd; }
+@keyframes tv-notice-in { from {opacity:0;transform:translateY(-5px)} to {opacity:1;transform:translateY(0)} }
+@media(max-width:720px) {
+  .tv-admin-premium-top .tv-admin-header-notice { font-size:13px; padding:11px 12px; }
+}
+
+
+
+/* Thulirkum Ver — Home Sections spacing patch. Add at END of src/styles.css */
+.admin-main-v6 .admin-home-content-v7 {
+  width: 100%;
+  max-width: 1360px;
+  margin: 28px auto 48px;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+.admin-main-v6 .admin-home-content-v7 > .admin-panel-v6 {
+  padding: clamp(20px, 2.6vw, 38px);
+  box-sizing: border-box;
+}
+.admin-home-content-v7 .admin-home-section-toolbar-v7,
+.admin-home-content-v7 .admin-home-config-grid-v7,
+.admin-home-content-v7 .admin-home-extra-grid-v7 {
+  column-gap: 20px;
+  row-gap: 22px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+.admin-home-content-v7 .admin-home-manual-picker-v7 {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+.admin-home-content-v7 .admin-home-section-meta-v7 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 14px;
+}
+.admin-home-content-v7 .tv-home-manual-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1 1 250px;
+  min-width: 0;
+}
+.admin-home-content-v7 .tv-home-manual-copy strong {
+  display: block;
+  font-size: 15px;
+  line-height: 1.4;
+}
+.admin-home-content-v7 .tv-home-manual-copy small {
+  display: block;
+  font-size: 13px;
+  line-height: 1.6;
+  font-weight: 400;
+}
+.admin-home-content-v7 .admin-home-section-meta-v7 > span {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.admin-home-content-v7 .admin-home-search-block-v7 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  min-width: 0;
+}
+.admin-home-content-v7 .admin-home-search-block-v7 input {
+  width: 100%;
+  box-sizing: border-box;
+}
+.admin-home-content-v7 .admin-home-book-grid-v7 {
+  display: grid;
+  gap: 16px;
+  margin-top: 0;
+}
+@media (max-width: 900px) {
+  .admin-main-v6 .admin-home-content-v7 {
+    margin: 20px auto 36px;
+    padding: 0 16px;
+  }
+  .admin-home-content-v7 .admin-home-section-toolbar-v7,
+  .admin-home-content-v7 .admin-home-config-grid-v7,
+  .admin-home-content-v7 .admin-home-extra-grid-v7 {
+    gap: 16px;
+  }
+}
+@media (max-width: 720px) {
+  .admin-main-v6 .admin-home-content-v7 {
+    margin: 16px auto 32px;
+    padding: 0 12px;
+  }
+  .admin-main-v6 .admin-home-content-v7 > .admin-panel-v6 {
+    padding: 18px 14px;
+  }
+  .admin-home-content-v7 .admin-home-section-toolbar-v7,
+  .admin-home-content-v7 .admin-home-config-grid-v7,
+  .admin-home-content-v7 .admin-home-extra-grid-v7 {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  .admin-home-content-v7 .admin-home-manual-picker-v7 {
+    margin-top: 24px;
+    gap: 16px;
+  }
+  .admin-home-content-v7 .admin-home-section-meta-v7 {
+    padding: 16px;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .admin-home-content-v7 .tv-home-manual-copy {
+    flex-basis: 100%;
+  }
+  .admin-home-content-v7 .admin-home-book-grid-v7 {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+}
+
+
+/* ==========================================
+   ADMIN HEADER - ALIGNMENT & SPACING FIX
+   ========================================== */
+
+/* Add breathing room around the header card */
+.admin-shell-v6 .admin-main-v6 > .admin-top-v6 {
+  width: auto !important;
+  max-width: none !important;
+
+  margin: 24px 26px 24px !important;
+  padding: 24px 26px !important;
+
+  box-sizing: border-box !important;
+  border-radius: 20px !important;
+}
+
+/* Align title and subtitle */
+.admin-top-v6 .tv-admin-header-copy {
+  padding-left: 0 !important;
+  min-width: 0;
+}
+
+.admin-top-v6 .tv-admin-header-copy h1 {
+  margin: 0 0 6px !important;
+  line-height: 1.2;
+}
+
+.admin-top-v6 .tv-admin-header-copy p {
+  margin: 0 !important;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .admin-shell-v6 .admin-main-v6 > .admin-top-v6 {
+    margin: 18px !important;
+    padding: 22px !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 720px) {
+  .admin-shell-v6 .admin-main-v6 > .admin-top-v6 {
+    margin: 14px 12px 18px !important;
+    padding: 18px 16px !important;
+    border-radius: 18px !important;
+  }
+
+  .admin-top-v6 .tv-admin-header-copy h1 {
+    font-size: clamp(26px, 7vw, 34px);
+  }
+
+  .admin-top-v6 .admin-top-actions-v6 {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+  }
+
+  .admin-top-v6 .admin-top-actions-v6 button {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+
+
+/* ==========================================
+   ADMIN DASHBOARD - CLEAN ALIGNMENT
+   ========================================== */
+
+/* Keep dashboard sections aligned */
+.admin-main-v6 {
+  box-sizing: border-box;
+}
+
+/* Dashboard header */
+.admin-shell-v6 .admin-main-v6 > .admin-top-v6 {
+  margin: 24px 26px !important;
+  padding: 24px 26px !important;
+  width: auto !important;
+}
+
+/* Quick Actions: evenly distribute 3 cards */
+.admin-main-v6 .admin-quick-actions-grid-v7 {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  width: 100%;
+}
+
+/* Prevent cards from overflowing */
+.admin-main-v6 .admin-quick-actions-grid-v7 > * {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .admin-main-v6 .admin-quick-actions-grid-v7 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 720px) {
+  .admin-shell-v6 .admin-main-v6 > .admin-top-v6 {
+    margin: 14px 12px 18px !important;
+    padding: 18px 16px !important;
+  }
+
+  .admin-main-v6 .admin-quick-actions-grid-v7 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+  .admin-main-v6 .admin-quick-actions-grid-v7 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Quick Actions - Fill the full available width */
+
+/* Desktop */
+@media (min-width: 1025px) {
+  .admin-quick-actions-grid-v7 {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+    width: 100% !important;
+  }
+
+  .admin-quick-actions-grid-v7 > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    box-sizing: border-box;
+  }
+}
+
+/* Tablet */
+@media (min-width: 721px) and (max-width: 1024px) {
+  .admin-quick-actions-grid-v7 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 720px) {
+  .admin-quick-actions-grid-v7 {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .admin-quick-actions-grid-v7 > * {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+}
+
+/* Fix Quick Actions empty space */
+.tv-admin-quick-actions .tv-admin-quick-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  width: 100% !important;
+}
+
+.tv-admin-quick-actions .tv-admin-quick-grid > button {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .tv-admin-quick-actions .tv-admin-quick-grid {
+    gap: 12px !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .tv-admin-quick-actions .tv-admin-quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+}
+
+
+/* =========================================
+   ADMIN DASHBOARD — CONSISTENT MOBILE UI
+   ========================================= */
+
+@media (max-width: 720px) {
+
+  /* Keep the desktop-style welcome card */
+  .admin-hero-v6.tv-admin-premium-hero {
+    background: #ffffff !important;
+    background-image: none !important;
+    color: #053b2d !important;
+    border: 1px solid #e4e6df !important;
+    border-radius: 16px !important;
+    padding: 22px 18px !important;
+    box-shadow: 0 4px 18px rgba(17, 57, 42, 0.04) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+  }
+
+  /* Remove mobile decorative overlays */
+  .admin-hero-v6.tv-admin-premium-hero::before,
+  .admin-hero-v6.tv-admin-premium-hero::after {
+    display: none !important;
+  }
+
+  /* Match desktop heading */
+  .admin-hero-v6.tv-admin-premium-hero h1,
+  .admin-hero-v6.tv-admin-premium-hero h2,
+  .admin-hero-v6.tv-admin-premium-hero h3 {
+    color: #053b2d !important;
+    font-size: clamp(24px, 6vw, 32px) !important;
+    line-height: 1.2 !important;
+  }
+
+  .admin-hero-v6.tv-admin-premium-hero p,
+  .admin-hero-v6.tv-admin-premium-hero span {
+    color: #68786f !important;
+  }
+
+  /* Buttons remain compact and aligned */
+  .admin-hero-actions-v6 {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .admin-hero-actions-v6 button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 42px !important;
+  }
+
+  /* Two-column statistics layout */
+  .tv-admin-stat-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  /* Quick actions: responsive grid */
+  .tv-admin-quick-actions .tv-admin-quick-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+
+  .tv-admin-quick-grid > button {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+
+/* =========================================
+   ADMIN MOBILE — MATCH HEADER & HERO WIDTH
+   ========================================= */
+
+@media (max-width: 720px) {
+
+  /* Give both sections the same width */
+  .admin-top-v6.tv-admin-premium-top,
+  .admin-hero-v6.tv-admin-premium-hero {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Keep consistent outer spacing */
+  .admin-main-main-v6 {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Dashboard header */
+  .admin-top-v6.tv-admin-premium-top {
+    padding: 18px !important;
+    border-radius: 18px !important;
+  }
+
+  /* Welcome card */
+  .admin-hero-v6.tv-admin-premium-hero {
+    padding: 18px !important;
+    border-radius: 18px !important;
+  }
+}
+
+/* Home Sections: remove a selected book without deleting it from catalogue */
+.admin-home-book-option-v7 { position: relative; }
+.admin-home-remove-book-v7 {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 2;
+  border: 1px solid #d9a6a6;
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: #fff7f7;
+  color: #a32626;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.admin-home-remove-book-v7:hover { background: #ffe6e6; }
+.admin-home-book-option-v7.selected { padding-bottom: 48px; }
+
+
+/* Premium Home Sections book curation — isolated to this interface */
+.admin-home-manual-picker-v7 .tv-curation-group { margin-top: 30px; min-width: 0; }
+.admin-home-manual-picker-v7 .tv-curation-group-head { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:16px; }
+.admin-home-manual-picker-v7 .tv-curation-group-head h3 { margin:3px 0 4px; font:700 clamp(20px,2vw,25px)/1.2 Georgia,serif; color:#073f31; }
+.admin-home-manual-picker-v7 .tv-curation-group-head p { margin:0; color:#71877c; font-size:12px; }
+.admin-home-manual-picker-v7 .tv-curation-eyebrow { color:#a58440; font-size:10px; letter-spacing:.15em; font-weight:800; }
+.admin-home-manual-picker-v7 .tv-curation-count { flex-shrink:0; background:#edf5ef; color:#116047; border:1px solid #d8e9dd; padding:8px 12px; border-radius:100px; font-size:12px; font-weight:750; }
+.admin-home-manual-picker-v7 .admin-home-book-grid-v7 { grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+.admin-home-manual-picker-v7 .tv-curation-card { min-width:0; cursor:default; grid-template-columns:24px 76px minmax(0,1fr); gap:14px; align-items:start; padding:19px; border:1px solid #e0e9e1; border-radius:19px; background:linear-gradient(145deg,#fff 55%,#fcfdf9); box-shadow:0 7px 25px rgba(8,62,43,.045); transition:box-shadow .2s ease, transform .2s ease, border-color .2s ease; }
+.admin-home-manual-picker-v7 .tv-curation-card:hover { transform:translateY(-2px); box-shadow:0 14px 32px rgba(8,62,43,.095); }
+.admin-home-manual-picker-v7 .tv-curation-card.selected { border-color:#a3cbb7; background:linear-gradient(145deg,#fff,#f7fbf7); box-shadow:0 7px 24px rgba(8,92,60,.075); padding-bottom:65px; }
+.admin-home-manual-picker-v7 .tv-curation-card > input[type=checkbox] { width:19px; height:19px; margin:29px 0 0; cursor:pointer; accent-color:#096547; }
+.admin-home-manual-picker-v7 .tv-curation-card .admin-home-book-thumb-v7 { width:76px; height:104px; border-radius:10px; box-shadow:0 8px 16px rgba(16,49,34,.12); }
+.admin-home-manual-picker-v7 .tv-curation-card .admin-home-book-copy-v7 { min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:5px; }
+.admin-home-manual-picker-v7 .tv-curation-card .admin-home-book-copy-v7 > strong { font-size:16px; color:#073e30; line-height:1.35; max-width:100%; }
+.admin-home-manual-picker-v7 .tv-curation-card .admin-home-book-copy-v7 > small { font-size:13px; color:#688074; }
+.admin-home-manual-picker-v7 .tv-curation-card .admin-home-book-copy-v7 > em { color:#9a9f94; font-size:11px; }
+.admin-home-manual-picker-v7 .tv-curation-card .admin-home-individual-discount { display:grid; grid-template-columns:minmax(0,1fr) minmax(76px,1fr); gap:8px; width:100%; margin-top:12px; }
+.admin-home-manual-picker-v7 .tv-curation-control-label { grid-column:1/-1; color:#788f80; letter-spacing:.12em; font-size:10px; font-weight:800; }
+.admin-home-manual-picker-v7 .tv-curation-card .admin-home-individual-discount select,
+.admin-home-manual-picker-v7 .tv-curation-card .admin-home-individual-discount input { width:100% !important; min-width:0; height:39px; padding:7px 9px; border:1px solid #d9e5db; border-radius:9px; background:white; color:#174b39; font-size:13px; outline:none; }
+.admin-home-manual-picker-v7 .tv-curation-card .admin-home-individual-discount select:focus,
+.admin-home-manual-picker-v7 .tv-curation-card .admin-home-individual-discount input:focus { border-color:#218263; box-shadow:0 0 0 3px rgba(20,125,82,.1); }
+.admin-home-manual-picker-v7 .tv-curation-card .tv-curation-final-price { display:flex; flex-wrap:wrap; align-items:center; gap:7px 10px; width:100%; padding:12px; margin-top:8px; background:#eaf5ed; border:1px solid #d9eade; border-radius:11px; }
+.admin-home-manual-picker-v7 .tv-curation-card .tv-curation-final-price del { font-size:12px; color:#8c9b92; }
+.admin-home-manual-picker-v7 .tv-curation-card .tv-curation-final-price b { color:#075a3e; font-size:19px; letter-spacing:-.03em; }
+.admin-home-manual-picker-v7 .tv-curation-card .tv-curation-final-price mark { background:#d1e9d8; color:#0c6b43; border-radius:100px; padding:4px 8px; font-size:11px; font-weight:800; }
+.admin-home-manual-picker-v7 .tv-curation-card .admin-home-remove-book-v7 { right:18px; bottom:17px; border:1px solid #eacccc; border-radius:9px; padding:9px 12px; background:#fff9f8; color:#a63c35; font-size:11px; }
+.admin-home-manual-picker-v7 .tv-curation-card .admin-home-remove-book-v7:hover { background:#ffeae7; border-color:#d79c97; }
+.admin-home-manual-picker-v7 .tv-curation-available { padding-top:24px; border-top:1px solid #e8ede7; }
+.admin-home-manual-picker-v7 .tv-curation-available .tv-curation-card { grid-template-columns:24px 60px minmax(0,1fr); padding:14px; box-shadow:none; }
+.admin-home-manual-picker-v7 .tv-curation-available .tv-curation-card .admin-home-book-thumb-v7 { width:60px; height:82px; }
+.admin-home-manual-picker-v7 .tv-curation-available .tv-curation-card > input[type=checkbox] { margin-top:29px; }
+@media (max-width:1100px) { .admin-home-manual-picker-v7 .admin-home-book-grid-v7 { grid-template-columns:1fr; } }
+@media (max-width:600px) { .admin-home-manual-picker-v7 .tv-curation-card { grid-template-columns:21px 58px minmax(0,1fr); padding:12px; gap:9px; border-radius:14px; } .admin-home-manual-picker-v7 .tv-curation-card .admin-home-book-thumb-v7 { width:58px; height:80px; } .admin-home-manual-picker-v7 .tv-curation-card .admin-home-book-copy-v7 > strong { font-size:14px; } .admin-home-manual-picker-v7 .tv-curation-card .tv-curation-final-price b { font-size:16px; } .admin-home-manual-picker-v7 .tv-curation-card.selected { padding-bottom:60px; } .admin-home-manual-picker-v7 .tv-curation-group-head h3 { font-size:20px; } .admin-home-manual-picker-v7 .tv-curation-available .tv-curation-card { grid-template-columns:21px 52px minmax(0,1fr); } .admin-home-manual-picker-v7 .tv-curation-available .tv-curation-card .admin-home-book-thumb-v7 { width:52px; height:72px; } }
+
+
+/* Premium discount-type picker: custom menu instead of browser-native select */
+.admin-home-manual-picker-v7 .tv-curation-card .admin-home-individual-discount { position:relative; }
+.admin-home-manual-picker-v7 .tv-curation-card .tv-discount-dropdown { position:relative; min-width:0; }
+.admin-home-manual-picker-v7 .tv-curation-card .tv-discount-dropdown summary { display:flex; align-items:center; gap:8px; width:100%; min-height:42px; padding:6px 10px; background:#fff; border:1px solid #d6e5dc; border-radius:11px; color:#164d3a; font-size:12px; font-weight:700; cursor:pointer; list-style:none; user-select:none; }
+.admin-home-manual-picker-v7 .tv-curation-card .tv-discount-dropdown summary::-webkit-details-marker { display:none; }
+.admin-home-manual-picker-v7 .tv-curation-card .tv-discount-dropdown[open] summary, .admin-home-manual-picker-v7 .tv-curation-card .tv-discount-dropdown summary:focus-visible { border-color:#177a57; box-shadow:0 0 0 3px rgba(23,122,87,.12); outline:none; }
+.tv-discount-dropdown-icon, .tv-discount-dropdown-option-icon { display:grid; place-items:center; flex:0 0 26px; width:26px; height:26px; border-radius:8px; background:#e8f4eb; color:#086343; font-weight:800; font-size:15px; }
+.tv-discount-dropdown-chevron { margin-left:auto; font-size:19px; line-height:1; transition:transform .2s ease; }
+.tv-discount-dropdown[open] .tv-discount-dropdown-chevron { transform:rotate(180deg); }
+.tv-discount-dropdown-menu { position:absolute; top:calc(100% + 7px); left:0; z-index:80; width:max(100%, 205px); padding:6px; background:#fff; border:1px solid #dbe8de; border-radius:13px; box-shadow:0 14px 36px rgba(4,51,36,.16); }
+.tv-discount-dropdown-option { display:flex; align-items:center; gap:9px; width:100%; min-height:43px; padding:7px 9px; border:0; border-radius:9px; background:transparent; color:#264d3d; text-align:left; font-size:12px; font-weight:650; }
+.tv-discount-dropdown-option:hover, .tv-discount-dropdown-option.is-selected { background:#eaf5ee; color:#075c3f; }
+.tv-discount-dropdown-check { margin-left:auto; font-size:16px; color:#08754f; }
+@media(max-width:520px) { .tv-discount-dropdown-menu { width:max(100%, 185px); } }
