@@ -11,15 +11,16 @@ function cleanMobile(value) {
 }
 
 export default function LoginPage() {
-  const {
-    user,
-    login,
-    register,
-    getOtpConfig,
-    sendOtp,
-    verifyOtp,
-    loginWithOtp,
-  } = useAuth()
+const {
+  user,
+  login,
+  register,
+  logout,
+  getOtpConfig,
+  sendOtp,
+  verifyOtp,
+  loginWithOtp,
+} = useAuth()
   const navigate = useNavigate()
 
   // 'login' (email + password) | 'otp' (mobile OTP login) | 'register'
@@ -53,7 +54,27 @@ export default function LoginPage() {
     return () => clearTimeout(timer)
   }, [cooldown])
 
-  if (user?.role === 'ADMIN') return <Navigate to="/admin" replace />
+if (user?.role === 'ADMIN') {
+  return (
+    <div className="login-page">
+      <div className="login-panel">
+        <div className="login-card">
+          <h2>Administrator session detected</h2>
+          <p>
+            Please use the separate Admin website to manage your store.
+          </p>
+          <button
+            type="button"
+            className="primary-btn full big"
+            onClick={() => logout()}
+          >
+            Sign out and continue
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
   if (user) return <Navigate to="/home" replace />
 
   const registerNeedsOtp = mode === 'register' && otpConfig.requiredForRegistration
