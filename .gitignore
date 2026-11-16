@@ -5,3 +5,21 @@ dist/
 .vscode/
 .idea/
 *.log
+# React build output
+/dist-user/
+/dist-admin/
+
+# Android generated output
+/android-user/.gradle/
+/android-admin/.gradle/
+/android-user/build/
+/android-admin/build/
+/android-user/app/build/
+/android-admin/app/build/
+/android-user/capacitor-cordova-android-plugins/build/
+/android-admin/capacitor-cordova-android-plugins/build/
+/android-user/app/src/main/assets/public/
+/android-admin/app/src/main/assets/public/
+
+# Machine-specific Android settings
+**/local.properties

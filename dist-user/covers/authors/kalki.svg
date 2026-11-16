@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
-  <rect width="160" height="160" rx="80" fill="#f6eadb"/>
-  <circle cx="80" cy="58" r="28" fill="#c59267"/>
-  <path d="M30 136c12-28 33-42 50-42s38 14 50 42" fill="#8f5f3c"/>
-  <text x="80" y="150" text-anchor="middle" font-size="16" fill="#214d3c" font-family="Georgia">Kalki</text>
-</svg>
