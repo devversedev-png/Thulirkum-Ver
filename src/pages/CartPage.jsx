@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useStore } from '../context/StoreContext'
+import { getPricing, formatMoney } from '../utils/pricing'
+import { activeBundleForBook, previewBuyGet, paidBooksFor, giftBooksFor, describeBookLines } from '../utils/buyGetOffers'
+import { useDeliverySettings, shippingPaiseFor } from '../utils/delivery'
 
 export default function CartPage() {
   const {
@@ -14,25 +17,38 @@ export default function CartPage() {
     accountError,
     catalogueReady,
     loadAccount,
+    loadBooks,
+    homeSections,
+    books,
   } = useStore()
+  const deliverySettings = useDeliverySettings()
   const [error, setError] = useState('')
   const [couponCode, setCouponCode] = useState('')
   const [appliedCode, setAppliedCode] = useState('')
+
+  // Refresh live catalogue prices whenever the cart is opened.
+  useEffect(() => {
+    void loadBooks(true)
+  }, [])
+
   const rows = cartRows()
   const hasSavedCartItems = Boolean(account?.cart?.length)
   const cartDataStillLoading = !accountReady || !catalogueReady || accountLoading
   const cartBooksNotResolved = hasSavedCartItems && rows.length === 0
   const hydratingCart = cartDataStillLoading || cartBooksNotResolved
   const subtotal = rows.reduce((sum, row) => sum + Number(row.book.price || 0) * Number(row.quantity || 0), 0)
-  const shipping = subtotal >= 499 || subtotal === 0 ? 0 : 60
+  const buyGet = previewBuyGet(rows, offers, books)
+  const bogoDiscount = buyGet.giftValuePaise / 100
+  const merchandiseDue = subtotal
+  const shipping = shippingPaiseFor(merchandiseDue, deliverySettings) / 100
 
-  const matchedOffer = useMemo(() => offers.find(offer => offer.code?.toLowerCase() === appliedCode.trim().toLowerCase()), [offers, appliedCode])
-  const discount = matchedOffer && subtotal >= Number(matchedOffer.minOrderAmount || 0)
+  const matchedOffer = useMemo(() => offers.find(offer => offer.offerType !== 'BUY_GET' && offer.code && offer.code.toLowerCase() === appliedCode.trim().toLowerCase()), [offers, appliedCode])
+  const discount = matchedOffer && merchandiseDue >= Number(matchedOffer.minOrderAmount || 0)
     ? matchedOffer.discountType === 'FIXED'
-      ? Math.min(subtotal, Number(matchedOffer.discountValue || 0))
-      : subtotal * Number(matchedOffer.discountValue || 0) / 100
+      ? Math.min(merchandiseDue, Number(matchedOffer.discountValue || 0))
+      : merchandiseDue * Number(matchedOffer.discountValue || 0) / 100
     : 0
-  const total = Math.max(0, subtotal + shipping - discount)
+  const total = Math.max(0, merchandiseDue + shipping - discount)
 
   async function changeQuantity(book, quantity) {
     setError('')
@@ -46,10 +62,10 @@ export default function CartPage() {
 
   function applyCoupon() {
     const code = couponCode.trim().toUpperCase()
-    const offer = offers.find(item => item.code?.toUpperCase() === code)
+    const offer = offers.find(item => item.offerType !== 'BUY_GET' && item.code?.toUpperCase() === code)
     if (!code) return setError('Enter a coupon code.')
     if (!offer) return setError('This coupon code is not currently active.')
-    if (subtotal < Number(offer.minOrderAmount || 0)) return setError(`Minimum order ₹${offer.minOrderAmount || 0} required for this offer.`)
+    if (merchandiseDue < Number(offer.minOrderAmount || 0)) return setError(`Minimum order ₹${offer.minOrderAmount || 0} required for this offer.`)
     setError('')
     setAppliedCode(code)
   }
@@ -96,8 +112,14 @@ export default function CartPage() {
                       <span>{book.author}</span>
                       <small>{book.language || 'Paperback'}</small>
                       {book.featured && <em>Bestseller</em>}
+                      {activeBundleForBook(book.id, offers) && <small className="book-bogo-note">🎁 Bundle: buy {describeBookLines(paidBooksFor(activeBundleForBook(book.id, offers)), books)} to unlock free books</small>}
                     </div>
-                    <div className="cart-price-block"><strong>₹{book.price}</strong>{Number(book.originalPrice || 0) > Number(book.price || 0) && <del>₹{book.originalPrice}</del>}</div>
+                    <div className="cart-price-block">
+                      <span className="cart-price-unit">Price per copy: ₹{formatMoney(book.price)}</span>
+                      {getPricing(book).hasDiscount && <del>MRP ₹{formatMoney(getPricing(book).original)}</del>}
+                      <span className="cart-price-formula">{quantity} {quantity === 1 ? 'copy' : 'copies'} at ₹{formatMoney(book.price)} each</span>
+                      <strong className="cart-item-line-total">Item total: ₹{formatMoney(Math.round(Number(book.price || 0) * quantity * 100) / 100)}</strong>
+                    </div>
                     <div className="qty-box"><button onClick={() => changeQuantity(book, quantity - 1)}>−</button><span>{quantity}</span><button disabled={book.available === false || Number(book.stock || 0) <= 0} onClick={() => changeQuantity(book, quantity + 1)}>+</button></div>
                     <button className="remove-btn" aria-label="Remove item" onClick={() => removeFromCart(book.id)}>⌫</button>
                   </div>
@@ -107,10 +129,18 @@ export default function CartPage() {
 
               <aside className="summary-card cart-summary">
                 <h3>Order Summary</h3>
-                <div><span>Subtotal ({rows.length} items)</span><strong>₹{subtotal}</strong></div>
-                <div><span>Delivery Charge<small>{shipping ? 'Free above ₹499' : 'Free delivery applied'}</small></span><strong className={shipping ? '' : 'free-text'}>{shipping ? `₹${shipping}` : 'FREE'}</strong></div>
+                <div><span>Books and gift copies<small>Value before the free-book offer</small></span><strong>₹{(subtotal + bogoDiscount).toFixed(2)}</strong></div>
+                {buyGet.summaries.map(({ offer, count, giftBook }, index) => (
+                  <div className="cart-offer-detail" key={`${offer.id || offer.buyBookId}-${index}`}>
+                    <span>🎁 Free-book offer<small>Buy {describeBookLines(paidBooksFor(offer), books)} — receive {describeBookLines(giftBooksFor(offer), books)} free</small><small>Free copies of this title: {count}</small></span>
+                    <strong className="free-text">FREE</strong>
+                  </div>
+                ))}
+                {bogoDiscount > 0 && <div className="checkout-discount"><span>Free-book offer savings<small>Value of the complimentary copies</small></span><strong className="free-text">− ₹{bogoDiscount.toFixed(2)}</strong></div>}
+                <div><span>Delivery Charge<small>{shipping ? `Free above ₹${(deliverySettings.freeDeliveryThresholdPaise / 100).toLocaleString('en-IN')}` : 'Free delivery applied'}</small></span><strong className={shipping ? '' : 'free-text'}>{shipping ? `₹${shipping}` : 'FREE'}</strong></div>
                 {discount > 0 && <div><span>Discount<small>{appliedCode} applied</small></span><strong className="free-text">− ₹{Math.round(discount)}</strong></div>}
-                <div className="summary-total"><span>Total Amount</span><strong>₹{Math.round(total)}</strong></div>
+                <div className="summary-total"><span>Estimated Total</span><strong>₹{total.toFixed(2)}</strong></div>
+                {bogoDiscount > 0 && <small>Free books will be added automatically to your order. Final gift stock and pricing are verified at checkout.</small>}
 
                 <div className="cart-coupon"><label>Have a coupon code?</label><div><input value={couponCode} onChange={event => setCouponCode(event.target.value.toUpperCase())} placeholder="Enter coupon" /><button type="button" onClick={applyCoupon}>Apply</button></div>{discount > 0 && <small>✓ Coupon applied! You saved ₹{Math.round(discount)}.</small>}</div>
 

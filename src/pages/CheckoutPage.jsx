@@ -3,10 +3,15 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
 import { api } from '../api/client'
-import { getAccuratePosition, reverseGeocode, addressFromPlace, locationErrorMessage, accuracyNote } from '../utils/location'
+import { getPricing, formatMoney } from '../utils/pricing'
+import { formatWalletAmount } from '../utils/wallet'
+import { useDeliverySettings, shippingPaiseFor } from '../utils/delivery'
+import { getAccuratePosition, reverseGeocode, addressFromPlace, formatDeliveryAddress, googleMapsDeliveryUrl, locationErrorMessage, accuracyNote } from '../utils/location'
 import {
   createRazorpayOrder,
-  verifyRazorpayPayment
+  verifyRazorpayPayment,
+  quoteCheckout,
+  payFullyWithWallet
 } from '../api/payment'
 
 function blankAddress(user) {
@@ -16,6 +21,7 @@ function blankAddress(user) {
     mobile: user?.mobile || '',
     email: user?.email || '',
     line1: '',
+    locality: '',
     line2: '',
     city: '',
     district: '',
@@ -29,7 +35,7 @@ function blankAddress(user) {
 
 export default function CheckoutPage() {
   const { user } = useAuth()
-  const { cartRows, account, offers, placeOrder } = useStore()
+  const { cartRows, account, offers, placeOrder, loadBooks } = useStore()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const rows = cartRows()
@@ -40,11 +46,22 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState(searchParams.get('coupon') || '')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [addressCopied, setAddressCopied] = useState(false)
+  const deliverySettings = useDeliverySettings()
+  const [useWallet, setUseWallet] = useState(false)
+  const [checkoutQuote, setCheckoutQuote] = useState(null)
+  const [quoteLoading, setQuoteLoading] = useState(true)
+  const [quoteError, setQuoteError] = useState('')
 
   // Wake the backend (Render free tier sleeps) while the user fills the form,
   // so "Place Order" does not wait for a cold start.
   useEffect(() => {
     api('/health').catch(() => {})
+  }, [])
+
+  // Refresh live catalogue prices before the customer pays.
+  useEffect(() => {
+    void loadBooks(true)
   }, [])
 
   useEffect(() => {
@@ -54,14 +71,52 @@ export default function CheckoutPage() {
   }, [account?.addresses, selectedAddressId])
 
   const subtotal = rows.reduce((sum, row) => sum + Number(row.book.price || 0) * Number(row.quantity || 0), 0)
-  const shipping = subtotal >= 499 ? 0 : 60
-  const matchedOffer = useMemo(() => offers.find(offer => offer.code?.toLowerCase() === couponCode.trim().toLowerCase()), [offers, couponCode])
+  const shipping = shippingPaiseFor(subtotal, deliverySettings) / 100
+  const matchedOffer = useMemo(() => offers.find(offer => offer.offerType !== 'BUY_GET' && offer.code && offer.code.toLowerCase() === couponCode.trim().toLowerCase()), [offers, couponCode])
   const estimateDiscount = matchedOffer && subtotal >= Number(matchedOffer.minOrderAmount || 0)
     ? matchedOffer.discountType === 'FIXED'
       ? Math.min(subtotal, Number(matchedOffer.discountValue || 0))
       : subtotal * Number(matchedOffer.discountValue || 0) / 100
     : 0
   const total = Math.max(0, subtotal + shipping - estimateDiscount)
+
+  // Reprice with the authenticated backend after coupon/cart/wallet changes.
+  // Latest-only updates prevent an old response from overwriting a newer selection.
+  const cartFingerprint = rows.map(row => `${row.book.id}:${row.quantity}:${row.book.price}`).join('|')
+  useEffect(() => {
+    let cancelled = false
+    const refresh = async () => {
+      setQuoteLoading(true)
+      setQuoteError('')
+      setCheckoutQuote(null)
+      try {
+        const result = await quoteCheckout({
+          couponCode: couponCode.trim() || null,
+          useWallet,
+        })
+        if (!cancelled) setCheckoutQuote(result)
+      } catch (err) {
+        if (!cancelled) setQuoteError(err.message || 'Unable to calculate the wallet amount.')
+      } finally {
+        if (!cancelled) setQuoteLoading(false)
+      }
+    }
+    // Debounce typing coupon codes, but keep the submit path authoritative.
+    const timer = setTimeout(refresh, 250)
+    return () => { cancelled = true; clearTimeout(timer) }
+  }, [cartFingerprint, couponCode, useWallet])
+
+  const walletBalancePaise = Math.max(0, checkoutQuote?.walletBalancePaise || 0)
+  const walletRedeemedPaise = useWallet ? Math.max(0, checkoutQuote?.walletRedeemedPaise || 0) : 0
+  const payablePaise = checkoutQuote?.razorpayAmountPaise ?? Math.round(total * 100)
+  const grossPaise = checkoutQuote?.totalPaise ?? Math.round(total * 100)
+  const shownSubtotalPaise = checkoutQuote?.subtotalPaise ?? Math.round(subtotal * 100)
+  const shownShippingPaise = checkoutQuote?.shippingPaise ?? Math.round(shipping * 100)
+  const shownDiscountPaise = checkoutQuote?.discountPaise ?? Math.round(estimateDiscount * 100)
+  const shownBogoPaise = checkoutQuote?.bogoDiscountPaise ?? 0
+  const freeItems = checkoutQuote?.freeItems || []
+  const shownCouponPaise = Math.max(0, shownDiscountPaise - shownBogoPaise)
+  const isWalletOnly = useWallet && walletRedeemedPaise > 0 && payablePaise === 0
 
   if (!rows.length) return <Navigate to="/cart" replace />
 
@@ -100,8 +155,10 @@ export default function CheckoutPage() {
           latitude,
           longitude,
           locationLabel: found.locationLabel || current.locationLabel,
-          line1: found.line1 || current.line1,
-          line2: found.line2 || current.line2,
+          // Keep house number and existing delivery instructions entered by user.
+          line1: current.line1 || found.line1,
+          locality: found.locality || current.locality,
+          line2: current.line2,
           city: found.city || current.city,
           district: found.district || current.district,
           state: found.state || current.state,
@@ -126,6 +183,18 @@ export default function CheckoutPage() {
     }
   }
 
+  async function copyFullAddress() {
+    const full = formatDeliveryAddress(address)
+    if (!full) return
+    try {
+      await navigator.clipboard.writeText(full)
+      setAddressCopied(true)
+      window.setTimeout(() => setAddressCopied(false), 1800)
+    } catch {
+      setError('Copy was unavailable. You can select the address shown below and copy it.')
+    }
+  }
+
   async function submit(event) {
     event.preventDefault()
     setBusy(true)
@@ -134,13 +203,27 @@ export default function CheckoutPage() {
     try {
       // The backend calculates the amount from the authenticated user's cart.
       // The browser never sends a trusted payment amount.
+      const requestedCoupon = couponCode.trim() || null
+      // Refresh the quote at submission: coupon, cart and wallet may have changed.
+      const latestQuote = await quoteCheckout({ couponCode: requestedCoupon, useWallet })
+      if (useWallet && latestQuote?.walletRedeemedPaise > 0 && latestQuote.razorpayAmountPaise === 0) {
+        const result = await payFullyWithWallet({ address, couponCode: requestedCoupon })
+        if (!result?.success || !result?.order) throw new Error('Wallet checkout could not be completed.')
+        navigate('/order-confirmation', { state: { order: result.order } })
+        return
+      }
+
       const razorpayOrder = await createRazorpayOrder({
         address,
-        couponCode: couponCode.trim() || null,
+        couponCode: requestedCoupon,
+        useWallet,
       })
 
       if (!razorpayOrder?.orderId || !razorpayOrder?.keyId) {
         throw new Error('Unable to create Razorpay payment order.')
+      }
+      if (latestQuote && Number(razorpayOrder.amount) !== Number(latestQuote.razorpayAmountPaise)) {
+        throw new Error('Your payable amount changed. Please review your wallet and try again.')
       }
 
       if (!window.Razorpay) {
@@ -243,7 +326,7 @@ export default function CheckoutPage() {
                 {addresses.map(item => (
                   <button type="button" key={item.id} className={`checkout-address-option-v7 ${selectedAddressId === item.id ? 'selected' : ''}`} onClick={() => chooseSavedAddress(item)}>
                     <span className="checkout-radio-v7">{selectedAddressId === item.id ? '●' : '○'}</span>
-                    <div><strong>{item.label || 'Address'} {item.defaultAddress && <small>Default</small>}</strong><p> {item.line1}{item.line2 ? `, ${item.line2}` : ''}, {item.city}{item.district ? `, ${item.district}` : ''} - {item.pincode}</p></div>
+                    <div><strong>{item.label || 'Address'} {item.defaultAddress && <small>Default</small>}</strong><p> {formatDeliveryAddress(item)}</p></div>
                   </button>
                 ))}
                 <button type="button" className={`checkout-address-option-v7 new ${selectedAddressId === 'NEW' ? 'selected' : ''}`} onClick={chooseNewAddress}><span>＋</span><div><strong>Use a new address</strong><p>Enter a different delivery address.</p></div></button>
@@ -254,11 +337,21 @@ export default function CheckoutPage() {
               <div><label>Full Name *</label><input name="fullName" value={address.fullName || ''} onChange={change} required /></div>
               <div><label>Phone Number *</label><input name="mobile" value={address.mobile || ''} onChange={change} required /></div>
               <div className="wide"><label>Email Address *</label><input type="email" value={user?.email || ''} readOnly /><small>We’ll send order updates to this email.</small></div>
-              <div className="wide"><label>Address Line *</label><input name="line1" value={address.line1 || ''} onChange={change} required /></div>
+              <div className="wide"><label>Door / Flat number, building and street *</label><input name="line1" value={address.line1 || ''} onChange={change} placeholder="e.g. No. 6, Periyar Nagar Main Road" required /><small>Enter your own house or flat number. Location services cannot identify it reliably.</small></div>
+              <div className="wide"><label>Area / Locality *</label><input name="locality" value={address.locality || ''} onChange={change} placeholder="e.g. Madipakkam, Periyar Nagar" required /><small>Confirm your neighbourhood for accurate delivery.</small></div>
               <div><label>City *</label><input name="city" value={address.city || ''} onChange={change} required /></div>
               <div><label>District</label><input name="district" value={address.district || ''} onChange={change} /></div><div><label>State *</label><input name="state" value={address.state || ''} onChange={change} required /></div>
               <div><label>Pincode *</label><input name="pincode" value={address.pincode || ''} onChange={change} required /></div>
-              <div className="wide"><label>Delivery Notes (Optional)</label><textarea name="line2" value={address.line2 || ''} onChange={change} placeholder="House name, nearby landmark, delivery instructions..." rows="3" /></div>
+              <div className="wide"><label>Delivery Notes (Optional)</label><textarea name="line2" value={address.line2 || ''} onChange={change} placeholder="Nearby landmark, gate / floor, directions for the delivery person..." rows="3" /></div>
+            </div>
+            <div className="checkout-address-share">
+              <div className="checkout-address-share-head"><strong>📍 Address for delivery</strong><span>Check the street and locality before placing the order</span></div>
+              <p className="checkout-address-preview">{formatDeliveryAddress(address)}</p>
+              <div className="checkout-address-actions">
+                <button type="button" onClick={copyFullAddress} disabled={!address.line1 || !address.city}>{addressCopied ? '✓ Copied address' : '⧉ Copy full address'}</button>
+                {googleMapsDeliveryUrl(address) && <a href={googleMapsDeliveryUrl(address)} target="_blank" rel="noopener noreferrer">↗ Open in Google Maps</a>}
+              </div>
+              {address.latitude != null && address.longitude != null && <small>Map link uses the captured GPS pin; its accuracy depends on your device. Please confirm the pin before ordering. Editing the address text does not move the pin.</small>}
             </div>
           </section>
 
@@ -280,8 +373,31 @@ export default function CheckoutPage() {
             </div>
 
             <div className="payment-note">
-              🔒 Secure payment powered by Razorpay.
-              You will be redirected to Razorpay Checkout to complete your payment.
+              {isWalletOnly
+                ? 'Your wallet covers the full order. No Razorpay payment is needed.'
+                : '🔒 The remaining amount is securely paid through Razorpay.'}
+            </div>
+
+            <div className="checkout-wallet-card">
+              <div className="checkout-wallet-heading">
+                <span className="checkout-wallet-icon" aria-hidden="true">🎁</span>
+                <div><strong>My Cashback Wallet</strong><small>Redeem earned rewards on this purchase</small></div>
+                <strong className="checkout-wallet-balance">
+                  {quoteLoading ? 'Checking…' : quoteError ? '—' : formatWalletAmount(walletBalancePaise)}
+                </strong>
+              </div>
+              <label className="checkout-wallet-choice">
+                <input type="checkbox" checked={useWallet} onChange={event => setUseWallet(event.target.checked)} disabled={busy || quoteLoading || (!useWallet && (!!quoteError || walletBalancePaise === 0))} />
+                <span>Use my cashback wallet for this order</span>
+              </label>
+              {useWallet && walletRedeemedPaise > 0 && !quoteLoading && !quoteError && (
+                <p className="checkout-wallet-applied">✓ {formatWalletAmount(walletRedeemedPaise)} will be used from your wallet.</p>
+              )}
+              {!quoteLoading && !quoteError && walletBalancePaise === 0 && (
+                <small>Earn cashback on eligible Razorpay purchases to use it next time.</small>
+              )}
+              {quoteError && <p className="form-error" role="alert">Unable to confirm final checkout: {quoteError}</p>}
+              <small>Wallet funds are debited only when the order is confirmed. Redeemed funds earn no new cashback.</small>
             </div>
 
             <div className="checkout-coupon-box">
@@ -289,7 +405,7 @@ export default function CheckoutPage() {
               <div><input value={couponCode} onChange={event => setCouponCode(event.target.value.toUpperCase())} placeholder="Enter coupon code" /></div>
               {matchedOffer && subtotal >= Number(matchedOffer.minOrderAmount || 0) && <span>✓ {matchedOffer.title} applied</span>}
             </div>
-            {offers.length > 0 && <div className="checkout-offer-chips">{offers.slice(0, 4).map(offer => <button type="button" key={offer.id} onClick={() => setCouponCode(offer.code || '')}>{offer.code || offer.title}</button>)}</div>}
+            {offers.some(offer => offer.offerType !== 'BUY_GET' && offer.code) && <div className="checkout-offer-chips">{offers.filter(offer => offer.offerType !== 'BUY_GET' && offer.code).slice(0, 4).map(offer => <button type="button" key={offer.id} onClick={() => setCouponCode(offer.code)}>{offer.code}</button>)}</div>}
           </section>
 
           {error && <div className="form-error">{error}</div>}
@@ -298,14 +414,21 @@ export default function CheckoutPage() {
         <aside className="summary-card checkout-summary">
           <div className="checkout-summary-title"><h3>🛒 Order Summary</h3><span>{rows.length} items</span></div>
           <div className="checkout-summary-items">
-            {rows.map(row => <div className="mini-order" key={row.book.id}><img src={row.book.image} alt="" /><span><strong>{row.book.title}</strong><small>{row.book.author}</small><b>₹{row.book.price} <del>{Number(row.book.originalPrice || 0) > Number(row.book.price || 0) ? `₹${row.book.originalPrice}` : ''}</del></b></span><small>Qty: {row.quantity}</small></div>)}
+            {rows.map(row => <div className="mini-order" key={row.book.id}><img src={row.book.image} alt="" /><span><strong>{row.book.title}</strong><small>{row.book.author}</small><b>₹{formatMoney(getPricing(row.book).selling)} <del>{getPricing(row.book).hasDiscount ? `₹${formatMoney(getPricing(row.book).original)}` : ''}</del></b></span><small>Qty: {row.quantity}</small></div>)}
           </div>
-          <div><span>Subtotal ({rows.length} items)</span><strong>₹{subtotal}</strong></div>
-          {estimateDiscount > 0 && <div className="checkout-discount"><span>Discount</span><strong>− ₹{Math.round(estimateDiscount)}</strong></div>}
-          <div><span>Shipping</span><strong className="free-text">{shipping ? `₹${shipping}` : 'Free'}</strong></div>
-          <div className="summary-total"><span>Total Amount</span><strong>₹{Math.round(total)}</strong></div>
-          {estimateDiscount > 0 && <div className="checkout-savings">🏷 You’re saving ₹{Math.round(estimateDiscount)} on this order!</div>}
-          <button className="primary-btn full big" type="button" onClick={() => document.querySelector('.checkout-form')?.requestSubmit()} disabled={busy}>{busy ? 'Placing order...' : '🔒 Place Order »'}</button>
+          {freeItems.length > 0 && <div className="checkout-free-items"><strong>🎁 Free books added automatically</strong>{freeItems.map((item, index) => <div key={`${item.bookId}-${index}`}><span>{item.title} × {item.bogoFreeQuantity}</span><b>FREE</b></div>)}</div>}
+          {shownBogoPaise > 0 && <p className="checkout-bogo-note">🎁 Free gifts are automatically included in this order; their full value is deducted below.</p>}
+          <div><span>Subtotal ({rows.length} items)</span><strong>{formatWalletAmount(shownSubtotalPaise)}</strong></div>
+          {shownBogoPaise > 0 && <div className="checkout-discount"><span>🎁 Free-book offer savings</span><strong>− {formatWalletAmount(shownBogoPaise)}</strong></div>}
+          {shownCouponPaise > 0 && <div className="checkout-discount"><span>Coupon discount</span><strong>− {formatWalletAmount(shownCouponPaise)}</strong></div>}
+          <div><span>Shipping</span><strong className="free-text">{shownShippingPaise ? formatWalletAmount(shownShippingPaise) : 'Free'}</strong></div>
+          <div className="summary-total"><span>Order Total</span><strong>{formatWalletAmount(grossPaise)}</strong></div>
+          {useWallet && walletRedeemedPaise > 0 && (
+            <div className="checkout-wallet-summary-row"><span>Cashback wallet used</span><strong>− {formatWalletAmount(walletRedeemedPaise)}</strong></div>
+          )}
+          <div className="checkout-final-payable"><span>{isWalletOnly ? 'Pay with wallet' : 'Pay with Razorpay'}</span><strong>{formatWalletAmount(payablePaise)}</strong></div>
+          {shownDiscountPaise > 0 && <div className="checkout-savings">🏷 You’re saving {formatWalletAmount(shownDiscountPaise)} on this order!</div>}
+          <button className="primary-btn full big" type="button" onClick={() => document.querySelector('.checkout-form')?.requestSubmit()} disabled={busy || quoteLoading || !!quoteError || !checkoutQuote}>{busy ? 'Placing order...' : isWalletOnly ? '🎁 Place order with wallet »' : '🔒 Place Order »'}</button>
           <small className="checkout-terms">By placing this order, you agree to our Terms & Conditions and Privacy Policy.</small>
           <div className="summary-trust checkout-trust"><span>◆ <b>Secure Payment</b><small>Protected checkout</small></span><span>🚚 <b>Fast Delivery</b><small>Across India</small></span><span>♧ <b>Dedicated Support</b><small>We’re here to help</small></span></div>
           <Link className="continue-link" to="/cart">← Back to cart</Link>

@@ -1,3 +1,4 @@
+import { useDeliverySettings } from '../utils/delivery'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import InfoShell, { InfoCard, InfoCta, InfoSection } from '../components/InfoShell'
@@ -60,6 +61,10 @@ export function AboutPage() {
 
 /* ----------------------------- SHIPPING ----------------------------- */
 export function ShippingPage() {
+  const delivery = useDeliverySettings()
+  const freeAll = !delivery.enabled || delivery.freeShippingAll
+  const threshold = (delivery.freeDeliveryThresholdPaise / 100).toLocaleString('en-IN')
+  const fee = (delivery.feePaise / 100).toLocaleString('en-IN')
   return (
     <InfoShell
       eyebrow="Delivery"
@@ -68,10 +73,10 @@ export function ShippingPage() {
     >
       <div className="info-grid">
         <InfoCard icon="🎁" title="Free delivery">
-          On orders of ₹{SITE.freeShippingAbove} and above, shipping is on us.
+          {freeAll ? 'Free delivery on every order.' : `On orders of ₹${threshold} and above, shipping is on us.`}
         </InfoCard>
         <InfoCard icon="🚚" title="Flat shipping">
-          Orders below ₹{SITE.freeShippingAbove} carry a flat ₹{SITE.shippingFee} delivery fee.
+          {freeAll ? 'No delivery fee is charged.' : `Orders below ₹${threshold} carry a flat ₹${fee} delivery fee.`}
         </InfoCard>
         <InfoCard icon="⏱" title="Delivery time">
           Typically {SITE.deliveryDays} after dispatch, depending on your location.
@@ -170,6 +175,12 @@ const FAQS = [
 ]
 
 export function FaqPage() {
+  const delivery = useDeliverySettings()
+  const answers = FAQS.map(([q, a]) => q === 'How much is shipping?'
+    ? [q, (!delivery.enabled || delivery.freeShippingAll)
+      ? 'Delivery is free for all orders.'
+      : `Delivery is free on orders of ₹${(delivery.freeDeliveryThresholdPaise / 100).toLocaleString('en-IN')} and above. Smaller orders carry a flat ₹${(delivery.feePaise / 100).toLocaleString('en-IN')} fee.`]
+    : [q, a])
   const [open, setOpen] = useState(0)
   return (
     <InfoShell
@@ -178,7 +189,7 @@ export function FaqPage() {
       intro="Quick answers to the things readers ask us most."
     >
       <div className="faq-list">
-        {FAQS.map(([q, a], i) => (
+        {answers.map(([q, a], i) => (
           <div key={q} className={`faq-item ${open === i ? 'open' : ''}`}>
             <button type="button" onClick={() => setOpen(open === i ? -1 : i)} aria-expanded={open === i}>
               <span>{q}</span>

@@ -17,8 +17,8 @@ import {
 
 const StoreContext = createContext(null)
 
-const CACHE_VERSION = 'v6'
-const LEGACY_CACHE_VERSIONS = ['v5', 'v4', 'v3']
+const CACHE_VERSION = 'v7'
+const LEGACY_CACHE_VERSIONS = ['v6', 'v5', 'v4', 'v3']
 
 const PUBLIC_CACHE_KEYS = {
   books: `tvb_cache_${CACHE_VERSION}_books`,
@@ -520,6 +520,84 @@ export function StoreProvider({ children }) {
     }
   }
 
+
+  useEffect(() => {
+  const handleCatalogueUpdate = () => {
+    void loadBooks(true)
+    void loadHomeSections(true)
+    void loadOffers(true)
+  }
+
+  window.addEventListener(
+    'tv:catalogue-updated',
+    handleCatalogueUpdate
+  )
+
+  return () => {
+    window.removeEventListener(
+      'tv:catalogue-updated',
+      handleCatalogueUpdate
+    )
+  }
+}, [])
+
+useEffect(() => {
+  const handleStorageUpdate = (event) => {
+    if (event.key !== 'tv:catalogue-updated') {
+      return
+    }
+
+    void loadBooks(true)
+    void loadHomeSections(true)
+    void loadOffers(true)
+  }
+
+  window.addEventListener(
+    'storage',
+    handleStorageUpdate
+  )
+
+  return () => {
+    window.removeEventListener(
+      'storage',
+      handleStorageUpdate
+    )
+  }
+}, [])
+
+  /* =========================================================
+     APP RESUME / FOREGROUND REFRESH
+     Fast cached render first, authoritative server data second.
+     Refresh only when visible, dedupe concurrent resume events.
+     Separate API calls run concurrently and never clear current rows.
+  ========================================================= */
+  const resumeRequestRef = useRef(null)
+  const lastResumeRef = useRef(0)
+  useEffect(() => {
+    const onResume = () => {
+      if (document.visibilityState === 'hidden') return
+      // On every real app resume, request the latest store data. Do not
+      // start another batch while the previous one is still running.
+      if (resumeRequestRef.current) return
+      if (Date.now() - lastResumeRef.current < 1200) return
+      lastResumeRef.current = Date.now()
+      const pending = Promise.allSettled([
+        loadBooks(true),
+        loadOffers(true),
+        loadAuthors(true),
+        loadHomeSections(true),
+        loadHomeSettings(true),
+        ...(user ? [loadAccount(true)] : []),
+      ])
+      resumeRequestRef.current = pending
+      void pending.finally(() => {
+        if (resumeRequestRef.current === pending) resumeRequestRef.current = null
+      })
+    }
+    window.addEventListener('tvb:app-resumed', onResume)
+    return () => window.removeEventListener('tvb:app-resumed', onResume)
+  }, [user?.id, user?.email])
+
   /* =========================================================
      LOAD OFFERS
   ========================================================= */
@@ -534,23 +612,9 @@ export function StoreProvider({ children }) {
           ? data
           : []
 
-      if (
-        next.length > 0 ||
-        offers.length === 0
-      ) {
-        setOffers(next)
-
-        if (next.length > 0) {
-          writeCache(
-            PUBLIC_CACHE_KEYS.offers,
-            next
-          )
-        }
-      }
-
-      return next.length > 0
-        ? next
-        : offers
+      setOffers(next)
+      writeCache(PUBLIC_CACHE_KEYS.offers, next)
+      return next
     } catch (error) {
       if (!silent) {
         throw error

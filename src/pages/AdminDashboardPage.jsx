@@ -1,3 +1,5 @@
+import '../delivery-settings.css'
+import '../homepage-slides.css'
 import { LayoutDashboard, ShoppingCart, BookOpen, Users, Menu, Plus, BarChart3, RefreshCw, ExternalLink, Package, IndianRupee, Bell, ArrowRight, Layers } from 'lucide-react'
 import {
   useEffect,
@@ -12,8 +14,32 @@ import { useAuth } from '../context/AuthContext'
 
 import PremiumConfirm from '../components/PremiumConfirm'
 import PremiumSelect from '../components/PremiumSelect'
+import CashbackTypeDropdown from '../components/CashbackTypeDropdown'
+import OfferBookDropdown from '../components/OfferBookDropdown'
 import PremiumDatePicker from '../components/PremiumDatePicker'
 import AmazonOrdersPanel from '../components/AmazonOrdersPanel'
+
+const HOMEPAGE_SLIDE_PRESETS = [
+  { title: 'Discover Your Next Favourite Book', eyebrow: 'DISCOVER • READ • ENJOY' },
+  { title: 'New Stories, New Beginnings', eyebrow: 'FRESH ON THE SHELVES' },
+  { title: 'Let Knowledge Take Root', eyebrow: 'READ • LEARN • GROW' },
+  { title: 'Books That Inspire Every Day', eyebrow: 'INSPIRATION • EVERY PAGE' },
+  { title: 'Explore Worlds Beyond Words', eyebrow: 'IMAGINE • EXPLORE • DISCOVER' },
+  { title: 'A Little More Magic in Every Page', eyebrow: 'STORIES • WONDER • JOY' },
+  { title: 'Prepare Smarter. Aim Higher.', eyebrow: 'LEARN • PREPARE • ACHIEVE' },
+  { title: 'Timeless Reads, Endless Possibilities', eyebrow: 'CLASSICS • CULTURE • IDEAS' },
+]
+const HOMEPAGE_SLIDE_THEMES = [
+  ['peach', '🍑 Peach'], ['cream', '☀️ Warm cream'], ['green', '🌿 Emerald'],
+  ['sage', '🍃 Sage'], ['lavender', '💜 Lavender'], ['sky', '☁️ Sky blue'],
+  ['rose', '🌸 Rose'], ['mint', '🍀 Fresh mint'], ['sand', '🏖️ Sand'],
+  ['sunset', '🌅 Sunset'],
+]
+
+const emptyHomepageSlide = {
+  title: '', description: '', eyebrow: '', bookId: '', imageUrl: '', theme: 'peach',
+  buttonText: 'Explore book', buttonLink: '', active: true,
+}
 
 const emptyBook = {
   title: '',
@@ -44,6 +70,8 @@ const emptyAuthor = {
   displayOrder: 0,
 }
 
+const DEFAULT_DELIVERY_SETTINGS = { enabled: true, feePaise: 6000, freeDeliveryThresholdPaise: 49900, freeShippingAll: false }
+
 const emptyOffer = {
   title: '',
   code: '',
@@ -55,64 +83,73 @@ const emptyOffer = {
   endDate: '',
   active: true,
   bannerImage: '',
+  offerType: 'COUPON',
+  buyBookId: '',
+  getBookId: '',
+  buyQuantity: 1,
+  getQuantity: 1,
+  buyItems: [{ bookId: '', quantity: 1 }],
+  giftItems: [{ bookId: '', quantity: 1 }],
 }
 
 const HOME_SECTION_OPTIONS = [
-  { key: 'discounted', title: 'Discounted Books', copy: 'Automatically finds books whose current price is below the original price.' },
-  { key: 'top-selling', title: 'Top Selling Books', copy: 'Ranks books from recent completed/active orders.' },
-  { key: 'highly-featured', title: 'Highly Featured Books', copy: 'Uses the Featured flag or a manual selection.' },
-  { key: 'cashback', title: 'Cashback Books', copy: 'Manually select books and define the cashback value shown for this section.' },
-  { key: 'new-arrivals', title: 'New Arrivals', copy: 'Uses books marked as New Arrival, with an optional manual mode.' },
-  { key: 'best-rated', title: 'Best Rated Books', copy: 'Filters by minimum rating and minimum review count.' },
-  { key: 'trending', title: 'Trending Books', copy: 'Ranks recent sales or rating signals for a chosen period.' },
-  { key: 'recommended', title: 'Recommended Books', copy: 'Choose manual books, category, author, or books similar to another title.' },
+  { key: 'top-selling', title: 'Top Selling Books', copy: 'Show the books customers buy most, based on actual order history.', icon: '🏆' },
+  { key: 'highly-featured', title: 'Highly Featured Books', copy: 'Spotlight handpicked titles or books marked as featured.', icon: '✨' },
+  { key: 'new-arrivals', title: 'New Arrivals', copy: 'Keep the newest additions to your collection in the spotlight.', icon: '📚' },
+  { key: 'best-rated', title: 'Best Rated Books', copy: 'Highlight titles that readers love, using ratings and reviews.', icon: '⭐' },
+  { key: 'trending', title: 'Trending Books', copy: 'Show popular titles based on recent purchases and reader interest.', icon: '📈' },
 ]
+
+// Promotional controls stay available without cluttering the five main sections.
+const HOME_PROMOTION_OPTIONS = [
+  { key: 'discounted', title: 'Discounted Books', copy: 'Manage book-wise selling-price discounts.', icon: '🏷️' },
+  { key: 'cashback', title: 'Cashback Books', copy: 'Set a separate cashback reward for each selected book.', icon: '💰' },
+]
+const ALL_HOME_SECTION_OPTIONS = [...HOME_SECTION_OPTIONS, ...HOME_PROMOTION_OPTIONS]
 
 const HOME_SECTION_DEFAULTS = {
   discounted: {
     mode: 'MANUAL',
     discountPercent: 10,
     minDiscountPercent: 10,
-    limit: 8,
+    limit: 5,
   },
 
   'top-selling': {
-    mode: 'AUTO',
+    mode: 'MANUAL',
     periodDays: 30,
     basis: 'QUANTITY',
-    limit: 8,
+    limit: 5,
   },
 
   'highly-featured': {
-    mode: 'FEATURED_FLAG',
-    limit: 8,
+    mode: 'MANUAL',
+    limit: 5,
   },
 
   cashback: {
     mode: 'MANUAL',
-    cashbackType: 'PERCENT',
-    cashbackValue: 5,
-    maxCashback: 0,
-    limit: 8,
+    perBookCashbacks: {},
+    limit: 5,
   },
 
   'new-arrivals': {
-    mode: 'NEW_ARRIVAL_FLAG',
-    limit: 8,
+    mode: 'MANUAL',
+    limit: 5,
   },
 
   'best-rated': {
-    mode: 'AUTO',
+    mode: 'MANUAL',
     minRating: 4,
     minReviews: 5,
-    limit: 8,
+    limit: 5,
   },
 
   trending: {
-    mode: 'AUTO',
+    mode: 'MANUAL',
     periodDays: 7,
     basis: 'SALES',
-    limit: 8,
+    limit: 5,
   },
 
   recommended: {
@@ -120,7 +157,7 @@ const HOME_SECTION_DEFAULTS = {
     category: '',
     author: '',
     sourceBookId: '',
-    limit: 8,
+    limit: 5,
   },
 }
 
@@ -180,13 +217,21 @@ export default function AdminDashboardPage() {
   const [orders, setOrders] = useState([])
   const [customers, setCustomers] = useState([])
   const [offers, setOffers] = useState([])
+  const [deliveryForm, setDeliveryForm] = useState(DEFAULT_DELIVERY_SETTINGS)
+  const [savingDelivery, setSavingDelivery] = useState(false)
   const [authors, setAuthors] = useState([])
   const [homeSections, setHomeSections] = useState([])
-  const [selectedHomeSectionKey, setSelectedHomeSectionKey] = useState('discounted')
+  const [homepageSlides, setHomepageSlides] = useState([])
+  const [homepageSlideForm, setHomepageSlideForm] = useState(emptyHomepageSlide)
+  const [editingHomepageSlide, setEditingHomepageSlide] = useState(null)
+  const [savingHomepageSlide, setSavingHomepageSlide] = useState(false)
+  const [slideSearch, setSlideSearch] = useState('')
+  const [showHomePromotions, setShowHomePromotions] = useState(false)
+  const [selectedHomeSectionKey, setSelectedHomeSectionKey] = useState('top-selling')
   const [selectedHomeBookIds, setSelectedHomeBookIds] = useState([])
   const [perBookDiscounts, setPerBookDiscounts] = useState({})
   const [homeBookSearch, setHomeBookSearch] = useState('')
-  const [homeConfigForm, setHomeConfigForm] = useState(HOME_SECTION_DEFAULTS.discounted)
+  const [homeConfigForm, setHomeConfigForm] = useState(HOME_SECTION_DEFAULTS['top-selling'])
   const [homeSettingsForm, setHomeSettingsForm] = useState({ bannerUrls: ['', '', '', ''], activeBannerIndex: 0 })
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
@@ -283,6 +328,20 @@ export default function AdminDashboardPage() {
       ).forEach(clearTimeout)
   }, [])
 
+  // Reload server-backed lists after the admin APK returns to foreground.
+  // Never refresh the entire WebView or reset which admin tab is open.
+  const adminResumeInFlight = useRef(false)
+  useEffect(() => {
+    const refreshOnResume = async () => {
+      if (adminResumeInFlight.current || document.visibilityState === 'hidden') return
+      adminResumeInFlight.current = true
+      try { await loadEverything() }
+      finally { adminResumeInFlight.current = false }
+    }
+    window.addEventListener('tvb:app-resumed', refreshOnResume)
+    return () => window.removeEventListener('tvb:app-resumed', refreshOnResume)
+  }, [])
+
   useEffect(() => {
     const selected = homeSections.find(section => section.key === selectedHomeSectionKey)
     setSelectedHomeBookIds(selected?.bookIds || [])
@@ -290,6 +349,8 @@ export default function AdminDashboardPage() {
     setHomeConfigForm({
       ...(HOME_SECTION_DEFAULTS[selectedHomeSectionKey] || {}),
       ...(selected?.config || {}),
+      // Discounted Books are always selected manually, with a discount per book.
+      ...(selectedHomeSectionKey === 'discounted' ? { mode: 'MANUAL' } : {}),
     })
     setHomeBookSearch('')
   }, [selectedHomeSectionKey, homeSections])
@@ -357,6 +418,8 @@ export default function AdminDashboardPage() {
       ['authors', api('/admin/authors')],
       ['homeSections', api('/admin/home-sections')],
       ['homeSettings', api('/admin/home-settings')],
+      ['homepageSlides', api('/admin/homepage-slides')],
+      ['deliverySettings', api('/admin/delivery-settings')],
     ]
 
     const results = await Promise.allSettled(
@@ -388,8 +451,12 @@ export default function AdminDashboardPage() {
           setOffers(Array.isArray(data) ? data : [])
         } else if (key === 'authors') {
           setAuthors(Array.isArray(data) ? data : [])
+        } else if (key === 'homepageSlides') {
+          setHomepageSlides(Array.isArray(data) ? data : [])
         } else if (key === 'homeSections') {
           setHomeSections(Array.isArray(data) ? data : [])
+        } else if (key === 'deliverySettings') {
+          setDeliveryForm({ ...DEFAULT_DELIVERY_SETTINGS, ...data })
         } else if (key === 'homeSettings') {
           setHomeSettingsForm({
             bannerUrls: [0, 1, 2, 3].map(index => data?.bannerUrls?.[index] || ''),
@@ -413,7 +480,7 @@ export default function AdminDashboardPage() {
       // endpoints have not been deployed yet. The selected section falls back
       // to HOME_SECTION_DEFAULTS and can be saved once the backend is updated.
       if (homeFailed) {
-        setHomeSections(current => current.length ? current : HOME_SECTION_OPTIONS.map(option => ({
+        setHomeSections(current => current.length ? current : ALL_HOME_SECTION_OPTIONS.map(option => ({
           key: option.key,
           title: option.title,
           bookIds: [],
@@ -702,6 +769,10 @@ export default function AdminDashboardPage() {
       price:
         Number(bookForm.price),
 
+      // Normal selling price. Promotions are managed only from Home Sections.
+      basePrice:
+        Number(bookForm.price),
+
       originalPrice:
         Number(
           bookForm.originalPrice
@@ -761,6 +832,8 @@ export default function AdminDashboardPage() {
     setBookForm({
       ...emptyBook,
       ...book,
+      // The form edits the normal selling price, not the promotional amount.
+      price: book.basePrice ?? book.price,
       available:
         book.available !== false,
     })
@@ -1498,8 +1571,31 @@ export default function AdminDashboardPage() {
   ) {
     event.preventDefault()
 
+    const bundle = offerForm.offerType === 'BUY_GET'
+    const required = (offerForm.buyItems || []).map(line => ({ bookId: line.bookId, quantity: Number(line.quantity) }))
+    const gifts = (offerForm.giftItems || []).map(line => ({ bookId: line.bookId, quantity: Number(line.quantity) }))
+    const validLines = lines => lines.length > 0 && lines.length <= 15 &&
+      lines.every(line => line.bookId && Number.isInteger(line.quantity) && line.quantity >= 1 && line.quantity <= 50) &&
+      new Set(lines.map(line => line.bookId)).size === lines.length
+    if (bundle && (!validLines(required) || !validLines(gifts))) {
+      setMessage('Select each book and a quantity from 1–50. A book cannot be repeated in the same list.')
+      return
+    }
+    const lineDescription = lines => lines.map(line => `${line.quantity} ${books.find(book => String(book.id) === String(line.bookId))?.title || 'book'}`).join(' + ')
+    const generatedTitle = `Buy ${lineDescription(required)} · Receive ${lineDescription(gifts)} free`
     const payload = {
       ...offerForm,
+      title: bundle && !(offerForm.title || '').trim() ? generatedTitle : offerForm.title,
+      description: bundle && !(offerForm.description || '').trim() ? `Purchase ${lineDescription(required)} to receive ${lineDescription(gifts)} free. Gifts are added automatically at checkout.` : offerForm.description,
+      code: bundle ? '' : offerForm.code,
+      offerType: bundle ? 'BUY_GET' : 'COUPON',
+      buyItems: bundle ? required : offerForm.buyItems,
+      giftItems: bundle ? gifts : offerForm.giftItems,
+      // Legacy fields remain populated for older clients.
+      buyBookId: bundle ? required[0].bookId : offerForm.buyBookId,
+      getBookId: bundle ? gifts[0].bookId : offerForm.getBookId,
+      buyQuantity: bundle ? required[0].quantity : Number(offerForm.buyQuantity || 1),
+      getQuantity: bundle ? gifts[0].quantity : Number(offerForm.getQuantity || 1),
 
       discountValue:
         Number(
@@ -1541,13 +1637,10 @@ export default function AdminDashboardPage() {
     setEditingOffer(null)
     setOfferForm(emptyOffer)
 
-    setOffers(
-      await api('/admin/offers')
-    )
-
-    setMessage(
-      'Offer saved successfully'
-    )
+    setOffers(await api('/admin/offers'))
+    window.dispatchEvent(new Event('tv:catalogue-updated'))
+    localStorage.setItem('tv:catalogue-updated', String(Date.now()))
+    setMessage('Offer saved successfully')
   }
 
   function editOffer(
@@ -1560,6 +1653,8 @@ export default function AdminDashboardPage() {
     setOfferForm({
       ...emptyOffer,
       ...offer,
+      buyItems: offer.buyItems?.length ? offer.buyItems : [{ bookId: offer.buyBookId || '', quantity: offer.buyQuantity || 1 }],
+      giftItems: offer.giftItems?.length ? offer.giftItems : [{ bookId: offer.getBookId || '', quantity: offer.getQuantity || 1 }],
     })
 
     window.scrollTo({
@@ -1605,9 +1700,9 @@ export default function AdminDashboardPage() {
               )
           )
 
-          setMessage(
-            `${offer.title} deleted`
-          )
+          window.dispatchEvent(new Event('tv:catalogue-updated'))
+          localStorage.setItem('tv:catalogue-updated', String(Date.now()))
+          setMessage(`${offer.title} deleted`)
         },
     })
   }
@@ -1619,15 +1714,42 @@ export default function AdminDashboardPage() {
     const key = selectedHomeSectionKey
     const selectedIds = [...selectedHomeBookIds]
     const config = { ...homeConfigForm }
+    if (key === 'cashback') {
+      config.mode = 'MANUAL'
+      const rules = {}
+      for (const id of selectedIds) {
+        const book = books.find(item => item.id === id)
+        const rule = config.perBookCashbacks?.[id] || { type: 'PERCENT', value: 5 }
+        const value = Number(rule.value)
+        const sellingPrice = Number(book?.price || 0)
+        const type = rule.type === 'FIXED' ? 'FIXED' : 'PERCENT'
+        if (!book || !Number.isFinite(value) || value <= 0 || sellingPrice <= 0 ||
+            (type === 'PERCENT' && value > 100) ||
+            (type === 'FIXED' && value > sellingPrice)) {
+          setMessage(`Enter a valid cashback for ${book?.title || id}.`)
+          return
+        }
+        rules[id] = { type, value }
+      }
+      config.perBookCashbacks = rules
+      delete config.cashbackType
+      delete config.cashbackValue
+      delete config.maxCashback
+    }
+    if (key === 'discounted') {
+      // Discounts are always chosen per book; the removed mode / maximum controls no longer apply.
+      config.mode = 'MANUAL'
+      config.limit = 30
+    }
     if (key === 'discounted' && config.mode === 'MANUAL') {
       if (!selectedIds.length) { setMessage('Please select at least one book.'); return }
       const discounts = {}
       for (const id of selectedIds) {
-        const entry = perBookDiscounts[id] || { type: 'PERCENT', value: Number(config.discountPercent ?? 10) }
+        const entry = perBookDiscounts[id] || { type: 'PERCENT', value: 0 }
         const value = Number(entry.value)
         const book = books.find(item => item.id === id)
-        const original = Number(book?.originalPrice || book?.price || 0)
-        if (!Number.isFinite(value) || value <= 0 ||
+        const original = Number(book?.basePrice || book?.price || 0)
+        if (!Number.isFinite(value) || value < 0 ||
             (entry.type === 'PERCENT' && value > 100) ||
             (entry.type === 'FIXED' && value >= original)) {
           setMessage(`Enter a valid discount for ${book?.title || id}.`)
@@ -1646,8 +1768,25 @@ export default function AdminDashboardPage() {
       setHomeSections(current => current.some(section => section.key === key)
         ? current.map(section => section.key === key ? saved : section)
         : [...current, saved])
-      setBooks(await api('/admin/books'))
-      setMessage('Home section and individual discounts saved successfully')
+      const updatedBooks = await api('/admin/books')
+
+setBooks(updatedBooks)
+
+// Notify the public catalogue in this browser tab
+window.dispatchEvent(
+  new Event('tv:catalogue-updated')
+)
+
+// Notify other open tabs
+localStorage.setItem(
+  'tv:catalogue-updated',
+  String(Date.now())
+)
+
+setMessage(
+  key === 'cashback' ? 'Book-wise cashback saved. Customers will see the updated cashback on eligible cards.'
+    : 'Home section and individual discounts saved successfully'
+)
     } catch (err) {
       setMessage(err.message || 'Unable to save home section')
     } finally {
@@ -1681,6 +1820,62 @@ export default function AdminDashboardPage() {
     )
   }, [books, homeBookSearch])
 
+  async function saveDeliverySettings(event) {
+    event.preventDefault()
+    if (savingDelivery) return
+    setSavingDelivery(true)
+    try {
+      const saved = await api('/admin/delivery-settings', {
+        method: 'PUT',
+        body: JSON.stringify(deliveryForm),
+      })
+      setDeliveryForm({ ...DEFAULT_DELIVERY_SETTINGS, ...saved })
+      setMessage('Delivery settings saved successfully')
+    } catch (err) {
+      setMessage(err.message || 'Unable to save delivery settings')
+    } finally {
+      setSavingDelivery(false)
+    }
+  }
+
+  async function saveHomepageSlide(event) {
+    event.preventDefault()
+    if (savingHomepageSlide) return
+    setSavingHomepageSlide(true)
+    try {
+      const url = editingHomepageSlide ? `/admin/homepage-slides/${editingHomepageSlide}` : '/admin/homepage-slides'
+      await api(url, { method: editingHomepageSlide ? 'PUT' : 'POST', body: JSON.stringify({ ...homepageSlideForm, buttonLink: homepageSlideForm.buttonLink.includes('BOOK_ID') ? (homepageSlideForm.bookId ? `/book/${encodeURIComponent(homepageSlideForm.bookId)}` : '/shop') : homepageSlideForm.buttonLink }) })
+      setHomepageSlides(await api('/admin/homepage-slides'))
+      setHomepageSlideForm({ ...emptyHomepageSlide })
+      setEditingHomepageSlide(null)
+      setMessage('Homepage slide saved')
+    } catch (error) { setMessage(error.message || 'Unable to save slide') }
+    finally { setSavingHomepageSlide(false) }
+  }
+
+  async function deleteHomepageSlide(id) {
+    if (!window.confirm('Delete this slide? Existing books and orders will not be changed.')) return
+    try {
+      await api(`/admin/homepage-slides/${id}`, { method: 'DELETE' })
+      setHomepageSlides(await api('/admin/homepage-slides'))
+      if (editingHomepageSlide === id) { setEditingHomepageSlide(null); setHomepageSlideForm({ ...emptyHomepageSlide }) }
+      setMessage('Slide deleted')
+    } catch (error) { setMessage(error.message || 'Unable to delete slide') }
+  }
+
+  async function moveHomepageSlide(index, offset) {
+    const destination = index + offset
+    if (destination < 0 || destination >= homepageSlides.length) return
+    const ordered = [...homepageSlides]
+    ;[ordered[index], ordered[destination]] = [ordered[destination], ordered[index]]
+    try {
+      setHomepageSlides(await api('/admin/homepage-slides/reorder', {
+        method: 'PUT', body: JSON.stringify({ ids: ordered.map(item => item.id) }),
+      }))
+      setMessage('Slide order saved')
+    } catch (error) { setMessage(error.message || 'Unable to reorder slides') }
+  }
+
   const navItems = [
     [
       'overview',
@@ -1702,11 +1897,11 @@ export default function AdminDashboardPage() {
       '◎',
       'Customers',
     ],
-    [
-      'amazon',
-      '⌁',
-      'Amazon Orders',
-    ],
+    // [
+    //   'amazon',
+    //   '⌁',
+    //   'Amazon Orders',
+    // ],
     [
       'authors',
       '✎',
@@ -1721,6 +1916,12 @@ export default function AdminDashboardPage() {
       'homeSections',
       '▥',
       'Home Sections',
+    ],
+    ['homepageSlides', '▧', 'Homepage Banners'],
+    [
+      'delivery',
+      '🚚',
+      'Delivery Settings',
     ],
   ]
 
@@ -2813,7 +3014,7 @@ export default function AdminDashboardPage() {
         )}
 
         {/* Amazon seller orders */}
-        {tab === 'amazon' && <AmazonOrdersPanel />}
+        {/* {tab === 'amazon' && <AmazonOrdersPanel />} */}
 
         {/* Authors */}
         {tab === 'authors' && (
@@ -3186,6 +3387,106 @@ export default function AdminDashboardPage() {
           </section>
         )}
 
+        {/* Homepage category slideshow manager; independent of existing background banner settings. */}
+        {tab === 'homepageSlides' && (
+          <section className="admin-panel-v6 glass-panel tv-slide-admin">
+            <PanelTitle eyebrow="HOMEPAGE" title="Homepage Banners & Slideshow"
+              copy="Add slides, choose real books from inventory, and control which banners appear on the customer homepage." />
+            <form onSubmit={saveHomepageSlide} className="tv-slide-editor">
+              <div className="tv-slide-preset-field">
+                <label>Quick heading & short-label ideas</label>
+                <PremiumSelect
+                  value=""
+                  options={[{ value: '', label: 'Choose a ready-made heading (optional)' }, ...HOMEPAGE_SLIDE_PRESETS.map((preset, index) => ({ value: String(index), label: preset.title }))]}
+                  onChange={index => {
+                    if (index === '') return
+                    const preset = HOMEPAGE_SLIDE_PRESETS[Number(index)]
+                    if (preset) setHomepageSlideForm(current => ({ ...current, title: preset.title, eyebrow: preset.eyebrow }))
+                  }}
+                />
+                <small>Select an idea to fill both fields. You can still change the wording below.</small>
+              </div>
+              <div className="tv-slide-grid">
+                <label>Heading *
+                  <input required maxLength={130} value={homepageSlideForm.title}
+                    onChange={e => setHomepageSlideForm(v => ({ ...v, title: e.target.value }))} placeholder="Prepare Smarter. Aim Higher." />
+                </label>
+                <label>Short label
+                  <input maxLength={90} value={homepageSlideForm.eyebrow}
+                    onChange={e => setHomepageSlideForm(v => ({ ...v, eyebrow: e.target.value }))} placeholder="LEARN • PREPARE • ACHIEVE" />
+                </label>
+                <label className="tv-slide-wide">Description
+                  <textarea maxLength={350} rows={2} value={homepageSlideForm.description}
+                    onChange={e => setHomepageSlideForm(v => ({ ...v, description: e.target.value }))} />
+                </label>
+                <div className="tv-slide-wide tv-slide-book-field">
+                  <label>Featured book (optional)</label>
+                  <OfferBookDropdown
+                    books={books}
+                    value={homepageSlideForm.bookId}
+                    onChange={id => setHomepageSlideForm(v => ({ ...v, bookId: String(id), buttonLink: (!v.buttonLink || v.buttonLink.includes('BOOK_ID') || /^\/book\/[^/]+\/?$/.test(v.buttonLink)) ? (id ? `/book/${encodeURIComponent(id)}` : '/shop') : v.buttonLink }))}
+                    placeholder="Select a book to feature"
+                    searchLabel="Search featured books"
+                  />
+                  <small>Choose a book to automatically link the slide to its product page. Use a custom link below only when needed.</small>
+                  {homepageSlideForm.bookId && <button type="button" className="tv-slide-clear-book" onClick={() => setHomepageSlideForm(v => ({...v, bookId: '', buttonLink: '/shop'}))}>Remove selected book</button>}
+                </div>
+                <div className="tv-slide-theme-field">
+                  <label>Slide colour theme</label>
+                  <PremiumSelect
+                    value={homepageSlideForm.theme}
+                    options={HOMEPAGE_SLIDE_THEMES.map(([value, label]) => ({ value, label }))}
+                    onChange={theme => setHomepageSlideForm(v => ({...v, theme}))}
+                  />
+                </div>
+                <label>Banner image URL (optional)
+                  <input value={homepageSlideForm.imageUrl} onChange={e => setHomepageSlideForm(v => ({ ...v, imageUrl: e.target.value }))}
+                    placeholder="Leave blank to use selected book cover" />
+                </label>
+                <label>Button text
+                  <input maxLength={75} value={homepageSlideForm.buttonText} onChange={e => setHomepageSlideForm(v => ({ ...v, buttonText: e.target.value }))} />
+                </label>
+                <label>Button link
+                  <input value={homepageSlideForm.buttonLink} onChange={e => setHomepageSlideForm(v => ({ ...v, buttonLink: e.target.value }))}
+                    placeholder="Select a book for an automatic link, or enter /shop" />
+                </label>
+                <label className="tv-slide-switch"><input type="checkbox" checked={homepageSlideForm.active}
+                  onChange={e => setHomepageSlideForm(v => ({ ...v, active: e.target.checked }))} /> Show this slide on the website</label>
+              </div>
+              <div className="tv-slide-preview" data-theme={homepageSlideForm.theme}>
+                <div className="tv-slide-preview-decor" aria-hidden="true"><span>📚</span><span>✨</span><span>🌿</span><span>📖</span></div>
+                <div className="tv-slide-preview-content"><small>LIVE PREVIEW</small><h3>{homepageSlideForm.title || 'Slide heading'}</h3><p>{homepageSlideForm.description || 'Description appears here.'}</p>
+                  <span className="tv-slide-preview-button">{homepageSlideForm.buttonText || 'Explore book'} <span>↗</span></span></div>
+                {(homepageSlideForm.imageUrl || books.find(book => book.id === homepageSlideForm.bookId)?.image) &&
+                  <img src={homepageSlideForm.imageUrl || books.find(book => book.id === homepageSlideForm.bookId)?.image} alt="Selected banner preview" />}
+              </div>
+              <div className="tv-slide-actions">
+                <button type="submit" className="admin-primary-v6" disabled={savingHomepageSlide}>
+                  {savingHomepageSlide ? 'Saving...' : editingHomepageSlide ? 'Save slide changes' : 'Add slide'}
+                </button>
+                <button type="button" className="admin-secondary-v6" onClick={() => { setEditingHomepageSlide(null); setHomepageSlideForm({ ...emptyHomepageSlide }); setSlideSearch('') }}>Clear form</button>
+              </div>
+            </form>
+            <h3>Slideshow order ({homepageSlides.length} slides)</h3>
+            <p className="tv-slide-help">Use arrows to reorder. An inactive slide stays saved in MongoDB but will not appear to customers.</p>
+            <div className="tv-slide-list">
+              {homepageSlides.map((slide, index) => (
+                <article key={slide.id} className="tv-slide-list-item">
+                  {slide.imageUrl || slide.bookImage ? <img src={slide.imageUrl || slide.bookImage} alt="" /> : <span>📚</span>}
+                  <div><strong>{slide.title}</strong><small>{slide.bookTitle || 'No featured book'} · {slide.active ? 'Published' : 'Hidden'}</small></div>
+                  <div className="tv-slide-list-actions">
+                    <button type="button" title="Move up" disabled={index === 0} onClick={() => moveHomepageSlide(index, -1)}>↑</button>
+                    <button type="button" title="Move down" disabled={index === homepageSlides.length - 1} onClick={() => moveHomepageSlide(index, 1)}>↓</button>
+                    <button type="button" onClick={() => { setEditingHomepageSlide(slide.id); setHomepageSlideForm({ ...emptyHomepageSlide, ...slide, buttonLink: String(slide.buttonLink || '').includes('BOOK_ID') ? (slide.bookId ? `/book/${encodeURIComponent(slide.bookId)}` : '/shop') : (slide.buttonLink || (slide.bookId ? `/book/${encodeURIComponent(slide.bookId)}` : '/shop')) }); setSlideSearch(''); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Edit</button>
+                    <button type="button" className="tv-slide-delete" onClick={() => deleteHomepageSlide(slide.id)}>Delete</button>
+                  </div>
+                </article>
+              ))}
+              {!homepageSlides.length && <p>No custom slides yet. Your existing homepage category slideshow remains visible until you add one.</p>}
+            </div>
+          </section>
+        )}
+
         {/* Home Sections */}
         {tab === 'homeSections' && (
           <section className="admin-home-content-v7">
@@ -3193,133 +3494,65 @@ export default function AdminDashboardPage() {
               <PanelTitle
                 eyebrow="HOME CONTENT"
                 title="Home Sections"
-                copy="Each section has its own rules. Choose a section first, configure only the options that belong to it, then save."
+                copy="Choose one of your five homepage collections, adjust its display rules, and save your changes."
               />
 
-              <div className="admin-home-section-toolbar-v7">
-                <label>
-                  Section
-                  <PremiumSelect
-                    value={selectedHomeSectionKey}
-                    options={HOME_SECTION_OPTIONS.map(option => ({ value: option.key, label: option.title }))}
-                    onChange={value => setSelectedHomeSectionKey(value)}
-                  />
-                </label>
-
-                <div className="admin-home-section-explainer-v7">
-                  {HOME_SECTION_OPTIONS.find(option => option.key === selectedHomeSectionKey)?.copy}
+              <div className="tv-home-section-choice">
+                <div className="tv-home-section-choice-heading">
+                  <div>
+                    <span className="tv-home-section-kicker">CHOOSE WHAT TO SHOW</span>
+                    <h3>Featured homepage collections</h3>
+                    <p>Pick a collection and fine-tune which books appear on your homepage.</p>
+                  </div>
+                  <button type="button" className="tv-home-promo-toggle" onClick={() => {
+                    setShowHomePromotions(current => {
+                      if (current) setSelectedHomeSectionKey('top-selling')
+                      else setSelectedHomeSectionKey('discounted')
+                      return !current
+                    })
+                  }}>
+                    {showHomePromotions ? '← Back to collections' : 'Manage discounts & cashback'}
+                  </button>
                 </div>
-
-                <button className="admin-primary-v6" type="button" onClick={saveHomeSection} disabled={homeSectionSaving}>
-                  {homeSectionSaving ? 'Saving...' : 'Save section'}
-                </button>
+                <div className="tv-home-section-choices" role="group" aria-label="Homepage section">
+                  {(showHomePromotions ? HOME_PROMOTION_OPTIONS : HOME_SECTION_OPTIONS).map(option => (
+                    <button
+                      key={option.key}
+                      type="button"
+                      className={`tv-home-section-choice-card ${selectedHomeSectionKey === option.key ? 'is-active' : ''}`}
+                      onClick={() => setSelectedHomeSectionKey(option.key)}
+                      aria-pressed={selectedHomeSectionKey === option.key}
+                    >
+                      <span className="tv-home-choice-icon" aria-hidden="true">{option.icon}</span>
+                      <span className="tv-home-choice-name">{option.title}</span>
+                      {selectedHomeSectionKey === option.key && <span className="tv-home-choice-check" aria-hidden="true">✓</span>}
+                    </button>
+                  ))}
+                </div>
+                <div className="tv-home-selected-section">
+                  <div className="tv-home-selected-copy">
+                    <span className="tv-home-selected-eyebrow">CURRENT COLLECTION</span>
+                    <strong>{ALL_HOME_SECTION_OPTIONS.find(option => option.key === selectedHomeSectionKey)?.title}</strong>
+                    <p>{ALL_HOME_SECTION_OPTIONS.find(option => option.key === selectedHomeSectionKey)?.copy}</p>
+                  </div>
+                  <button className="admin-primary-v6" type="button" onClick={saveHomeSection} disabled={homeSectionSaving}>
+                    {homeSectionSaving ? 'Saving...' : 'Save section'}
+                  </button>
+                </div>
               </div>
 
               <div className="admin-home-config-grid-v7">
-                <label>
-                  Maximum books
-                  <input
-                    type="number"
-                    min="1"
-                    max="30"
-                    value={homeConfigForm.limit ?? 8}
-                    onChange={event => setHomeConfigForm(current => ({ ...current, limit: Number(event.target.value || 1) }))}
-                  />
-                </label>
-
-                {selectedHomeSectionKey === 'discounted' && (
-                  <>
-                    <label>
-                      Selection mode
-
-                      <PremiumSelect
-                        value={homeConfigForm.mode || 'MANUAL'}
-                        options={[
-                          {
-                            value: 'MANUAL',
-                            label: 'Manually selected books',
-                          },
-                          {
-                            value: 'AUTO',
-                            label: 'Automatically selected books',
-                          },
-                        ]}
-                        onChange={value =>
-                          setHomeConfigForm(current => ({
-                            ...current,
-                            mode: value,
-                          }))
-                        }
-                      />
-                    </label>
-
-                    {homeConfigForm.mode === 'MANUAL' ? (
-                      <label>
-                        Default discount for newly selected books
-
-                        <div className="admin-home-input-with-suffix-v7">
-                          <input
-                            type="number"
-                            min="0"
-                            max="100"
-                            step="0.01"
-                            value={homeConfigForm.discountPercent ?? 10}
-                            onChange={event =>
-                              setHomeConfigForm(current => ({
-                                ...current,
-                                discountPercent: Math.min(
-                                  100,
-                                  Math.max(
-                                    0,
-                                    Number(event.target.value || 0)
-                                  )
-                                ),
-                              }))
-                            }
-                          />
-
-                          <span>%</span>
-                        </div>
-
-                        <small className="admin-home-field-help-v7">
-                          Each selected book can have its own percentage or fixed-amount discount below.
-                        </small>
-                      </label>
-                    ) : (
-                      <label>
-                        Minimum discount required
-
-                        <div className="admin-home-input-with-suffix-v7">
-                          <input
-                            type="number"
-                            min="0"
-                            max="100"
-                            step="0.01"
-                            value={homeConfigForm.minDiscountPercent ?? 10}
-                            onChange={event =>
-                              setHomeConfigForm(current => ({
-                                ...current,
-                                minDiscountPercent: Math.min(
-                                  100,
-                                  Math.max(
-                                    0,
-                                    Number(event.target.value || 0)
-                                  )
-                                ),
-                              }))
-                            }
-                          />
-
-                          <span>%</span>
-                        </div>
-
-                        <small className="admin-home-field-help-v7">
-                          Only books already discounted by this percentage or more
-                          are included.
-                        </small>
-                      </label>
-                    )}
-                  </>
+                {selectedHomeSectionKey !== 'discounted' && (
+                  <label>
+                    Maximum books
+                    <input
+                      type="number"
+                      min="1"
+                      max="30"
+                      value={homeConfigForm.limit ?? 5}
+                      onChange={event => setHomeConfigForm(current => ({ ...current, limit: Number(event.target.value || 1) }))}
+                    />
+                  </label>
                 )}
 
                 {selectedHomeSectionKey === 'top-selling' && (
@@ -3327,7 +3560,7 @@ export default function AdminDashboardPage() {
                     <label>
                       Selection mode
                       <PremiumSelect
-                        value={homeConfigForm.mode || 'AUTO'}
+                        value={homeConfigForm.mode || 'MANUAL'}
                         options={[
                           {
                             value: 'AUTO',
@@ -3399,7 +3632,7 @@ export default function AdminDashboardPage() {
                   <label>
                     Source
                     <PremiumSelect
-                      value={homeConfigForm.mode || 'FEATURED_FLAG'}
+                      value={homeConfigForm.mode || 'MANUAL'}
                       options={[
                         { value: 'FEATURED_FLAG', label: 'Books marked Featured' },
                         { value: 'MANUAL', label: 'Manually selected books' },
@@ -3410,44 +3643,17 @@ export default function AdminDashboardPage() {
                 )}
 
                 {selectedHomeSectionKey === 'cashback' && (
-                  <>
-                    <label>
-                      Cashback type
-                      <PremiumSelect
-                        value={homeConfigForm.cashbackType || 'PERCENT'}
-                        options={[
-                          { value: 'PERCENT', label: 'Percentage' },
-                          { value: 'FIXED', label: 'Fixed ₹ amount' },
-                        ]}
-                        onChange={value => setHomeConfigForm(current => ({ ...current, cashbackType: value }))}
-                      />
-                    </label>
-                    <label>
-                      Cashback value
-                      <input
-                        type="number"
-                        min="0"
-                        value={homeConfigForm.cashbackValue ?? 5}
-                        onChange={event => setHomeConfigForm(current => ({ ...current, cashbackValue: Number(event.target.value || 0) }))}
-                      />
-                    </label>
-                    <label>
-                      Max cashback (₹)
-                      <input
-                        type="number"
-                        min="0"
-                        value={homeConfigForm.maxCashback ?? 0}
-                        onChange={event => setHomeConfigForm(current => ({ ...current, maxCashback: Number(event.target.value || 0) }))}
-                      />
-                    </label>
-                  </>
+                  <div className="admin-cashback-helper">
+                    <strong>Cashback is set separately for each book.</strong>
+                    <span>Select a title below, choose percentage or fixed ₹ cashback, then save. These rewards appear on customer book cards and are credited to the wallet after an eligible paid order.</span>
+                  </div>
                 )}
 
                 {selectedHomeSectionKey === 'new-arrivals' && (
                   <label>
                     Source
                     <PremiumSelect
-                      value={homeConfigForm.mode || 'NEW_ARRIVAL_FLAG'}
+                      value={homeConfigForm.mode || 'MANUAL'}
                       options={[
                         { value: 'NEW_ARRIVAL_FLAG', label: 'Books marked New Arrival' },
                         { value: 'MANUAL', label: 'Manually selected books' },
@@ -3462,7 +3668,7 @@ export default function AdminDashboardPage() {
                     <label>
                       Selection mode
                       <PremiumSelect
-                        value={homeConfigForm.mode || 'AUTO'}
+                        value={homeConfigForm.mode || 'MANUAL'}
                         options={[
                           {
                             value: 'AUTO',
@@ -3541,7 +3747,7 @@ export default function AdminDashboardPage() {
                     <label>
                       Selection mode
                       <PremiumSelect
-                        value={homeConfigForm.mode || 'AUTO'}
+                        value={homeConfigForm.mode || 'MANUAL'}
                         options={[
                           {
                             value: 'AUTO',
@@ -3718,14 +3924,20 @@ export default function AdminDashboardPage() {
                         const checked = selectedHomeBookIds.includes(book.id)
 
                         const originalPrice = Number(
-                          book.originalPrice || book.price || 0
+                          book.basePrice || book.price || 0
                         )
 
                         const discountEntry = perBookDiscounts[book.id] || {
-                          type: 'PERCENT', value: Number(homeConfigForm.discountPercent ?? 10)
+                          type: 'PERCENT', value: 0
                         }
                         const discountValue = Number(discountEntry.value || 0)
-                        const discountedPrice = checked
+                        const cashbackEntry = homeConfigForm.perBookCashbacks?.[book.id] || { type: 'PERCENT', value: 5 }
+                        const cashbackValue = Number(cashbackEntry.value || 0)
+                        const cashbackPrice = Number(book.price || 0)
+                        const cashbackPerCopy = cashbackEntry.type === 'FIXED'
+                          ? Math.min(cashbackPrice, cashbackValue)
+                          : Math.min(cashbackPrice, Math.round(cashbackPrice * cashbackValue) / 100)
+                        const discountedPrice = checked && discountValue > 0
                           ? Math.max(0, Math.round((discountEntry.type === 'FIXED'
                               ? originalPrice - discountValue
                               : originalPrice * (1 - discountValue / 100)) * 100) / 100)
@@ -3741,13 +3953,20 @@ export default function AdminDashboardPage() {
                               type="checkbox"
                               aria-label={`Select ${book.title} for this section`}
                               checked={checked}
-                              onChange={() =>
+                              onChange={() => {
                                 setSelectedHomeBookIds(current =>
-                                  checked
-                                    ? current.filter(id => id !== book.id)
-                                    : [...current, book.id]
+                                  checked ? current.filter(id => id !== book.id) : [...current, book.id]
                                 )
-                              }
+                                if (!checked && selectedHomeSectionKey === 'cashback') {
+                                  setHomeConfigForm(current => ({
+                                    ...current,
+                                    perBookCashbacks: {
+                                      ...(current.perBookCashbacks || {}),
+                                      [book.id]: current.perBookCashbacks?.[book.id] || { type: 'PERCENT', value: 5 },
+                                    },
+                                  }))
+                                }
+                              }}
                             />
 
                             <span className="admin-home-book-thumb-v7">
@@ -3773,6 +3992,49 @@ export default function AdminDashboardPage() {
                                 {book.category || 'Uncategorised'}
                               </em>
 
+                              {selectedHomeSectionKey === 'cashback' && checked && (
+                                <div className="admin-book-cashback-controls" onClick={event => event.stopPropagation()}>
+                                  <span className="tv-curation-control-label">CASHBACK FOR THIS BOOK</span>
+                                  <div className="admin-book-cashback-fields">
+                                    <div className="tv-cashback-type-field">
+                                      <span>Type</span>
+                                      <CashbackTypeDropdown
+                                        bookTitle={book.title}
+                                        value={cashbackEntry.type === 'FIXED' ? 'FIXED' : 'PERCENT'}
+                                        onChange={type => setHomeConfigForm(current => ({
+                                          ...current,
+                                          perBookCashbacks: {
+                                            ...(current.perBookCashbacks || {}),
+                                            [book.id]: { type, value: 0 },
+                                          },
+                                        }))}
+                                      />
+                                    </div>
+                                    <label>
+                                      <span>{cashbackEntry.type === 'FIXED' ? 'Amount (₹)' : 'Percent (%)'}</span>
+                                      <input
+                                        aria-label={`Cashback value for ${book.title}`}
+                                        type="number" min="0" step="0.01"
+                                        max={cashbackEntry.type === 'FIXED' ? cashbackPrice : 100}
+                                        value={cashbackEntry.value}
+                                        onChange={event => setHomeConfigForm(current => ({
+                                          ...current,
+                                          perBookCashbacks: {
+                                            ...(current.perBookCashbacks || {}),
+                                            [book.id]: { ...cashbackEntry, value: event.target.value },
+                                          },
+                                        }))}
+                                      />
+                                    </label>
+                                  </div>
+                                  {Number.isFinite(cashbackPerCopy) && cashbackPerCopy > 0 && (
+                                    <div className="admin-book-cashback-preview">
+                                      Customer card: <strong>Earn up to ₹{cashbackPerCopy.toFixed(2)} cashback</strong> per paid copy
+                                    </div>
+                                  )}
+                                  <small>Applied to eligible online payments; free BOGO copies and wallet-funded amounts do not earn cashback.</small>
+                                </div>
+                              )}
                               {selectedHomeSectionKey === 'discounted' &&
                                 homeConfigForm.mode === 'MANUAL' && !checked && (
                                   <span className="admin-home-price-preview-v7">
@@ -3886,7 +4148,7 @@ export default function AdminDashboardPage() {
               )}
             </section>
 
-            <section className="admin-panel-v6 glass-panel">
+            {/* <section className="admin-panel-v6 glass-panel">
               <PanelTitle
                 eyebrow="HOME BANNERS"
                 title="Background Banners"
@@ -3922,7 +4184,49 @@ export default function AdminDashboardPage() {
                   Save banners
                 </button>
               </div>
-            </section>
+            </section> */}
+          </section>
+        )}
+
+        {/* Delivery pricing is configured by the admin and calculated on the backend. */}
+        {tab === 'delivery' && (
+          <section className="admin-panel-v6 glass-panel tv-delivery-settings">
+            <PanelTitle eyebrow="STORE SETTINGS" title="Delivery Settings"
+              copy="Control shipping charges for new orders. Changes take effect on new checkout quotes, not existing orders." />
+            <form onSubmit={saveDeliverySettings} className="tv-delivery-settings-form">
+              <label className="tv-delivery-toggle">
+                <input type="checkbox" checked={deliveryForm.enabled}
+                  onChange={event => setDeliveryForm(current => ({ ...current, enabled: event.target.checked }))} />
+                <span><strong>Enable delivery charges</strong><small>When disabled, all orders have free shipping.</small></span>
+              </label>
+              <div className="tv-delivery-fields">
+                <label>Delivery fee (₹)
+                  <input type="number" min="0" max="10000" step="0.01" required
+                    disabled={!deliveryForm.enabled || deliveryForm.freeShippingAll}
+                    value={(deliveryForm.feePaise / 100).toString()}
+                    onChange={event => setDeliveryForm(current => ({ ...current, feePaise: Math.round(Number(event.target.value || 0) * 100) }))} />
+                </label>
+                <label>Free delivery from (₹)
+                  <input type="number" min="0" max="1000000" step="0.01" required
+                    disabled={!deliveryForm.enabled || deliveryForm.freeShippingAll}
+                    value={(deliveryForm.freeDeliveryThresholdPaise / 100).toString()}
+                    onChange={event => setDeliveryForm(current => ({ ...current, freeDeliveryThresholdPaise: Math.round(Number(event.target.value || 0) * 100) }))} />
+                </label>
+              </div>
+              <label className="tv-delivery-toggle">
+                <input type="checkbox" checked={deliveryForm.freeShippingAll}
+                  onChange={event => setDeliveryForm(current => ({ ...current, freeShippingAll: event.target.checked }))} />
+                <span><strong>Free delivery on all orders</strong><small>Overrides the fee and minimum order amount.</small></span>
+              </label>
+              <div className="tv-delivery-preview">
+                <span>Example: ₹450 merchandise total</span>
+                <strong>{!deliveryForm.enabled || deliveryForm.freeShippingAll || 45000 >= deliveryForm.freeDeliveryThresholdPaise
+                  ? 'FREE delivery' : `₹${(deliveryForm.feePaise / 100).toFixed(2)} delivery`}</strong>
+              </div>
+              <button className="admin-primary-v6" type="submit" disabled={savingDelivery}>
+                {savingDelivery ? 'Saving…' : 'Save delivery settings'}
+              </button>
+            </form>
           </section>
         )}
 
@@ -3964,7 +4268,55 @@ export default function AdminDashboardPage() {
                 }
               >
                 <label>
-                  Offer title
+                  Offer type
+                  <PremiumSelect
+                    value={offerForm.offerType || 'COUPON'}
+                    options={[{ value: 'COUPON', label: 'Coupon discount' }, { value: 'BUY_GET', label: 'Buy books · Get free books' }]}
+                    onChange={value => setOfferForm(current => ({ ...current, offerType: value }))}
+                  />
+                </label>
+
+                {offerForm.offerType === 'BUY_GET' && (
+                  <div className="wide admin-bundle-fields">
+                    <div className="admin-bundle-fields-title">
+                      <strong>🎁 Choose books to buy and books to receive free</strong>
+                      <span>Add several different titles and quantities. Customers must buy every required title to unlock every listed gift. Each complete set earns the gifts again.</span>
+                    </div>
+                    {[
+                      { key: 'buyItems', title: 'Books customers must buy', placeholder: 'Choose a qualifying book…' },
+                      { key: 'giftItems', title: 'Books customers receive FREE', placeholder: 'Choose a gift book…' },
+                    ].map(group => (
+                      <div className="bundle-book-group" key={group.key}>
+                        <h4>{group.title}</h4>
+                        {(offerForm[group.key] || []).map((line, index) => (
+                          <div className="bundle-book-line" key={`${group.key}-${index}`}>
+                            <OfferBookDropdown
+                              books={books}
+                              value={line.bookId || ''}
+                              placeholder={group.placeholder}
+                              searchLabel="Search books"
+                              onChange={bookId => setOfferForm(current => ({ ...current, [group.key]: current[group.key].map((entry, i) => i === index ? { ...entry, bookId } : entry) }))}
+                            />
+                            <label className="bundle-quantity-label">Copies
+                              <input aria-label={`${group.title} quantity ${index + 1}`} type="number" min="1" max="50" step="1" required value={line.quantity}
+                                onChange={event => setOfferForm(current => ({ ...current, [group.key]: current[group.key].map((entry, i) => i === index ? { ...entry, quantity: event.target.value } : entry) }))} />
+                            </label>
+                            <button type="button" className="bundle-remove-line" disabled={offerForm[group.key].length <= 1}
+                              onClick={() => setOfferForm(current => ({ ...current, [group.key]: current[group.key].filter((_, i) => i !== index) }))}>Remove</button>
+                          </div>
+                        ))}
+                        <button type="button" className="bundle-add-line" disabled={offerForm[group.key]?.length >= 15}
+                          onClick={() => setOfferForm(current => ({ ...current, [group.key]: [...(current[group.key] || []), { bookId: '', quantity: 1 }] }))}>
+                          + Add another {group.key === 'buyItems' ? 'qualifying book' : 'free book'}
+                        </button>
+                      </div>
+                    ))}
+                    <p className="admin-bundle-preview">A customer must buy every listed qualifying book in the stated quantity. All free books are then included automatically; gifts never unlock other offers.</p>
+                  </div>
+                )}
+
+                <label>
+                  {offerForm.offerType === 'BUY_GET' ? 'Offer title (optional — generated automatically)' : 'Offer title'}
 
                   <input
                     name="title"
@@ -3974,10 +4326,12 @@ export default function AdminDashboardPage() {
                     onChange={
                       offerChange
                     }
-                    required
+                    required={offerForm.offerType !== 'BUY_GET'}
                   />
                 </label>
 
+                {offerForm.offerType !== 'BUY_GET' && (
+                  <>
                 <label>
                   Coupon code
 
@@ -4060,6 +4414,9 @@ export default function AdminDashboardPage() {
                     }
                   />
                 </label>
+
+                  </>
+                )}
 
                 <label>
                   Start date
@@ -4186,8 +4543,9 @@ export default function AdminDashboardPage() {
                     </h3>
 
                     <b>
-                      {offer.code ||
-                        'No coupon code'}
+                      {offer.offerType === 'BUY_GET'
+                        ? 'Free-book bundle' 
+                        : (offer.code || 'No coupon code')}
                     </b>
 
                     <p>
@@ -4197,11 +4555,11 @@ export default function AdminDashboardPage() {
                     </p>
 
                     <strong>
-                      {offer.discountType ===
-                        'FIXED'
-                        ? `₹${offer.discountValue}`
-                        : `${offer.discountValue}%`}{' '}
-                      OFF
+                      {offer.offerType === 'BUY_GET' ? (
+                        <>🎁 {(offer.buyItems?.length ? offer.buyItems : [{bookId:offer.buyBookId, quantity:offer.buyQuantity}]).map(line => `${line.quantity} ${books.find(book => book.id === line.bookId)?.title || 'book'}`).join(' + ')} → {(offer.giftItems?.length ? offer.giftItems : [{bookId:offer.getBookId, quantity:offer.getQuantity}]).map(line => `${line.quantity} ${books.find(book => book.id === line.bookId)?.title || 'book'}`).join(' + ')} FREE</>
+                      ) : (
+                        <>{offer.discountType === 'FIXED' ? `₹${offer.discountValue}` : `${offer.discountValue}%`} OFF</>
+                      )}
                     </strong>
 
                     <small>
@@ -5120,4 +5478,3 @@ function formatDateTime(value) {
     ).toLocaleString()
     : '—'
 }
-

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import AndroidBackHandler from './components/AndroidBackHandler'
 
 import { Navigate, Route, Routes } from 'react-router-dom'
@@ -8,18 +9,19 @@ import Layout from './components/Layout'
 
 import LoginPage from './pages/LoginPage'
 import AdminLoginPage from './pages/AdminLoginPage'
-import AdminDashboardPage from './pages/AdminDashboardPage'
+const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage'))
 
-import HomePage from './pages/HomePage'
-import ShopPage from './pages/ShopPage'
-import BookDetailsPage from './pages/BookDetailsPage'
-import WishlistPage from './pages/WishlistPage'
-import CartPage from './pages/CartPage'
-import CheckoutPage from './pages/CheckoutPage'
-import OrderConfirmationPage from './pages/OrderConfirmationPage'
-import AccountPage from './pages/AccountPage'
-import OffersPage from './pages/OffersPage'
-import ProfileSettings from './pages/ProfileSettings'
+const HomePage = lazy(() => import('./pages/HomePage'))
+const ShopPage = lazy(() => import('./pages/ShopPage'))
+const BookDetailsPage = lazy(() => import('./pages/BookDetailsPage'))
+const WishlistPage = lazy(() => import('./pages/WishlistPage'))
+const CartPage = lazy(() => import('./pages/CartPage'))
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
+const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage'))
+const AccountPage = lazy(() => import('./pages/AccountPage'))
+const WalletPage = lazy(() => import('./pages/WalletPage'))
+const OffersPage = lazy(() => import('./pages/OffersPage'))
+const ProfileSettings = lazy(() => import('./pages/ProfileSettings'))
 
 import {
   AboutPage,
@@ -30,7 +32,7 @@ import {
   PrivacyPage
 } from './pages/InfoPages'
 
-import TrackOrderPage from './pages/TrackOrderPage'
+const TrackOrderPage = lazy(() => import('./pages/TrackOrderPage'))
 
 const isAdminApp = import.meta.env.MODE === 'admin'
 const isDevelopment = import.meta.env.DEV
@@ -44,6 +46,10 @@ function PrivatePage({ children }) {
 }
 
 export default function App() {
+  return <Suspense fallback={<div className="tv-route-loading" role="status" aria-live="polite"><span className="tv-route-loading-spinner" />Loading page…</div>}><AppRoutes /></Suspense>
+}
+
+function AppRoutes() {
   if (isAdminApp) {
     return (
       <>
@@ -111,6 +117,7 @@ export default function App() {
       />
 
       <Route path="/account" element={<PrivatePage><AccountPage /></PrivatePage>} />
+      <Route path="/wallet" element={<PrivatePage><WalletPage /></PrivatePage>} />
       <Route path="/account/profile" element={<PrivatePage><ProfileSettings /></PrivatePage>} />
 
       <Route path="/about" element={<PrivatePage><AboutPage /></PrivatePage>} />

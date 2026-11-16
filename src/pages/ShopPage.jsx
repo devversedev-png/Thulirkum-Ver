@@ -3,20 +3,30 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useStore } from '../context/StoreContext'
 import BookCard from '../components/BookCard'
 import PremiumSelect from '../components/PremiumSelect'
-import { demoBooks } from '../data/siteCatalog'
+import { getPricing, formatMoney } from '../utils/pricing'
 
 const PAGE_SIZE = 12
 
 export default function ShopPage() {
-  const { books, homeSections } = useStore()
+  const {
+  books,
+  homeSections,
+  loadBooks,
+  loadHomeSections,
+} = useStore()
 
-  const catalogue = useMemo(() => {
-    return books?.length ? books : demoBooks
-  }, [books])
+  // Real backend catalogue only: no hardcoded demo books or prices.
+  const catalogue = useMemo(() => books || [], [books])
 
   const [params, setParams] = useSearchParams()
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [activeSlide, setActiveSlide] = useState(0)
+
+  useEffect(() => {
+  // Fetch fresh catalogue prices when Shop opens
+  void loadBooks(true)
+  void loadHomeSections(true)
+}, [])
 
   const q = params.get('q') || ''
   const category = params.get('category') || ''
@@ -73,9 +83,7 @@ export default function ShopPage() {
 
     const promotional = catalogue.filter(book => {
 
-      const hasOffer =
-        Number(book.originalPrice || 0) >
-        Number(book.price || 0)
+      const hasOffer = getPricing(book).hasDiscount
 
       const isNew =
         book.newArrival === true
@@ -161,11 +169,19 @@ export default function ShopPage() {
     promoBooks.length
   ])
 
-  const sectionBookIds = useMemo(() => {
-    if (!homeSection || homeSection === 'discounted') return null
-    const section = (homeSections || []).find(item => item.key === homeSection)
-    return section ? new Set((section.bookIds || []).map(String)) : null
-  }, [homeSections, homeSection])
+const selectedSection = useMemo(() => {
+  return (homeSections || []).find(
+    section => section.key === homeSection
+  )
+}, [homeSections, homeSection])
+
+const sectionBookIds = useMemo(() => {
+  if (!selectedSection) return null
+
+  return new Set(
+    (selectedSection.bookIds || []).map(String)
+  )
+}, [selectedSection])
 
   const filtered = useMemo(() => {
     const text = q.toLowerCase().trim()
@@ -206,16 +222,21 @@ export default function ShopPage() {
           Number(book.stock || 0) > 0
         )
 
-      const sectionMatch =
-        !homeSection ||
-        (homeSection === 'discounted'
-          ? Number(book.originalPrice || 0) > Number(book.price || 0)
-          : sectionBookIds !== null && sectionBookIds.has(String(book.id)))
+    const isDiscounted = getPricing(book).hasDiscount
+
+const sectionMatch =
+  !homeSection ||
+  (
+    homeSection === 'discounted'
+      ? selectedSection?.config?.mode === 'MANUAL'
+        ? sectionBookIds?.has(String(book.id)) && isDiscounted
+        : isDiscounted
+      : sectionBookIds?.has(String(book.id))
+  )
 
       const offerMatch =
         !offerOnly ||
-        Number(book.originalPrice || 0) >
-        Number(book.price || 0)
+        getPricing(book).hasDiscount
 
       return (
         (!text || searchable.includes(text)) &&
@@ -516,14 +537,8 @@ export default function ShopPage() {
             <div className="shop-slider-shell">
 
               {promoBooks.map((book, index) => {
-                const discount =
-                  Number(book.originalPrice || 0) > Number(book.price || 0)
-                    ? Math.round(
-                      ((Number(book.originalPrice) - Number(book.price)) /
-                        Number(book.originalPrice)) *
-                      100
-                    )
-                    : 0
+                const pricing = getPricing(book)
+                const discount = pricing.percent
 
                 return (
                   <article
@@ -547,11 +562,10 @@ export default function ShopPage() {
                         <p>{book.author}</p>
 
                         <div className="shop-slider-price">
-                          <strong>₹{book.price}</strong>
+                          <strong>₹{formatMoney(pricing.selling)}</strong>
 
-                          {Number(book.originalPrice || 0) >
-                            Number(book.price || 0) && (
-                              <del>₹{book.originalPrice}</del>
+                          {pricing.hasDiscount && (
+                              <del>₹{formatMoney(pricing.original)}</del>
                             )}
                         </div>
 

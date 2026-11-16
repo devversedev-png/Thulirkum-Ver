@@ -84,24 +84,55 @@ export async function reverseGeocode(latitude, longitude) {
   return response.json()
 }
 
-/** Convert a Nominatim response into our address fields. */
+/**
+ * Nominatim address components are approximate to the GPS pin, not proof of
+ * the customer's house number. Keep road, locality and delivery notes separate.
+ */
 export function addressFromPlace(place) {
   const a = place?.address || {}
-  const line1 = [a.house_number, a.road || a.pedestrian || a.residential || a.footway]
-    .filter(Boolean)
-    .join(' ')
-  const line2 = a.suburb || a.neighbourhood || a.quarter || a.hamlet || a.city_district || ''
-  const city = a.city || a.town || a.village || a.municipality || a.county || ''
-  const district = a.state_district || a.county || a.district || city
+  const road = a.road || a.pedestrian || a.residential || a.footway || a.path || ''
+  const locality = a.neighbourhood || a.suburb || a.quarter || a.city_district ||
+    a.hamlet || a.village || a.locality || ''
+  const city = a.city || a.town || a.municipality || a.village || a.county || ''
+  const district = a.state_district || a.district || a.county || city
   return {
-    line1,
-    line2,
+    // Do not insert the nearest map feature's house number: it may be another home.
+    line1: road,
+    locality: locality || (a.subdistrict && a.subdistrict !== city ? a.subdistrict : ''),
+    line2: '',
     city,
     district,
     state: a.state || '',
     pincode: String(a.postcode || '').replace(/\s+/g, ''),
     locationLabel: place?.display_name || '',
   }
+}
+
+/** Full human-readable address for drivers, labels and Google Maps search. */
+export function formatDeliveryAddress(address) {
+  if (!address) return ''
+  const parts = [
+    address.line1,
+    address.locality,
+    address.line2,
+    address.city,
+    address.district && address.district !== address.city ? address.district : '',
+    address.state,
+    address.pincode,
+    'India',
+  ]
+  return parts.map(part => String(part || '').trim()).filter(Boolean).join(', ')
+}
+
+/** GPS-coordinates take priority; otherwise search the confirmed typed address. */
+export function googleMapsDeliveryUrl(address) {
+  const lat = Number(address?.latitude)
+  const lon = Number(address?.longitude)
+  const hasPin = address?.latitude != null && address?.longitude != null &&
+    Number.isFinite(lat) && Number.isFinite(lon) &&
+    Math.abs(lat) <= 90 && Math.abs(lon) <= 180
+  const query = hasPin ? `${lat},${lon}` : formatDeliveryAddress(address)
+  return query ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}` : ''
 }
 
 export function locationErrorMessage(error) {

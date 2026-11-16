@@ -1,0 +1,62 @@
+/* Admin-managed homepage slideshow */
+.tv-slide-admin { display:grid;gap:20px }
+.tv-slide-editor { display:grid;gap:18px }
+.tv-slide-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px }
+.tv-slide-grid label { display:flex;flex-direction:column;gap:7px;font-weight:700;color:#175443;font-size:13px }
+.tv-slide-grid input:not([type=checkbox]),.tv-slide-grid select,.tv-slide-grid textarea {width:100%;max-width:100%;min-width:0;border:1px solid #d4e2dc;background:#fff;border-radius:12px;padding:12px 14px;color:#153e33;font:inherit;outline-offset:2px}
+.tv-slide-grid input:focus,.tv-slide-grid select:focus,.tv-slide-grid textarea:focus {border-color:#16785d;outline:2px solid #d4eee4}
+.tv-slide-wide {grid-column:1/-1}
+.tv-slide-grid .tv-slide-switch {flex-direction:row;align-items:center;gap:10px}
+.tv-slide-preview {display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:170px;background:#fce8df;border:1px solid #e1e8dc;border-radius:18px;padding:25px}
+.tv-slide-preview[data-theme=cream] {background:#faf5e9}.tv-slide-preview[data-theme=green] {background:#d7ebe1}.tv-slide-preview[data-theme=sage] {background:#e7f0e9}.tv-slide-preview[data-theme=lavender] {background:#ede7f6}
+.tv-slide-preview h3 {font-family:Georgia,serif;color:#004a3d;font-size:clamp(22px,2vw,34px);margin:6px 0}.tv-slide-preview p{max-width:600px;font-size:14px}.tv-slide-preview strong{color:#00624b}
+.tv-slide-preview img{max-height:150px;max-width:145px;object-fit:contain}
+.tv-slide-actions,.tv-slide-list-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tv-slide-help{color:#668078;font-size:13px}
+.tv-slide-list{display:grid;gap:10px}.tv-slide-list-item{display:flex;align-items:center;gap:14px;border:1px solid #d9e7df;border-radius:14px;padding:12px;background:#f9fcfa}
+.tv-slide-list-item img{width:48px;height:68px;object-fit:contain}.tv-slide-list-item>div:nth-child(2){min-width:0;flex:1;display:grid;gap:5px}.tv-slide-list-item small{color:#567c6d}
+.tv-slide-list-actions button{background:white;color:#00634a;border:1px solid #c5d9cc;border-radius:9px;padding:8px 12px;cursor:pointer}.tv-slide-list-actions button:disabled{opacity:.35;cursor:default}.tv-slide-list-actions .tv-slide-delete{color:#a52b2b}
+@media(max-width:700px){.tv-slide-grid{grid-template-columns:1fr}.tv-slide-list-item{flex-wrap:wrap}.tv-slide-list-actions{width:100%}.tv-slide-preview{padding:16px}.tv-slide-preview img{max-width:80px}}
+
+/* Phase 17: clear, premium banner editor. */
+.tv-slide-admin { overflow: visible; }
+.tv-slide-book-field,.tv-slide-theme-field { display:flex;flex-direction:column;gap:9px; min-width:0; }
+.tv-slide-book-field>label,.tv-slide-theme-field>label{font-weight:750;font-size:13px;color:#175443}
+.tv-slide-book-field>small {color:#657e74;font-size:12px;line-height:1.5}
+.tv-slide-book-field .tv-offer-book-select {width:100%;z-index:10}
+.tv-slide-book-field .tv-offer-book-select.is-open {z-index:50}
+.tv-slide-book-field .tv-offer-book-popover {z-index:60}
+.tv-slide-clear-book {align-self:flex-start;border:0;background:transparent;color:#a14a34;cursor:pointer;text-decoration:underline;padding:1px 0;font-size:12px}
+.tv-slide-theme-field .premium-select {width:100%;position:relative;z-index:9}
+.tv-slide-theme-field .premium-select.open {z-index:51}
+.tv-slide-preview {position:relative;overflow:hidden;min-height:230px;padding:30px 38px;border:1px solid rgba(22,107,81,.12);background:linear-gradient(115deg,#fffaf7 8%,#ffe9df 100%);box-shadow:0 14px 32px rgba(49,57,45,.08)}
+.tv-slide-preview[data-theme=cream]{background:linear-gradient(115deg,#fffdf8,#fff1d6)}
+.tv-slide-preview[data-theme=green]{background:linear-gradient(115deg,#f6fffa,#cbe9dc)}
+.tv-slide-preview[data-theme=sage]{background:linear-gradient(115deg,#fcfff9,#d8e8d7)}
+.tv-slide-preview[data-theme=lavender]{background:linear-gradient(115deg,#fffaff,#e9dcf4)}
+.tv-slide-preview::before {content:'';position:absolute;right:10%;top:-65px;width:310px;height:310px;background:rgba(255,255,255,.45);border-radius:50%;pointer-events:none}
+.tv-slide-preview-content{position:relative;z-index:2;max-width:66%}
+.tv-slide-preview-content small {font-size:10px;font-weight:800;letter-spacing:.14em;color:#21745a}
+.tv-slide-preview h3{font-size:clamp(28px,3vw,43px);line-height:1.08;letter-spacing:-.03em;margin:13px 0}
+.tv-slide-preview p{font-size:15px;line-height:1.6;color:#49665d;margin-bottom:18px}
+.tv-slide-preview-button{display:inline-flex;gap:12px;align-items:center;background:linear-gradient(135deg,#0e7654,#00533e);color:white;border-radius:10px;padding:12px 20px;font-size:13px;font-weight:750;box-shadow:0 8px 18px rgba(0,82,60,.17)}
+.tv-slide-preview img{position:relative;z-index:2;max-height:200px;max-width:28%;filter:drop-shadow(0 18px 18px rgba(16,63,49,.20));border-radius:6px}
+@media(max-width:700px){.tv-slide-preview{padding:22px;min-height:200px}.tv-slide-preview-content{max-width:70%}.tv-slide-preview h3{font-size:25px}.tv-slide-preview img{max-width:26%;max-height:140px}}
+
+/* Phase 19: slide presets and matching editor preview themes. */
+.tv-slide-preset-field {display:flex;flex-direction:column;gap:8px;min-width:0;position:relative;z-index:25}
+.tv-slide-preset-field>label {font-size:13px;font-weight:750;color:#175443}
+.tv-slide-preset-field>small {font-size:12px;color:#678176}
+.tv-slide-preset-field .premium-select {max-width:610px;width:100%}
+.tv-slide-preset-field .premium-select.open {z-index:61}
+.tv-slide-preview[data-theme=sky]{background:linear-gradient(115deg,#f8fcff,#daeffc)}
+.tv-slide-preview[data-theme=rose]{background:linear-gradient(115deg,#fff9fb,#ffe0e9)}
+.tv-slide-preview[data-theme=mint]{background:linear-gradient(115deg,#f6fffb,#d2f5e8)}
+.tv-slide-preview[data-theme=sand]{background:linear-gradient(115deg,#fffdfa,#f4e4cb)}
+.tv-slide-preview[data-theme=sunset]{background:linear-gradient(115deg,#fffaf5,#ffddc9)}
+.tv-slide-preview-decor{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.tv-slide-preview-decor span{position:absolute;opacity:.22;filter:saturate(.7);font-size:26px}
+.tv-slide-preview-decor span:nth-child(1){left:46%;top:12%;transform:rotate(-15deg)}
+.tv-slide-preview-decor span:nth-child(2){right:9%;top:16%}
+.tv-slide-preview-decor span:nth-child(3){left:48%;bottom:14%}
+.tv-slide-preview-decor span:nth-child(4){right:9%;bottom:12%;transform:rotate(12deg)}

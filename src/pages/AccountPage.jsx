@@ -11,6 +11,8 @@ import {
 
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
+import { useWallet } from '../hooks/useWallet'
+import { formatWalletAmount } from '../utils/wallet'
 
 import PremiumConfirm from '../components/PremiumConfirm'
 import PremiumSelect from '../components/PremiumSelect'
@@ -38,6 +40,7 @@ function blankAddress(user) {
     fullName: user?.name || '',
     mobile: user?.mobile || '',
     line1: '',
+    locality: '',
     line2: '',
     city: '',
     district: '',
@@ -99,6 +102,8 @@ export default function AccountPage() {
     deleteAddress,
     setDefaultAddress,
   } = useStore()
+
+  const { wallet, loading: walletLoading, error: walletError } = useWallet()
 
   const [orders, setOrders] =
     useState([])
@@ -346,8 +351,9 @@ export default function AccountPage() {
           ...current,
           latitude,
           longitude,
-          line1: found.line1 || current.line1,
-          line2: found.line2 || current.line2,
+          line1: current.line1 || found.line1,
+          locality: found.locality || current.locality,
+          line2: current.line2,
           city: found.city || current.city,
           district: found.district || current.district,
           state: found.state || current.state,
@@ -553,6 +559,11 @@ export default function AccountPage() {
               Addresses
             </a>
 
+            <Link to="/wallet">
+              <span aria-hidden="true">₹</span>
+              My Wallet
+            </Link>
+
             <Link to="/account/profile">
               <span>♙</span>
               Profile Settings
@@ -704,6 +715,20 @@ export default function AccountPage() {
                 »
               </b>
             </a>
+            <Link
+              to="/wallet"
+              className="account-overview-card glass-card"
+              aria-label="View my cashback wallet"
+            >
+              <span aria-hidden="true">₹</span>
+              <div>
+                <strong>
+                  {walletLoading ? 'Loading…' : walletError ? 'Unavailable' : formatWalletAmount(wallet?.balancePaise ?? 0)}
+                </strong>
+                <small>My cashback wallet</small>
+              </div>
+              <b aria-hidden="true">»</b>
+            </Link>
           </div>
 
           <section
@@ -1120,6 +1145,7 @@ export default function AccountPage() {
 
                       <p>
                         {address.line1}
+                        {address.locality ? `, ${address.locality}` : ''}
 
                         {address.line2
                           ? `, ${address.line2}`
@@ -1490,8 +1516,13 @@ export default function AccountPage() {
                   </div>
 
                   <div className="wide">
+                    <label>Area / Locality</label>
+                    <input name="locality" value={addressForm.locality || ''} onChange={changeAddress} placeholder="e.g. Madipakkam, Periyar Nagar" />
+                  </div>
+
+                  <div className="wide">
                     <label>
-                      Area / Landmark
+                      Delivery notes / Landmark
                     </label>
 
                     <input

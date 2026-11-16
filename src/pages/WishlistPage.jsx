@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../context/StoreContext'
+import { getPricing, formatMoney } from '../utils/pricing'
 
 export default function WishlistPage() {
   const { books, account, addToCart, toggleWishlist } = useStore()
@@ -46,9 +47,8 @@ export default function WishlistPage() {
             <div className="wishlist-grid">
               {list.map(book => {
                 const available = book.available !== false && Number(book.stock || 0) > 0
-                const discount = Number(book.originalPrice || 0) > Number(book.price || 0)
-                  ? Math.round(((book.originalPrice - book.price) / book.originalPrice) * 100)
-                  : 0
+                const pricing = getPricing(book)
+                const discount = pricing.percent
                 return (
                   <article className="wishlist-item-v7" key={book.id}>
                     <button className="wishlist-heart" onClick={() => remove(book)} disabled={busyId === book.id}>♥</button>
@@ -57,7 +57,7 @@ export default function WishlistPage() {
                       <Link to={`/book/${book.id}`}><h3>{book.title}</h3></Link>
                       <span>{book.author}</span>
                       <div className="wishlist-rating-v7"><b>★ {Number(book.rating || 0).toFixed(1)}</b><small>({book.reviewCount || 0})</small></div>
-                      <div className="wishlist-price-v7"><strong>₹{book.price}</strong>{Number(book.originalPrice || 0) > Number(book.price || 0) && <del>₹{book.originalPrice}</del>}{discount > 0 && <span>{discount}% off</span>}</div>
+                      <div className="wishlist-price-v7"><strong>₹{formatMoney(pricing.selling)}</strong>{pricing.hasDiscount && <del>₹{formatMoney(pricing.original)}</del>}{discount > 0 && <span>{discount}% off</span>}</div>
                     </div>
                     <div className="wishlist-actions-v7">
                       <button className="primary-btn" disabled={!available || busyId === book.id} onClick={() => moveToCart(book)}>{busyId === book.id ? 'Updating...' : available ? '🛒 Add to Cart' : 'Out of Stock'}</button>

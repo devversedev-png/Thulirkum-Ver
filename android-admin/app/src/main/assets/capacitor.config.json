@@ -1,0 +1,8 @@
+{
+	"appId": "com.thulirkumver.admin",
+	"appName": "Thulirkum Ver Admin",
+	"webDir": "dist-admin",
+	"android": {
+		"path": "android-admin"
+	}
+}

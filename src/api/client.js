@@ -5,6 +5,11 @@ const API_URL = (
 
 let redirectingToAdminLogin = false
 
+// Coalesce simultaneous GETs without keeping stale responses after they finish.
+// We intentionally do NOT cache wallet, payment, account or order data.
+const activeGetRequests = new Map()
+
+
 const AUTH_ENDPOINTS = new Set([
   '/auth/login',
   '/auth/register',
@@ -69,6 +74,25 @@ function handleCustomerAuthorizationFailure(path, status) {
 }
 
 export async function api(path, options = {}) {
+  const method = String(options.method || 'GET').toUpperCase()
+  const isGet = method === 'GET'
+  const requestKey = isGet && !options.signal
+    ? `${localStorage.getItem('tvb_token') || sessionStorage.getItem('tvb_token') || ''}:${path}`
+    : null
+  if (requestKey && activeGetRequests.has(requestKey)) {
+    return activeGetRequests.get(requestKey)
+  }
+  const promise = performApiRequest(path, options, method)
+  if (requestKey) {
+    activeGetRequests.set(requestKey, promise)
+    void promise.finally(() => {
+      if (activeGetRequests.get(requestKey) === promise) activeGetRequests.delete(requestKey)
+    }).catch(() => {})
+  }
+  return promise
+}
+
+async function performApiRequest(path, options, method) {
   const token =
     localStorage.getItem('tvb_token') ||
     sessionStorage.getItem('tvb_token')
@@ -91,6 +115,8 @@ export async function api(path, options = {}) {
   try {
     response = await fetch(url, {
       ...options,
+      // WebView / browser HTTP cache must not serve old admin-edited content.
+      cache: method === 'GET' ? 'no-store' : 'default',
       headers,
     })
   } catch (error) {

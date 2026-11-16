@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import { formatWalletAmount } from '../utils/wallet'
 
 export default function OrderConfirmationPage() {
   const { state } = useLocation()
@@ -15,6 +16,27 @@ export default function OrderConfirmationPage() {
           <div className="confirmation-order-box">
             <span>Order</span><strong>#{order.orderNumber}</strong>
             <small>{order.estimatedDeliveryDate ? `Estimated delivery: ${new Date(order.estimatedDeliveryDate).toLocaleDateString()}` : 'You can follow every status update from My Account.'}</small>
+          </div>
+        )}
+        {Number(order?.bogoDiscountPaise) > 0 && (
+          <div className="confirmation-cashback-note">
+            <strong>🎁 {formatWalletAmount(order.bogoDiscountPaise)} saved with free-book offers</strong>
+            <span>{(order.items || []).filter(item => item.bogoFreeQuantity > 0).map(item => `${item.title} × ${item.bogoFreeQuantity}`).join(', ')} included FREE in your order.</span>
+          </div>
+        )}
+        {order?.paymentStatus === 'PAID' && Number(order.walletRedeemedPaise) > 0 && (
+          <div className="confirmation-wallet-spent">
+            <strong>{formatWalletAmount(order.walletRedeemedPaise)} redeemed from My Wallet</strong>
+            <span>{Number(order.razorpayPaidPaise) > 0 ? `${formatWalletAmount(order.razorpayPaidPaise)} paid online` : 'No additional payment was needed.'}</span>
+          </div>
+        )}
+        {order?.paymentStatus === 'PAID' && Number(order.cashbackEarnedPaise) > 0 && !order.cashbackReversed && (
+          <div className="confirmation-cashback-note">
+            <div>
+              <strong>{formatWalletAmount(order.cashbackEarnedPaise)} cashback earned!</strong>
+              <span>Added to your Thulirkum Ver wallet.</span>
+            </div>
+            <Link to="/wallet">View wallet</Link>
           </div>
         )}
         <div className="order-track premium-confirm-track">

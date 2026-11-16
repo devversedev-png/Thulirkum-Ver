@@ -1,19 +1,29 @@
+import { useDeliverySettings } from '../utils/delivery'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useStore } from '../context/StoreContext'
+import { getPricing, formatMoney } from '../utils/pricing'
+import { cashbackForBook } from '../utils/cashback'
+import { activeBundleForBook, paidBooksFor, giftBooksFor, describeBookLines } from '../utils/buyGetOffers'
 import BookCard from '../components/BookCard'
 import CartControl from '../components/CartControl'
 
 export default function BookDetailsPage() {
+  const deliverySettings = useDeliverySettings()
   const { id } = useParams()
   const navigate = useNavigate()
-  const { books, getBook, addToCart, toggleWishlist, account, backendReady } = useStore()
+  const { books, offers, getBook, addToCart, toggleWishlist, account, backendReady, loadBooks, homeSections } = useStore()
   const [qty, setQty] = useState(1)
   const [busy, setBusy] = useState(false)
   const [added, setAdded] = useState(false)
   const [message, setMessage] = useState('')
   const [tab, setTab] = useState('description')
   const book = getBook(id)
+
+  // Always show the latest backend price when a book is opened.
+  useEffect(() => {
+    void loadBooks(true)
+  }, [id])
 
   if (!book) {
     return <div className="empty-state page-width min-page"><h2>Book not found</h2><p>Please go back to the shop and choose another book.</p></div>
@@ -22,9 +32,11 @@ export default function BookDetailsPage() {
   const related = books.filter(item => item.category === book.category && item.id !== book.id).slice(0, 4)
   const wish = account?.wishlist?.includes(book.id)
   const available = book.available !== false && Number(book.stock || 0) > 0
-  const discount = Number(book.originalPrice || 0) > Number(book.price || 0)
-    ? Math.round(((book.originalPrice - book.price) / book.originalPrice) * 100)
-    : 0
+  const pricing = getPricing(book)
+  const discount = pricing.percent
+  const buyGetOffer = activeBundleForBook(book.id, offers)
+  const giftBook = books.find(item => String(item.id) === String(buyGetOffer?.getBookId))
+  const cashback = cashbackForBook(book, homeSections)
 
   async function cart(goCheckout = false) {
     if (!available || busy) return
@@ -98,7 +110,17 @@ export default function BookDetailsPage() {
 
           <p className="description details-lead">{book.description}</p>
 
-          <div className="details-price"><strong>₹{book.price}</strong>{discount > 0 && <span>{discount}% OFF</span>}{Number(book.originalPrice || 0) > Number(book.price || 0) && <del>₹{book.originalPrice}</del>}<b className={`stock ${available ? '' : 'stock-out'}`}>● {available ? 'In stock' : 'Out of stock'}</b></div>
+          <div className="details-price"><strong>₹{formatMoney(pricing.selling)}</strong>{discount > 0 && <span>{discount}% OFF</span>}{pricing.hasDiscount && <del>₹{formatMoney(pricing.original)}</del>}<b className={`stock ${available ? '' : 'stock-out'}`}>● {available ? 'In stock' : 'Out of stock'}</b></div>
+
+          {cashback && available && (
+            <div className="book-cashback-note details-cashback-note">
+              ✦ Earn up to <strong>₹{formatMoney(cashback.amount)} cashback</strong> per paid copy
+              {cashback.type === 'PERCENT' ? ` (${cashback.value}%)` : ''}. Credited to your wallet after an eligible Razorpay payment.
+            </div>
+          )}
+          {buyGetOffer && (
+            <div className="book-bogo-note">🎁 Buy {describeBookLines(paidBooksFor(buyGetOffer), books)} to receive {describeBookLines(giftBooksFor(buyGetOffer), books)} FREE. Offer repeats for complete sets, subject to stock.</div>
+          )}
 
           <div className="book-meta details-meta-grid">
             <div><span>▤</span><small>Language</small><strong>{book.language || '—'}</strong></div>
@@ -136,7 +158,7 @@ export default function BookDetailsPage() {
           {message && <div className="details-message">{message}</div>}
 
           <div className="details-trust-strip">
-            <div><b>🚚</b><span><strong>Free Delivery</strong><small>on orders above ₹499</small></span></div>
+            <div><b>🚚</b><span><strong>Free Delivery</strong><small>{!deliverySettings.enabled || deliverySettings.freeShippingAll ? 'on all orders' : `from ₹${(deliverySettings.freeDeliveryThresholdPaise / 100).toLocaleString('en-IN')}`}</small></span></div>
             <div><b>◆</b><span><strong>Secure Checkout</strong><small>Multiple payment options</small></span></div>
             <div><b>▣</b><span><strong>Genuine Books</strong><small>Original catalogue</small></span></div>
             <div><b>♧</b><span><strong>Dedicated Support</strong><small>We’re here to help</small></span></div>

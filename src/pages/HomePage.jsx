@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useStore } from '../context/StoreContext'
 import BookCard from '../components/BookCard'
 import { decorateBooks } from '../data/siteCatalog'
+import { api } from '../api/client'
+import { paidBooksFor, giftBooksFor, describeBookLines } from '../utils/buyGetOffers'
 
 const CATEGORY_CONFIG = [
   {
@@ -69,6 +71,9 @@ function normalizeCategory(value = '') {
 
 export default function HomePage() {
   const [activeCategorySlide, setActiveCategorySlide] = useState(0)
+  const [managedSlides, setManagedSlides] = useState(null)
+  const [managedSlidesConfigured, setManagedSlidesConfigured] = useState(false)
+  const [slidesReady, setSlidesReady] = useState(false)
   const [categoryPaused, setCategoryPaused] = useState(false)
   const [activeOfferSlide, setActiveOfferSlide] = useState(0)
   const { books, offers, authors, homeSections, homeSettings, loading } = useStore()
@@ -94,7 +99,7 @@ export default function HomePage() {
         .filter(Boolean),
     }))
     .filter(section => {
-      if (section.active === false || !section.books.length) {
+      if (section.active === false || !section.books.length || section.key === 'bogo') {
         return false
       }
 
@@ -137,7 +142,51 @@ export default function HomePage() {
   const activeOffer = offerRows[activeOfferSlide] || offerRows[0]
   const activeHeroBanner = homeSettings?.bannerUrls?.[homeSettings?.activeBannerIndex] || ''
 
+  useEffect(() => {
+    let live = true
+    const loadManagedSlides = () => {
+      Promise.all([api('/homepage-slides'), api('/homepage-slides/configured')]).then(([rows, status]) => {
+        if (live) {
+          setManagedSlides(Array.isArray(rows) ? rows : null)
+          setManagedSlidesConfigured(Boolean(status?.configured))
+        }
+      }).catch(() => { /* Keep last valid slide content when temporarily offline. */ })
+        .finally(() => { if (live) setSlidesReady(true) })
+    }
+    loadManagedSlides()
+    window.addEventListener('tvb:app-resumed', loadManagedSlides)
+    return () => {
+      live = false
+      window.removeEventListener('tvb:app-resumed', loadManagedSlides)
+    }
+  }, [])
+
   const categorySlides = useMemo(() => {
+    // Unconfigured stores keep their original category slideshow until the admin publishes slides.
+    // A fully inactive set intentionally displays no managed slides; old categories are not deleted.
+    if (managedSlidesConfigured) return (managedSlides || []).map(item => {
+      const selectedBook = catalogueById.get(String(item.bookId))
+      const image = item.bookImage || selectedBook?.image || item.imageUrl || '/covers/atomic-habits.svg'
+      const rawLink = String(item.buttonLink || '').trim()
+      const bookId = selectedBook?.id || item.bookId
+      const destination = rawLink.includes('BOOK_ID')
+        ? (bookId ? rawLink.replaceAll('BOOK_ID', encodeURIComponent(String(bookId))) : '/shop')
+        : (rawLink || (bookId ? `/book/${encodeURIComponent(String(bookId))}` : '/shop'))
+      return {
+        ...item,
+        name: item.id,
+        icon: '📚',
+        theme: ({ peach: 'exam', cream: 'children', green: 'selfhelp', sage: 'selfhelp', lavender: 'fiction', sky: 'sky', rose: 'rose', mint: 'mint', sand: 'sand', sunset: 'sunset' })[item.theme] || 'exam',
+        images: [image],
+        image,
+        backgroundBanner: item.imageUrl && (item.bookImage || selectedBook?.image) ? item.imageUrl : '',
+        visualText: selectedBook?.title || item.bookTitle || 'THULIRKUM VER',
+        count: selectedBook ? 1 : 0,
+        managed: true,
+        buttonText: item.buttonText || 'Explore book',
+        buttonLink: destination,
+      }
+    })
     return CATEGORY_CONFIG.map(item => {
       const matchSet = new Set(item.match.map(normalizeCategory))
 
@@ -158,7 +207,7 @@ export default function HomePage() {
         image: images[0] || '/covers/atomic-habits.svg'
       }
     })
-  }, [catalogue])
+  }, [catalogue, catalogueById, managedSlides, managedSlidesConfigured])
 
   useEffect(() => {
     if (offerRows.length <= 1) return undefined
@@ -183,10 +232,10 @@ export default function HomePage() {
       setActiveCategorySlide(current =>
         (current + 1) % categorySlides.length
       )
-    }, 2500)
+    }, 2000)
 
     return () => window.clearInterval(timer)
-  }, [categoryPaused, categorySlides.length])
+  }, [categoryPaused, categorySlides.length, activeCategorySlide])
 
   useEffect(() => {
     if (activeCategorySlide >= categorySlides.length) {
@@ -241,7 +290,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="page-width home-category-showcase">
+      {slidesReady && categorySlides.length > 0 && <section className="page-width home-category-showcase">
         <div className="category-showcase-header">
           <div>
             <span>EXPLORE</span>
@@ -261,11 +310,19 @@ export default function HomePage() {
           {categorySlides.map((slideItem, index) => (
             <article
               key={slideItem.name}
-              className={`category-feature-slide category-theme-${slideItem.theme} ${
+              className={`category-feature-slide category-theme-${slideItem.theme} ${slideItem.managed ? 'category-managed-slide' : ''} ${
                 index === activeCategorySlide ? 'active' : ''
               }`}
+              style={slideItem.backgroundBanner ? { backgroundImage: `linear-gradient(90deg, rgba(255,255,255,.96), rgba(255,255,255,.52)), url("${slideItem.backgroundBanner}")`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
               aria-hidden={index !== activeCategorySlide}
             >
+              <div className="category-ambient-decor" aria-hidden="true">
+                <span className="category-ambient category-ambient-one">📚</span>
+                <span className="category-ambient category-ambient-two">✨</span>
+                <span className="category-ambient category-ambient-three">🌿</span>
+                <span className="category-ambient category-ambient-four">📖</span>
+                <span className="category-ambient category-ambient-five">✦</span>
+              </div>
               <div className="category-feature-copy">
                 <span className="category-feature-eyebrow">
                   <b>{slideItem.icon}</b>
@@ -277,17 +334,17 @@ export default function HomePage() {
 
                 <div className="category-feature-actions">
                   <Link
-                    to={`/shop?category=${encodeURIComponent(slideItem.name)}`}
+                    to={slideItem.managed ? slideItem.buttonLink : `/shop?category=${encodeURIComponent(slideItem.name)}`}
                     className="category-explore-btn"
                   >
-                    Explore {slideItem.name}
+                    {slideItem.managed ? slideItem.buttonText : `Explore ${slideItem.name}`}
                     <span>»</span>
                   </Link>
 
-                  <small>
+                  {!slideItem.managed && <small>
                     <strong>{slideItem.count}</strong>{' '}
                     {slideItem.count === 1 ? 'book' : 'books'} available
-                  </small>
+                  </small>}
                 </div>
               </div>
 
@@ -328,7 +385,7 @@ export default function HomePage() {
                 type="button"
                 className="category-slider-arrow category-slider-prev"
                 onClick={previousCategorySlide}
-                aria-label="Previous category"
+                aria-label="Previous slide"
               >
                 ‹
               </button>
@@ -337,19 +394,19 @@ export default function HomePage() {
                 type="button"
                 className="category-slider-arrow category-slider-next"
                 onClick={nextCategorySlide}
-                aria-label="Next category"
+                aria-label="Next slide"
               >
                 ›
               </button>
 
-              <div className="category-slider-dots" aria-label="Category slides">
+              <div className="category-slider-dots" aria-label="Slideshow navigation">
                 {categorySlides.map((slideItem, index) => (
                   <button
                     type="button"
                     key={slideItem.name}
                     className={index === activeCategorySlide ? 'active' : ''}
                     onClick={() => setActiveCategorySlide(index)}
-                    aria-label={`Show ${slideItem.name}`}
+                    aria-label={`Show slide ${index + 1}: ${slideItem.title}`}
                     aria-current={index === activeCategorySlide ? 'true' : undefined}
                   />
                 ))}
@@ -357,7 +414,7 @@ export default function HomePage() {
             </>
           )}
         </div>
-      </section>
+      </section>}
 
       {homeBookSections.map(section => (
         <section className="page-width tv-section tv-home-book-section-v7" key={section.id || section.key}>
@@ -380,51 +437,39 @@ export default function HomePage() {
       ))}
 
       {activeOffer && (
-        <section className="page-width tv-offer-banner tv-offer-slider-v7">
-          <div className="tv-offer-copy">
-            <small>🎁 SPECIAL OFFER</small>
-            <h3>{activeOffer.title}</h3>
-            <p>{activeOffer.description || 'Save on selected books.'}</p>
-            <div className="tv-offer-slide-value-v7">
-              <strong>
-                {activeOffer.discountType === 'FIXED'
-                  ? `₹${activeOffer.discountValue}`
-                  : `${activeOffer.discountValue}%`}
-              </strong>
-              <span>OFF</span>
-              {activeOffer.code && <b>Code: {activeOffer.code}</b>}
-            </div>
-          </div>
-
-          <Link to="/offers" className="tv-offer-link">
-            View Offers <span>»</span>
-          </Link>
-
-          <div className="tv-offer-slider-controls-v7">
-            {offerRows.length > 1 && (
-              <>
-                <button type="button" onClick={() => setActiveOfferSlide(current => (current - 1 + offerRows.length) % offerRows.length)} aria-label="Previous offer">‹</button>
-                <div>
-                  {offerRows.map((offer, index) => (
-                    <button
-                      type="button"
-                      key={offer.id}
-                      className={index === activeOfferSlide ? 'active' : ''}
-                      onClick={() => setActiveOfferSlide(index)}
-                      aria-label={`Show offer ${index + 1}`}
-                    />
-                  ))}
-                </div>
-                <button type="button" onClick={() => setActiveOfferSlide(current => (current + 1) % offerRows.length)} aria-label="Next offer">›</button>
-              </>
+        <section className="page-width tv-offer-banner tv-offer-banner-clean" aria-label="Featured bookstore promotion">
+          <div className="tv-offer-copy tv-offer-copy-clean">
+            <small>✦ {activeOffer.offerType === 'BUY_GET' ? 'FREE BOOKS OFFER' : 'SPECIAL BOOKSTORE OFFER'}</small>
+            <h3>{activeOffer.title || (activeOffer.offerType === 'BUY_GET' ? 'Buy Books, Receive Free Gifts' : 'Special Savings')}</h3>
+            {activeOffer.description && <p>{activeOffer.description}</p>}
+            {activeOffer.offerType === 'BUY_GET' ? (
+              <div className="tv-offer-detail-clean">
+                <span className="tv-offer-detail-label">Buy</span>
+                <strong>{describeBookLines(paidBooksFor(activeOffer), catalogue)}</strong>
+                <span className="tv-offer-detail-divider" aria-hidden="true">+</span>
+                <span className="tv-offer-detail-label">Receive free</span>
+                <strong>{describeBookLines(giftBooksFor(activeOffer), catalogue)}</strong>
+              </div>
+            ) : (
+              <div className="tv-offer-discount-clean">
+                <strong>{activeOffer.discountType === 'FIXED' ? `₹${Number(activeOffer.discountValue || 0)}` : `${Number(activeOffer.discountValue || 0)}%`}</strong>
+                <span>OFF</span>
+                {activeOffer.code && <span className="tv-offer-coupon-clean">Code: {activeOffer.code}</span>}
+              </div>
             )}
           </div>
 
-          <img
-            className="tv-offer-photo"
-            src={activeOffer.bannerImage || '/premium/offer-books-premium.png'}
-            alt={activeOffer.title}
-          />
+          <Link to="/offers" className="tv-offer-link tv-offer-link-clean">
+            View Offer <span aria-hidden="true">→</span>
+          </Link>
+
+          <div className="tv-offer-art-clean" aria-hidden="true">
+            <span className="tv-offer-art-sparkle tv-offer-art-sparkle-one">✦</span>
+            <span className="tv-offer-art-sparkle tv-offer-art-sparkle-two">✧</span>
+            <div className="tv-offer-art-icon">{activeOffer.offerType === 'BUY_GET' ? '🎁' : '📚'}</div>
+            <div className="tv-offer-art-title">{activeOffer.offerType === 'BUY_GET' ? 'FREE BOOKS' : 'SPECIAL SAVINGS'}</div>
+            <div className="tv-offer-art-subtitle">{activeOffer.offerType === 'BUY_GET' ? 'A little more to read, on us' : 'More stories for less'}</div>
+          </div>
         </section>
       )}
 

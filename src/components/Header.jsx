@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Wallet } from 'lucide-react'
 import {
   Link,
   NavLink,
@@ -8,6 +9,7 @@ import {
 
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
+import { formatMoney } from '../utils/pricing'
 
 const preferredNav = [
   'Children Books',
@@ -278,7 +280,7 @@ export default function Header() {
 
                     <span className="search-suggestion-meta">
                       <b>
-                        ₹{book.price}
+                        ₹{formatMoney(book.price)}
                       </b>
 
                       <small
@@ -360,6 +362,19 @@ export default function Header() {
                 {cartCount}
               </b>
             )}
+          </NavLink>
+
+          {/* Wallet — opens the existing protected customer wallet page */}
+          <NavLink
+            to="/wallet"
+            className="market-action-link market-wallet-link"
+            aria-label="My Wallet"
+            title="My Wallet"
+          >
+            <span className="market-action-icon market-wallet-icon" aria-hidden="true">
+              <Wallet size={29} strokeWidth={1.8} />
+            </span>
+            <strong>Wallet</strong>
           </NavLink>
 
           {/* Account */}

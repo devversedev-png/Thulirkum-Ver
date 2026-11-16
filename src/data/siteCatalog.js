@@ -2,8 +2,6 @@ const bookVisualsByKey = {
   'atomic habits': {
     image: 'https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg',
     fallbackImage: '/covers/atomic-habits.svg',
-    price: 399,
-    originalPrice: 499,
     rating: 4.7,
     reviewCount: 98,
     category: 'Self Help',
@@ -14,20 +12,16 @@ const bookVisualsByKey = {
   ikigai: {
     image: 'https://covers.openlibrary.org/b/isbn/9780143130727-L.jpg',
     fallbackImage: '/covers/ikigai.svg',
-    price: 320,
-    originalPrice: 399,
     rating: 4.6,
     reviewCount: 89,
     category: 'Self Help',
     language: 'English',
     featured: true,
-    homeBadge: '20% OFF'
+  
   },
   'ponniyin selvan': {
     image: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1635910123i/59525602.jpg',
     fallbackImage: '/covers/ponniyin-selvan.svg',
-    price: 450,
-    originalPrice: 550,
     rating: 4.7,
     reviewCount: 122,
     category: 'Tamil Literature',
@@ -39,8 +33,6 @@ const bookVisualsByKey = {
   'siru maatrangal periya vazhkai': {
     image: '/covers/siru-maatrangal.svg',
     fallbackImage: '/covers/siru-maatrangal.svg',
-    price: 299,
-    originalPrice: 349,
     rating: 4.6,
     reviewCount: 86,
     category: 'Self Help',
@@ -51,19 +43,15 @@ const bookVisualsByKey = {
   'the alchemist': {
     image: 'https://covers.openlibrary.org/b/id/15121528-L.jpg',
     fallbackImage: '/covers/alchemist.svg',
-    price: 320,
-    originalPrice: 399,
     rating: 4.6,
     reviewCount: 88,
     category: 'Fiction',
     language: 'English',
     featured: true,
-    homeBadge: '20% OFF'
+
   },
   'children books starter set': {
     image: '/covers/kutti-kathaigal.svg',
-    price: 250,
-    originalPrice: 300,
     rating: 4.6,
     reviewCount: 48,
     category: 'Children Books',
@@ -71,8 +59,6 @@ const bookVisualsByKey = {
   },
   'general knowledge 2026': {
     image: '/covers/general-knowledge.svg',
-    price: 320,
-    originalPrice: 395,
     rating: 4.4,
     reviewCount: 52,
     category: 'Competitive Exams',
@@ -80,8 +66,6 @@ const bookVisualsByKey = {
   },
   'think like a monk': {
     image: '/covers/think-like-a-monk.svg',
-    price: 350,
-    originalPrice: 499,
     rating: 4.5,
     reviewCount: 60,
     category: 'Self Help',
@@ -240,8 +224,9 @@ export function decorateBook(book = {}) {
     ...book,
     image: book.image || preset.image || '/covers/atomic-habits.svg',
     fallbackImage: book.fallbackImage || preset.fallbackImage || '/covers/atomic-habits.svg',
-    originalPrice: Number(book.originalPrice || preset.originalPrice || book.price || 0),
-    price: Number(book.price || preset.price || 0),
+    // Prices come only from the backend; no hardcoded fallback may override them.
+    price: Number(book.price ?? 0),
+    originalPrice: Number(book.originalPrice ?? book.price ?? 0),
     rating: Number(book.rating || preset.rating || 0),
     reviewCount: Number(book.reviewCount || preset.reviewCount || 0),
     category: book.category || preset.category || 'Books',
