@@ -1,5 +1,10 @@
 {
+  "buildCommand": "npm run build:user",
+  "outputDirectory": "dist-user",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
