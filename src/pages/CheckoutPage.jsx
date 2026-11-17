@@ -1,4 +1,5 @@
 import { Navigate, Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Capacitor } from '@capacitor/core'
 import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
@@ -226,10 +227,6 @@ export default function CheckoutPage() {
         throw new Error('Your payable amount changed. Please review your wallet and try again.')
       }
 
-      if (!window.Razorpay) {
-        throw new Error('Razorpay Checkout could not be loaded. Please refresh the page.')
-      }
-
       const options = {
         key: razorpayOrder.keyId,
         amount: razorpayOrder.amount,
@@ -288,6 +285,35 @@ export default function CheckoutPage() {
         },
       }
 
+      // Razorpay native Android checkout: allows supported UPI apps to open from the APK.
+      // Browser checkout remains unchanged. Never fall back to a second checkout after native failure.
+      if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
+        const { Checkout: NativeCheckout } = await import('capacitor-razorpay')
+        // Do not send browser-only functions through the native bridge.
+        const { handler: onPaymentSuccess, modal: browserModal, ...nativeOptions } = options
+        void browserModal
+        const nativeResult = await NativeCheckout.open({
+          ...nativeOptions,
+          amount: String(razorpayOrder.amount),
+        })
+        let nativeResponse = nativeResult?.response ?? nativeResult
+        if (typeof nativeResponse === 'string') nativeResponse = JSON.parse(nativeResponse)
+        if (nativeResponse && typeof nativeResponse.response === 'object') {
+          nativeResponse = nativeResponse.response
+        }
+        if (!nativeResponse?.razorpay_payment_id ||
+            !nativeResponse?.razorpay_order_id ||
+            !nativeResponse?.razorpay_signature) {
+          throw new Error('Payment response was incomplete. Check payment status before trying again.')
+        }
+        // Only the backend can confirm and create an order, after verifying the signature.
+        await onPaymentSuccess(nativeResponse)
+        return
+      }
+
+      if (!window.Razorpay) {
+        throw new Error('Razorpay Checkout could not be loaded. Please refresh the page.')
+      }
       const razorpay = new window.Razorpay(options)
 
       razorpay.on('payment.failed', function (response) {
@@ -416,7 +442,17 @@ export default function CheckoutPage() {
           <div className="checkout-summary-items">
             {rows.map(row => <div className="mini-order" key={row.book.id}><img src={row.book.image} alt="" /><span><strong>{row.book.title}</strong><small>{row.book.author}</small><b>₹{formatMoney(getPricing(row.book).selling)} <del>{getPricing(row.book).hasDiscount ? `₹${formatMoney(getPricing(row.book).original)}` : ''}</del></b></span><small>Qty: {row.quantity}</small></div>)}
           </div>
-          {freeItems.length > 0 && <div className="checkout-free-items"><strong>🎁 Free books added automatically</strong>{freeItems.map((item, index) => <div key={`${item.bookId}-${index}`}><span>{item.title} × {item.bogoFreeQuantity}</span><b>FREE</b></div>)}</div>}
+          {freeItems.length > 0 && (
+            <div className="checkout-free-items">
+              <strong>🎁 Free books added automatically</strong>
+              {freeItems.map((item, index) => (
+                <div className="checkout-free-book-row" key={`${item.bookId}-${index}`}>
+                  <span className="checkout-free-book-label">{item.title} × {item.bogoFreeQuantity}</span>
+                  <b className="checkout-free-badge">FREE</b>
+                </div>
+              ))}
+            </div>
+          )}
           {shownBogoPaise > 0 && <p className="checkout-bogo-note">🎁 Free gifts are automatically included in this order; their full value is deducted below.</p>}
           <div><span>Subtotal ({rows.length} items)</span><strong>{formatWalletAmount(shownSubtotalPaise)}</strong></div>
           {shownBogoPaise > 0 && <div className="checkout-discount"><span>🎁 Free-book offer savings</span><strong>− {formatWalletAmount(shownBogoPaise)}</strong></div>}

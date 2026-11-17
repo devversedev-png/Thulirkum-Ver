@@ -1,0 +1,763 @@
+/* Thulirkum Ver — Premium customer auth experience, isolated from the admin portal.
+   Keep this as an import in LoginPage.jsx. Responsive and no remote fonts/images. */
+.login-page.tv-auth-2026 {
+  --auth-ink: #103a2f;
+  --auth-forest: #0b3029;
+  --auth-gold: #d9b779;
+  min-height: 100svh;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 53%) minmax(0, 47%);
+  background: #f7f4ed;
+  color: var(--auth-ink);
+  overflow: clip;
+}
+
+.login-page.tv-auth-2026 .login-art.tv-auth-story {
+  min-width: 0;
+  min-height: 100svh;
+  overflow: hidden;
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(24px, 3vh, 48px);
+  padding: clamp(27px, 3vw, 55px) clamp(28px, 5.3vw, 98px) 24px;
+  border: 0;
+  color: #fff9ed;
+  isolation: isolate;
+  background: radial-gradient(ellipse at 88% 2%, #29644c 0%, transparent 46%),
+    radial-gradient(ellipse at 0% 95%, #164c3e 0%, transparent 55%),
+    linear-gradient(148deg, #0b352b 0%, #082920 67%, #061e1a 100%);
+}
+
+.login-page.tv-auth-2026 .tv-auth-story::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(rgba(245, 221, 165, .23) .65px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: .23;
+  transform: none;
+  pointer-events: none;
+}
+
+.login-page.tv-auth-2026 .tv-auth-story::after {
+  content: '01 / 02';
+  position: absolute;
+  top: 47%;
+  right: 3.5%;
+  writing-mode: vertical-rl;
+  height: auto;
+  width: auto;
+  background: none;
+  filter: none;
+  mask-image: none;
+  -webkit-mask-image: none;
+  opacity: .52;
+  letter-spacing: .3em;
+  color: #e6c389;
+  font: 600 10px/1 system-ui, sans-serif;
+}
+
+.tv-auth-story-top,
+.tv-auth-story-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0
+}
+
+.login-page.tv-auth-2026 .tv-auth-story-logo {
+  width: clamp(190px, 19vw, 272px);
+  max-width: 57%;
+  height: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1) drop-shadow(0 4px 12px rgba(0, 0, 0, .05));
+}
+
+.tv-auth-story-edition {
+  font: 700 10px/1.4 system-ui, sans-serif;
+  letter-spacing: .13em;
+  color: #d0be94;
+  text-align: right;
+  white-space: nowrap
+}
+
+.tv-auth-story-edition span {
+  color: #d9b779;
+  padding-left: 5px
+}
+
+.tv-auth-story-body {
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  padding: 8px 0 0;
+  max-width: 760px
+}
+
+.tv-auth-story-kicker {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font: 700 11px/1.4 system-ui, sans-serif;
+  letter-spacing: .26em;
+  color: #e4c48c
+}
+
+.tv-auth-story-line {
+  width: 35px;
+  height: 1px;
+  background: #d9b779
+}
+
+.login-page.tv-auth-2026 .tv-auth-story h1 {
+  max-width: 740px;
+  margin: 18px 0 19px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 500;
+  font-size: clamp(47px, 4.5vw, 80px);
+  line-height: 1.055;
+  letter-spacing: -.055em;
+  color: #fffaf0;
+  text-wrap: balance
+}
+
+.tv-auth-story h1 em {
+  font-weight: 400;
+  color: #f1cf93;
+  font-style: italic
+}
+
+.login-page.tv-auth-2026 .tv-auth-story-body>p {
+  max-width: 505px;
+  margin: 0;
+  font-size: clamp(13px, 1.05vw, 16px);
+  line-height: 1.75;
+  color: #c2d6c9
+}
+
+.tv-auth-feature-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 24px
+}
+
+.tv-auth-feature-row>span {
+  color: #f7ead1;
+  border: 1px solid rgba(239, 224, 187, .20);
+  border-radius: 100px;
+  padding: 9px 12px;
+  font: 600 11px/1.4 system-ui, sans-serif;
+  background: rgba(255, 255, 255, .065);
+  backdrop-filter: blur(8px)
+}
+
+.tv-auth-feature-row>span span {
+  color: #e3bd7c;
+  margin-right: 5px;
+  font-size: 14px
+}
+
+.tv-auth-story-bottom {
+  position: relative;
+  z-index: 1;
+  min-width: 0
+}
+
+.tv-auth-book-image {
+  width: min(100%, 530px);
+  height: clamp(135px, 20vh, 220px);
+  margin: 0 0 23px auto;
+  background: url('/premium/hero-books-premium.png') center 54% / cover no-repeat;
+  border: 1px solid rgba(255, 244, 220, .28);
+  border-radius: 16px;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, .26);
+  position: relative;
+  overflow: hidden
+}
+
+.tv-auth-book-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 5px solid rgba(255, 255, 255, .035);
+  border-radius: inherit;
+  pointer-events: none
+}
+
+.tv-auth-story-footer {
+  padding-top: 15px;
+  border-top: 1px solid rgba(242, 214, 162, .22);
+  font: 700 9px/1.4 system-ui, sans-serif;
+  letter-spacing: .13em;
+  color: #b9d3c4
+}
+
+.tv-auth-story-footer b {
+  color: #d8b879;
+  padding: 0 3px
+}
+
+/* Ivory reading-room form pane */
+.login-page.tv-auth-2026 .login-panel.tv-auth-panel {
+  min-width: 0;
+  min-height: 100svh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(32px, 5vw, 80px) clamp(22px, 5.1vw, 90px);
+  background: radial-gradient(ellipse at 97% 1%, #f5ead6 0%, transparent 46%), linear-gradient(155deg, #f8f5ed 0%, #fcfaf6 65%, #f3f0e7 100%)
+}
+
+.login-page.tv-auth-2026 .login-panel.tv-auth-panel::before {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  border: 1px solid rgba(88, 92, 66, .10);
+  border-radius: 23px;
+  pointer-events: none
+}
+
+.login-page.tv-auth-2026 .login-card.tv-auth-card {
+  position: relative;
+  z-index: 1;
+  max-width: 485px;
+  width: 100%;
+  padding: clamp(28px, 3.4vw, 52px);
+  background: rgba(255, 255, 255, .87);
+  border: 1px solid rgba(67, 103, 83, .12);
+  border-radius: 26px;
+  box-shadow: 0 24px 65px rgba(23, 56, 41, .095), 0 4px 12px rgba(18, 55, 40, .03);
+}
+
+.tv-auth-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 25px
+}
+
+.tv-auth-monogram {
+  width: 44px;
+  height: 44px;
+  display: contents;
+  place-items: center;
+  border-radius: 13px;
+  overflow: hidden;
+  background: #faf9f1;
+  border: 1px solid #e8e5d7;
+  flex: none
+}
+
+.tv-auth-monogram img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain
+}
+
+.tv-auth-card-heading>span {
+  font: 800 10px/1.5 system-ui, sans-serif;
+  letter-spacing: .15em;
+  color: #285a46
+}
+
+.tv-auth-bullet {
+  color: #c59b5c;
+  padding: 0 3px
+}
+
+.tv-auth-mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 5px;
+  gap: 4px;
+  border: 1px solid #e8e8dc;
+  background: #f3f4ee;
+  border-radius: 14px;
+  margin-bottom: 27px
+}
+
+.tv-auth-mode-tabs button {
+  min-height: 43px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #617165;
+  font: 700 13px/1.2 system-ui, sans-serif;
+  cursor: pointer;
+  transition: background .2s, color .2s, box-shadow .2s
+}
+
+.tv-auth-mode-tabs button.is-selected {
+  background: #fff;
+  color: #0e5941;
+  box-shadow: 0 3px 12px rgba(17, 75, 52, .11)
+}
+
+.tv-auth-mode-tabs button:focus-visible {
+  outline: 3px solid #c4a56a;
+  outline-offset: 2px
+}
+
+.login-page.tv-auth-2026 .tv-auth-intro .eyebrow {
+  font: 800 10px/1.5 system-ui, sans-serif;
+  letter-spacing: .19em;
+  color: #af854b
+}
+
+.login-page.tv-auth-2026 .tv-auth-intro h2 {
+  margin: 10px 0 9px;
+  color: #103e31;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(28px, 2.45vw, 41px);
+  font-weight: 600;
+  letter-spacing: -.038em;
+  line-height: 1.13;
+  text-wrap: balance
+}
+
+.login-page.tv-auth-2026 .tv-auth-intro p {
+  margin: 0 0 24px;
+  color: #67796c;
+  font: 400 13px/1.65 system-ui, sans-serif
+}
+
+.login-page.tv-auth-2026 .tv-auth-card form {
+  display: grid;
+  gap: 7px
+}
+
+.login-page.tv-auth-2026 .tv-auth-card form>label:not(.remember-me) {
+  font: 700 12px/1.45 system-ui, sans-serif;
+  color: #244c3c;
+  margin-top: 4px
+}
+
+.login-page.tv-auth-2026 .tv-auth-card input:not([type=checkbox]) {
+  width: 100%;
+  min-height: 49px;
+  max-width: 100%;
+  margin: 0 0 7px;
+  padding: 0 15px;
+  border: 1px solid #dce5dd;
+  border-radius: 11px;
+  background: #fbfcfa;
+  color: #123b2e;
+  font-size: 14px;
+  box-shadow: 0 1px 2px rgba(24, 73, 50, .025);
+  transition: border-color .18s, box-shadow .18s
+}
+
+.login-page.tv-auth-2026 .tv-auth-card input:not([type=checkbox]):focus {
+  outline: none;
+  border-color: #3d9873;
+  box-shadow: 0 0 0 4px rgba(32, 145, 95, .11);
+  background: #fff
+}
+
+.login-page.tv-auth-2026 .tv-auth-card .password-input-wrap {
+  position: relative
+}
+
+.login-page.tv-auth-2026 .tv-auth-card .password-input-wrap input {
+  padding-right: 50px
+}
+
+.login-page.tv-auth-2026 .tv-auth-card .password-eye-btn {
+  right: 7px;
+  top: 4px;
+  min-height: 40px;
+  min-width: 39px;
+  color: #257054
+}
+
+.login-page.tv-auth-2026 .tv-auth-card .remember-me {
+  margin: 9px 0 14px;
+  font: 600 12px/1.4 system-ui, sans-serif;
+  color: #4e6856
+}
+
+.login-page.tv-auth-2026 .tv-auth-card .primary-btn {
+  border-radius: 11px;
+  min-height: 51px;
+  margin-top: 0;
+  background: linear-gradient(110deg, #126f50, #074b39);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .015em;
+  box-shadow: 0 10px 24px rgba(4, 82, 55, .17);
+  transition: filter .18s, transform .18s
+}
+
+.login-page.tv-auth-2026 .tv-auth-card .primary-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px)
+}
+
+.login-page.tv-auth-2026 .tv-auth-card .form-error {
+  border-radius: 10px;
+  line-height: 1.5;
+  overflow-wrap: anywhere
+}
+
+.login-page.tv-auth-2026 .tv-auth-card .otp-actions {
+  flex-wrap: wrap
+}
+
+.login-page.tv-auth-2026 .tv-auth-card .login-switch {
+  margin-top: 9px;
+  font: 800 12px/1.5 system-ui, sans-serif;
+  color: #0d7150
+}
+
+.tv-auth-switch-note {
+  display: flex;
+  gap: 5px 7px;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding-top: 21px;
+  text-align: center;
+  color: #718074;
+  font: 500 12px/1.5 system-ui, sans-serif
+}
+
+.tv-auth-switch-note .login-switch {
+  width: auto !important;
+  padding: 0;
+  margin: 0 !important
+}
+
+.tv-auth-privacy-note {
+  margin: 27px 0 0 !important;
+  border-top: 1px solid #edf0e8;
+  padding-top: 17px;
+  text-align: center;
+  font: 400 10px/1.5 system-ui, sans-serif !important;
+  color: #9aa89b !important
+}
+
+@media(max-width:1150px) {
+  .login-page.tv-auth-2026 {
+    grid-template-columns: minmax(0, 49%) minmax(0, 51%)
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-story {
+    padding-inline: 35px
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-story h1 {
+    font-size: clamp(44px, 4.6vw, 65px)
+  }
+
+  .tv-auth-story-edition {
+    display: none
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-panel {
+    padding-inline: 24px
+  }
+}
+
+@media(max-width:850px) {
+  .login-page.tv-auth-2026 {
+    grid-template-columns: 1fr;
+    min-height: 100svh;
+    overflow: visible
+  }
+
+  .login-page.tv-auth-2026 .login-art.tv-auth-story {
+    min-height: 0;
+    padding: 24px 28px 30px;
+    gap: 18px;
+    grid-template-rows: auto auto
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-story-logo {
+    width: 175px
+  }
+
+  .tv-auth-story-body {
+    padding: 0
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-story h1 {
+    font-size: clamp(35px, 5.6vw, 50px);
+    margin: 13px 0
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-story-body>p {
+    max-width: 500px;
+    font-size: 13px
+  }
+
+  .tv-auth-story-edition,
+  .tv-auth-story-bottom,
+  .tv-auth-story::after {
+    display: none !important
+  }
+
+  .tv-auth-feature-row {
+    margin-top: 13px
+  }
+
+  .tv-auth-feature-row>span {
+    padding: 6px 10px;
+    font-size: 10px
+  }
+
+  .login-page.tv-auth-2026 .login-panel.tv-auth-panel {
+    min-height: 0;
+    padding: 28px 20px 45px
+  }
+
+  .login-page.tv-auth-2026 .login-panel.tv-auth-panel::before {
+    inset: 10px
+  }
+
+  .login-page.tv-auth-2026 .login-card.tv-auth-card {
+    max-width: 570px
+  }
+}
+
+@media(max-width:560px) {
+  .login-page.tv-auth-2026 .login-art.tv-auth-story {
+    padding: 20px 22px 25px
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-story-logo {
+    width: 150px;
+    max-width: 70%
+  }
+
+  .tv-auth-story-kicker {
+    font-size: 9px;
+    letter-spacing: .15em
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-story h1 {
+    font-size: clamp(32px, 9vw, 44px);
+    line-height: 1.03;
+    margin: 11px 0
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-story-body>p {
+    font-size: 11px;
+    line-height: 1.6
+  }
+
+  .tv-auth-feature-row {
+    gap: 6px
+  }
+
+  .tv-auth-feature-row>span {
+    font-size: 9px;
+    padding: 5px 8px
+  }
+
+  .login-page.tv-auth-2026 .login-panel.tv-auth-panel {
+    padding: 20px 13px 30px
+  }
+
+  .login-page.tv-auth-2026 .login-panel.tv-auth-panel::before {
+    display: none
+  }
+
+  .login-page.tv-auth-2026 .login-card.tv-auth-card {
+    padding: 25px 21px;
+    border-radius: 20px
+  }
+
+  .tv-auth-card-heading {
+    margin-bottom: 19px
+  }
+
+  .tv-auth-mode-tabs {
+    margin-bottom: 21px
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-intro h2 {
+    font-size: 30px
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-card input:not([type=checkbox]) {
+    font-size: 16px
+  }
+}
+
+@media(max-height:750px) and (min-width:851px) {
+  .login-page.tv-auth-2026 .login-art.tv-auth-story {
+    gap: 12px;
+    padding-top: 24px
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-story h1 {
+    font-size: clamp(39px, 4vw, 62px);
+    margin: 9px 0 12px
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-story-body>p {
+    font-size: 13px
+  }
+
+  .tv-auth-feature-row {
+    margin-top: 12px
+  }
+
+  .tv-auth-book-image {
+    height: 120px;
+    margin-bottom: 12px
+  }
+
+  .login-page.tv-auth-2026 .login-card.tv-auth-card {
+    padding: 26px 33px
+  }
+
+  .tv-auth-card-heading {
+    margin-bottom: 12px
+  }
+
+  .tv-auth-mode-tabs {
+    margin-bottom: 14px
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-intro p {
+    margin-bottom: 12px
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .login-page.tv-auth-2026 * {
+    transition: none !important
+  }
+}
+
+/* Existing admin session notice is a one-panel state; keep it centered. */
+.login-page.tv-auth-2026.tv-auth-admin-session {
+  grid-template-columns: 1fr;
+  min-height: 100svh
+}
+
+.login-page.tv-auth-2026.tv-auth-admin-session .login-panel.tv-auth-panel {
+  min-height: 100svh
+}
+
+.login-page.tv-auth-2026.tv-auth-admin-session .tv-auth-card>h2 {
+  font-family: Georgia, serif;
+  font-size: 30px;
+  color: #113f30
+}
+
+/* Thulirkum Ver — Auth height + softened-green correction (add at END of PremiumAuth2026.css).
+   Both customer login and registration; does not affect admin or forms. */
+@media (min-width: 851px) {
+  .login-page.tv-auth-2026:not(.tv-auth-admin-session) {
+    height: auto !important;
+    min-height: 100svh !important;
+    align-items: stretch !important;
+    overflow: visible !important;
+  }
+
+  /* Grid items stretch to the same height as the taller form panel.
+     Do NOT give the story a fixed viewport height: registration can be taller. */
+  .login-page.tv-auth-2026 .login-art.tv-auth-story {
+    height: auto !important;
+    max-height: none !important;
+    min-height: 100svh !important;
+    align-self: stretch !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    gap: 28px !important;
+    padding-top: clamp(26px, 3.2vw, 48px) !important;
+    padding-bottom: clamp(26px, 3.2vw, 48px) !important;
+    background: radial-gradient(ellipse at 85% 8%, rgba(133, 175, 145, .24) 0%, transparent 52%),
+      linear-gradient(152deg, #346d58 0%, #285d4b 55%, #204d40 100%) !important;
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-story-body {
+    flex: 0 1 auto;
+    align-self: stretch;
+    padding: 0;
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-story-bottom {
+    flex: 0 0 auto;
+    margin-top: auto;
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-story h1 {
+    font-size: clamp(40px, 4vw, 67px) !important;
+    line-height: 1.08 !important;
+  }
+
+  .login-page.tv-auth-2026 .tv-auth-book-image {
+    height: clamp(132px, 18vh, 185px) !important;
+    width: min(100%, 530px);
+    margin: 0 0 18px auto;
+  }
+
+  .login-page.tv-auth-2026 .login-panel.tv-auth-panel {
+    height: auto !important;
+    max-height: none !important;
+    min-height: 100svh !important;
+    align-self: stretch !important;
+  }
+}
+
+/* Reduce heavy green tint, without losing white-text contrast, on every screen. */
+@media (max-width: 850px) {
+  .login-page.tv-auth-2026 .login-art.tv-auth-story {
+    background: linear-gradient(145deg, #346d58, #265342) !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+  }
+}
+
+/* Real image element: show the entire 559 x 260 book artwork with no cropping.
+   Replaces the old div/background-image technique. */
+.login-page.tv-auth-2026 img.tv-auth-book-image {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: 559 / 260;
+  object-fit: contain !important;
+  object-position: center !important;
+  flex: 0 0 auto !important;
+  background: none !important;
+  margin: 0 0 16px !important;
+  padding: 0 !important;
+  border-radius: 18px;
+  box-shadow: 0 12px 26px rgba(0,0,0,.14);
+}
+
+/* Keep the whole image visible, prevent the form height from stretching it. */
+@media (min-width: 851px) {
+  .login-page.tv-auth-2026 .tv-auth-story-bottom {
+    display: block !important;
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
+    margin-top: auto !important;
+  }
+  .login-page.tv-auth-2026 .tv-auth-story {
+    overflow: hidden !important;
+  }
+}
+
+/* Small screens already hide the artwork to prioritise the form. */
+@media (max-width: 850px) {
+  .login-page.tv-auth-2026 img.tv-auth-book-image {
+    display: none !important;
+  }
+}

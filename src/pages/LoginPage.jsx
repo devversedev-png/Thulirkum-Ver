@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Eye, EyeOff } from 'lucide-react'
 import './LoginOtp.css'
+import './PremiumAuth2026.css'
 
 const RESEND_SECONDS = 30
 
@@ -11,16 +12,16 @@ function cleanMobile(value) {
 }
 
 export default function LoginPage() {
-const {
-  user,
-  login,
-  register,
-  logout,
-  getOtpConfig,
-  sendOtp,
-  verifyOtp,
-  loginWithOtp,
-} = useAuth()
+  const {
+    user,
+    login,
+    register,
+    logout,
+    getOtpConfig,
+    sendOtp,
+    verifyOtp,
+    loginWithOtp,
+  } = useAuth()
   const navigate = useNavigate()
 
   // 'login' (email + password) | 'otp' (mobile OTP login) | 'register'
@@ -42,7 +43,7 @@ const {
     let active = true
     getOtpConfig()
       .then((config) => active && setOtpConfig(config))
-      .catch(() => {})
+      .catch(() => { })
     return () => {
       active = false
     }
@@ -54,27 +55,27 @@ const {
     return () => clearTimeout(timer)
   }, [cooldown])
 
-if (user?.role === 'ADMIN') {
-  return (
-    <div className="login-page">
-      <div className="login-panel">
-        <div className="login-card">
-          <h2>Administrator session detected</h2>
-          <p>
-            Please use the separate Admin website to manage your store.
-          </p>
-          <button
-            type="button"
-            className="primary-btn full big"
-            onClick={() => logout()}
-          >
-            Sign out and continue
-          </button>
+  if (user?.role === 'ADMIN') {
+    return (
+      <div className="login-page tv-auth-2026 tv-auth-admin-session">
+        <div className="login-panel tv-auth-panel">
+          <div className="login-card tv-auth-card">
+            <h2>Administrator session detected</h2>
+            <p>
+              Please use the separate Admin website to manage your store.
+            </p>
+            <button
+              type="button"
+              className="primary-btn full big"
+              onClick={() => logout()}
+            >
+              Sign out and continue
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  )
-}
+    )
+  }
   if (user) return <Navigate to="/home" replace />
 
   const registerNeedsOtp = mode === 'register' && otpConfig.requiredForRegistration
@@ -160,24 +161,57 @@ if (user?.role === 'ADMIN') {
   const lockFields = usesOtp && otpSent
 
   return (
-    <div className="login-page">
-      <div className="login-art">
-        <img src="/logo.png" alt="Thulirkum Ver Book Store" />
-        <div className="login-art-copy">
-          <span className="eyebrow">READ · LEARN · GROW</span>
-          <h1>Let Knowledge<br />Take Root.</h1>
-          <p>Discover Tamil and English books that inform, inspire and uplift.</p>
-          <div className="login-art-points"><span>✓ Genuine catalogue</span><span>✓ Secure checkout</span><span>✓ Live order tracking</span></div>
+    <main className="login-page tv-auth-2026">
+      <section className="login-art tv-auth-story" aria-label="Thulirkum Ver Book Store">
+        <div className="tv-auth-story-top">
+          <img
+            className="tv-auth-story-logo"
+            src="/logo.png"
+            alt="Thulirkum Ver Book Store"
+          />
         </div>
-        <blockquote>“A book today,<br />a better tomorrow.”</blockquote>
-      </div>
 
-      <div className="login-panel">
-        <div className="login-card">
-          <img className="login-logo" src="/logo.png" alt="Thulirkum Ver" />
-          <span className="eyebrow">{heading[0]}</span>
-          <h2>{heading[1]}</h2>
-          <p>{heading[2]}</p>
+        <div className="tv-auth-story-body">
+          <div className="tv-auth-story-kicker"><span className="tv-auth-story-line" /> A WORLD OF STORIES</div>
+          <h1>Every great journey<br /><em>begins with a book.</em></h1>
+          <p>Discover stories that stay with you. Find new perspectives, timeless classics, and your next favourite read.</p>
+          <div className="tv-auth-feature-row" aria-label="Store benefits">
+            <span><span aria-hidden="true">✧</span> Curated reads</span>
+            <span><span aria-hidden="true">✧</span> Secure checkout</span>
+            <span><span aria-hidden="true">✧</span> Made for readers</span>
+          </div>
+        </div>
+
+        <div className="tv-auth-story-bottom">
+          <img
+              className="tv-auth-book-image"
+              src="/premium/hero-books-premium.png"
+              alt="A stack of books beside a small green plant"
+              loading="eager"
+              decoding="async"
+            />
+          <div className="tv-auth-story-footer">
+            <span>THULIRKUM VER COLLECTION</span>
+            <span>READ <b>·</b> LEARN <b>·</b> GROW</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="login-panel tv-auth-panel" aria-label="Account access">
+        <div className="login-card tv-auth-card">
+          <div className="tv-auth-card-heading">
+            <div className="tv-auth-monogram"><img src="/logo-icon.jpeg" alt="" /></div>
+            <span>THULIRKUM VER <span className="tv-auth-bullet">✦</span> BOOK STORE</span>
+          </div>
+          <div className="tv-auth-mode-tabs" role="group" aria-label="Choose account action">
+            <button type="button" className={mode === 'login' || mode === 'otp' ? 'is-selected' : ''} aria-pressed={mode === 'login' || mode === 'otp'} onClick={() => switchMode('login')}>Sign in</button>
+            <button type="button" className={mode === 'register' ? 'is-selected' : ''} aria-pressed={mode === 'register'} onClick={() => switchMode('register')}>Create account</button>
+          </div>
+          <div className="tv-auth-intro">
+            <span className="eyebrow">{heading[0]}</span>
+            <h2>{heading[1]}</h2>
+            <p>{heading[2]}</p>
+          </div>
 
           <form onSubmit={submit}>
             {mode === 'register' && (
@@ -278,11 +312,15 @@ if (user?.role === 'ADMIN') {
           {mode === 'otp' && (
             <button className="text-btn login-switch" onClick={() => switchMode('login')}>Use email and password instead</button>
           )}
-          <button className="text-btn login-switch" onClick={() => switchMode(mode === 'register' ? 'login' : 'register')}>
-            {mode === 'register' ? 'Already have an account? Login' : 'New to Thulirkum Ver? Create an account'}
-          </button>
+          <div className="tv-auth-switch-note">
+            <span>{mode === 'register' ? 'Already part of our reading community?' : 'New to our reading community?'}</span>
+            <button type="button" className="text-btn login-switch" onClick={() => switchMode(mode === 'register' ? 'login' : 'register')}>
+              {mode === 'register' ? 'Sign in instead' : 'Create an account'}
+            </button>
+          </div>
+          <p className="tv-auth-privacy-note">A little space for big stories. Your reading journey starts here.</p>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   )
 }

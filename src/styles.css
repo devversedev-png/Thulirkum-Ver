@@ -26633,3 +26633,428 @@ html.desktop-fit #root {
   .tv-homepage .tv-offer-link-clean { justify-self: start; }
   .tv-offer-detail-clean { font-size: 12px; }
 }
+
+
+/* Thulirkum Ver — APK responsive cards and checkout, 2026-11-17.
+   Append ONCE at end of src/styles.css. No pricing/payment logic changes. */
+
+/* All home sections share the same book-card geometry (including cashback books). */
+.tv-home-book-row-v7 {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 16px;
+  overflow: visible;
+}
+.tv-home-book-row-v7 > * { min-width: 0; width: 100%; height: 100%; }
+.tv-home-book-row-v7 .book-card.home-ref-book-card {
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 13px;
+  border-radius: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.tv-home-book-row-v7 .home-ref-book-card .market-card-topline { flex: 0 0 auto; }
+.tv-home-book-row-v7 .home-ref-book-card .market-cover-wrap {
+  flex: 0 0 auto;
+  width: 100%;
+  height: clamp(170px, 19vw, 215px);
+  box-sizing: border-box;
+}
+.tv-home-book-row-v7 .home-ref-book-card .market-cover-wrap img { width: auto; max-width: 100%; height: 100%; max-height: 100%; object-fit: contain; }
+.tv-home-book-row-v7 .home-ref-book-card .market-book-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+.tv-home-book-row-v7 .home-ref-book-card .market-book-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  min-height: 2.65em;
+  line-height: 1.32;
+  overflow-wrap: anywhere;
+}
+.tv-home-book-row-v7 .home-ref-book-card .market-book-author {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+  min-height: 1.5em;
+}
+.tv-home-book-row-v7 .home-ref-book-card .price-line { display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; min-width: 0; }
+.tv-home-book-row-v7 .home-ref-book-card .book-cashback-note { width: 100%; max-width: 100%; box-sizing: border-box; overflow-wrap: anywhere; }
+.tv-home-book-row-v7 .home-ref-book-card .market-cart-button,
+.tv-home-book-row-v7 .home-ref-book-card .cart-control,
+.tv-home-book-row-v7 .home-ref-book-card .cart-control-v7 { width: 100%; margin-top: auto; }
+.tv-home-book-row-v7 .home-ref-book-card .market-cart-button { min-height: 43px; }
+
+@media (max-width: 1150px) {
+  .tv-home-book-row-v7 { grid-template-columns: repeat(3,minmax(0,1fr)); }
+}
+@media (max-width: 760px) {
+  .tv-home-book-row-v7 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+  .tv-home-book-row-v7 > * { flex: none; min-width: 0; }
+  .tv-home-book-row-v7 .home-ref-book-card .market-cover-wrap { height: 195px; }
+}
+@media (max-width: 540px) {
+  .tv-home-book-row-v7 { grid-template-columns: minmax(0,1fr); gap: 16px; padding: 2px 0 10px; }
+  .tv-home-book-row-v7 .book-card.home-ref-book-card { max-width: 100%; padding: 14px; }
+  .tv-home-book-row-v7 .home-ref-book-card .market-cover-wrap { height: 220px; }
+  .tv-home-book-row-v7 .home-ref-book-card .market-book-title { font-size: 16px; }
+  .tv-home-book-row-v7 .home-ref-book-card .market-book-author { font-size: 12px; }
+  .tv-home-book-row-v7 .home-ref-book-card .price-line strong { font-size: 20px; }
+}
+
+/* Checkout: prevent the 'FREE' label from splitting letter by letter. */
+.checkout-summary .checkout-free-items {
+  display: grid;
+  gap: 10px;
+  padding: 15px;
+  min-width: 0;
+  border-radius: 14px;
+}
+.checkout-summary .checkout-free-items > strong {
+  display: block;
+  min-width: 0;
+  line-height: 1.35;
+  font-size: 13px;
+  overflow-wrap: normal;
+}
+.checkout-summary .checkout-free-items > .checkout-free-book-row {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin-top: 0;
+}
+.checkout-summary .checkout-free-book-label { display: block; min-width: 0; overflow-wrap: anywhere; line-height: 1.4; }
+.checkout-summary .checkout-free-book-row .checkout-free-badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+  padding: 6px 10px;
+  min-width: 58px;
+  border-radius: 999px;
+  background: #d8f1df;
+  color: #075f3c;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+@media (max-width: 420px) {
+  .checkout-summary .checkout-free-items { padding: 12px; }
+  .checkout-summary .checkout-free-book-row .checkout-free-badge { padding: 5px 8px; min-width: 48px; }
+}
+
+/* Admin catalogue: one flexible book header + two distinct, full-width action rows. */
+.admin-shell-v6 .inventory-grid-v6,
+.inventory-grid-v6 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(min(100%,340px),1fr));
+  gap: 16px;
+  min-width: 0;
+}
+.admin-shell-v6 .inventory-card-v6,
+.inventory-card-v6 {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 84px minmax(0,1fr);
+  grid-template-rows: auto auto auto auto;
+  align-items: start;
+  gap: 12px 14px;
+  padding: 17px;
+  border: 1px solid #dce8de;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(5,54,36,.055);
+  overflow: hidden;
+}
+.inventory-card-v6 > img { grid-column: 1; grid-row: 1; width: 84px; height: 115px; object-fit: contain; border-radius: 10px; background: #f8faf6; }
+.inventory-card-v6 .inventory-info-v6 { grid-column: 2; grid-row: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.inventory-card-v6 .inventory-info-v6 > strong {
+  display: block;
+  font-size: 16px;
+  line-height: 1.3;
+  color: #123e30;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.inventory-card-v6 .inventory-info-v6 > span { display: block; font-size: 13px; line-height: 1.45; color: #506e5c; overflow-wrap: anywhere; }
+.inventory-card-v6 .inventory-info-v6 > small { display: block; font-size: 11px; color: #86938a; overflow-wrap: anywhere; }
+.inventory-card-v6 .inventory-stock-v6 {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 11px 12px;
+  border-radius: 11px;
+  background: #f2f8f3;
+  color: #255c43;
+  font-size: 13px;
+}
+.inventory-card-v6 .inventory-stock-v6 > span { font-weight: 650; }
+.inventory-card-v6 .inventory-stock-v6 > strong { font-size: 17px; color: #07573b; }
+.inventory-card-v6 .inventory-stock-v6 > small { margin-left: auto; font-size: 12px; font-weight: 700; }
+.inventory-card-v6 .inventory-stepper-v6 {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  text-align: center;
+}
+.inventory-card-v6 .inventory-stepper-v6 button {
+  width: 100%;
+  height: 43px;
+  min-width: 0;
+  padding: 0 6px;
+  border: 1px solid #d3e4d7;
+  border-radius: 10px;
+  background: #f8fbf8;
+  color: #155c3c;
+  font-size: 14px;
+  font-weight: 800;
+}
+.inventory-card-v6 .inventory-stepper-v6 button:disabled { opacity: .4; }
+.inventory-card-v6 .inventory-actions-v6 {
+  grid-column: 1 / -1;
+  grid-row: 4;
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 8px;
+  width: 100%;
+  align-self: stretch;
+}
+.inventory-card-v6 .inventory-actions-v6 button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 42px;
+  padding: 8px 7px;
+  border: 1px solid #dce7df;
+  border-radius: 10px;
+  background: #f6faf6;
+  color: #125b3e;
+  font-size: 12px;
+  line-height: 1.25;
+  font-weight: 750;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+.inventory-card-v6 .inventory-actions-v6 button.danger { background: #fff6f5; border-color: #f2d9d5; color: #a33d33; }
+.inventory-card-v6 .inventory-actions-v6 button:focus-visible,
+.inventory-card-v6 .inventory-stepper-v6 button:focus-visible { outline: 3px solid #70be9a; outline-offset: 2px; }
+@media (max-width: 600px) {
+  .admin-shell-v6 .inventory-grid-v6, .inventory-grid-v6 { grid-template-columns: minmax(0,1fr); gap: 14px; }
+  .inventory-card-v6 { padding: 13px; grid-template-columns: 72px minmax(0,1fr); gap: 10px 12px; }
+  .inventory-card-v6 > img { width: 72px; height: 100px; }
+  .inventory-card-v6 .inventory-info-v6 > strong { font-size: 15px; }
+  .inventory-card-v6 .inventory-actions-v6 button { font-size: 11px; }
+}
+@media (max-width: 360px) {
+  .inventory-card-v6 .inventory-actions-v6 { grid-template-columns: 1fr 1fr; }
+  .inventory-card-v6 .inventory-actions-v6 button:last-child { grid-column: 1 / -1; }
+}
+
+/* Admin Add/Edit Book form: readable and full-width fields on every screen. */
+.admin-shell-v6 .admin-form-grid-v6 {
+  width: 100%;
+  min-width: 0;
+  gap: 16px;
+}
+.admin-shell-v6 .admin-form-grid-v6 > label { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.admin-shell-v6 .admin-form-grid-v6 input,
+.admin-shell-v6 .admin-form-grid-v6 textarea,
+.admin-shell-v6 .admin-form-grid-v6 select {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  border-radius: 10px;
+}
+@media (max-width: 700px) {
+  .admin-shell-v6 .admin-form-grid-v6 { grid-template-columns: minmax(0,1fr); gap: 13px; }
+  .admin-shell-v6 .admin-form-grid-v6 > label,
+  .admin-shell-v6 .admin-form-grid-v6 > .wide { grid-column: 1 / -1; }
+  .admin-shell-v6 .admin-form-grid-v6 input,
+  .admin-shell-v6 .admin-form-grid-v6 textarea,
+  .admin-shell-v6 .admin-form-grid-v6 select { min-height: 44px; font-size: 16px; }
+}
+
+
+/* ===============================================
+   THULIRKUM VER — HOMEPAGE BOOK CARD FIX
+   Prevent images overlapping titles and prices
+   =============================================== */
+
+.tv-home-book-row-v7 {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  align-items: stretch;
+  gap: 18px;
+}
+
+.tv-home-book-row-v7 > * {
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.tv-home-book-row-v7 .book-card.home-ref-book-card {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 14px;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+/* Give every cover a fixed, separate area */
+.tv-home-book-row-v7 .home-ref-book-card .cover-wrap {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex: 0 0 225px !important;
+  width: 100% !important;
+  height: 225px !important;
+  min-height: 225px !important;
+  max-height: 225px !important;
+
+  padding: 12px !important;
+  margin: 10px 0 14px !important;
+
+  overflow: hidden !important;
+  background: #faf9f5;
+  border-radius: 12px;
+}
+
+/* Keep images inside their cover area */
+.tv-home-book-row-v7 .home-ref-book-card .cover-wrap img {
+  position: static !important;
+  display: block !important;
+  flex: 0 1 auto !important;
+
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+
+  object-fit: contain !important;
+  transform: none !important;
+}
+
+/* Keep book information below the image */
+.tv-home-book-row-v7 .home-ref-book-card .book-card-body {
+  position: relative;
+  z-index: 1;
+
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+
+  min-width: 0;
+  width: 100%;
+  background: #fff;
+}
+
+.tv-home-book-row-v7 .home-ref-book-card .book-title {
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+
+  min-height: 2.8em;
+  max-height: 2.8em;
+  overflow: hidden;
+
+  font-size: 16px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.tv-home-book-row-v7 .home-ref-book-card .market-book-author {
+  min-height: 20px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tv-home-book-row-v7 .home-ref-book-card .price-line {
+  min-height: 32px;
+}
+
+/* Cashback or offer labels have their own space */
+.tv-home-book-row-v7 .home-ref-book-card .book-cashback-note,
+.tv-home-book-row-v7 .home-ref-book-card .book-bogo-note {
+  flex-shrink: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+/* Cart button stays at the bottom */
+.tv-home-book-row-v7 .home-ref-book-card .market-cart-button,
+.tv-home-book-row-v7 .home-ref-book-card .cart-control {
+  margin-top: auto !important;
+  width: 100%;
+}
+
+/* Tablet */
+@media (max-width: 1100px) {
+  .tv-home-book-row-v7 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 760px) {
+  .tv-home-book-row-v7 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px;
+  }
+
+  .tv-home-book-row-v7 .home-ref-book-card .cover-wrap {
+    flex-basis: 175px !important;
+    height: 175px !important;
+    min-height: 175px !important;
+    max-height: 175px !important;
+  }
+}
+
+/* Small phones */
+@media (max-width: 390px) {
+  .tv-home-book-row-v7 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
